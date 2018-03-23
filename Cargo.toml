@@ -1,0 +1,6 @@
+[package]
+name = "rapier"
+version = "0.1.0"
+authors = ["dannypsnl <dannypsnl@gmail.com>"]
+
+[dependencies]
