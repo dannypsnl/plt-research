@@ -6,7 +6,7 @@ enum TkValue {
 #[derive(Debug, PartialEq)]
 struct Token((u32, u32), TkValue);
 
-struct Lexer {}
+pub struct Lexer {}
 
 #[cfg(test)]
 mod tests {
