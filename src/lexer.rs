@@ -6,7 +6,19 @@ enum TkValue {
 #[derive(Debug, PartialEq)]
 struct Token((u32, u32), TkValue);
 
-pub struct Lexer {}
+pub struct Lexer {
+    source: String,
+    result: Vec<Token>,
+}
+
+impl Lexer {
+    fn from<'a>(code: &'a str) -> Lexer {
+        Lexer {
+            source: String::from(code),
+            result: Vec::new(),
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -23,5 +35,11 @@ mod tests {
             Token((0, 0), TkValue::Int(3)),
             Token((0, 0), TkValue::Int(3))
         );
+    }
+
+    #[test]
+    fn create_lexer() {
+        let lexer = Lexer::from("some code");
+        assert_eq!(String::from("some code"), lexer.source);
     }
 }
