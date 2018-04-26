@@ -4,13 +4,17 @@ pub enum TkValue {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Token((u32, u32), TkValue);
+pub struct Token((i32, i32), TkValue);
 
 pub fn lex<'a>(code: &'a str) -> Vec<Token> {
     let mut tokens = Vec::<Token>::new();
+
+    let mut line = 1;
+    let mut pos = -1;
     let mut chars = code.chars();
     loop {
         if let Some(c) = chars.next() {
+            pos = pos + 1;
             if c.is_digit(10) {
                 let mut t = String::new();
                 t.push(c);
@@ -22,9 +26,10 @@ pub fn lex<'a>(code: &'a str) -> Vec<Token> {
                     }
                 }
                 if let Ok(i) = t.parse::<i32>() {
-                    tokens.push(Token((0, 0), TkValue::Int(i)));
+                    tokens.push(Token((line, pos), TkValue::Int(i)));
                 }
             }
+            pos = pos + 1;
         } else {
             break;
         }
@@ -51,12 +56,12 @@ mod tests {
 
     #[test]
     fn lex_return_tokens() {
-        assert_eq!(lex("1"), vec![Token((0, 0), TkValue::Int(1))]);
+        assert_eq!(lex("1"), vec![Token((1, 0), TkValue::Int(1))]);
         assert_eq!(
             lex("1 2"),
             vec![
-                Token((0, 0), TkValue::Int(1)),
-                Token((0, 2), TkValue::Int(2)),
+                Token((1, 0), TkValue::Int(1)),
+                Token((1, 2), TkValue::Int(2)),
             ]
         );
     }
