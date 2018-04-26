@@ -53,10 +53,10 @@ mod tests {
     fn lex_return_tokens() {
         assert_eq!(lex("1"), vec![Token((0, 0), TkValue::Int(1))]);
         assert_eq!(
-            lex("1, 2"),
+            lex("1 2"),
             vec![
                 Token((0, 0), TkValue::Int(1)),
-                Token((0, 0), TkValue::Int(2)),
+                Token((0, 2), TkValue::Int(2)),
             ]
         );
     }
