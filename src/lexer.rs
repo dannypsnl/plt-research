@@ -1,23 +1,35 @@
 #[derive(Debug, PartialEq)]
-enum TkValue {
+pub enum TkValue {
     Int(i32),
 }
 
 #[derive(Debug, PartialEq)]
-struct Token((u32, u32), TkValue);
+pub struct Token((u32, u32), TkValue);
 
-pub struct Lexer {
-    source: String,
-    result: Vec<Token>,
-}
-
-impl Lexer {
-    fn from<'a>(code: &'a str) -> Lexer {
-        Lexer {
-            source: String::from(code),
-            result: Vec::new(),
+pub fn lex<'a>(code: &'a str) -> Vec<Token> {
+    let mut tokens = Vec::<Token>::new();
+    let mut chars = code.chars();
+    loop {
+        if let Some(c) = chars.next() {
+            if c.is_digit(10) {
+                let mut t = String::new();
+                t.push(c);
+                while let Some(c) = chars.next() {
+                    if c.is_digit(10) {
+                        t.push(c);
+                    } else {
+                        break;
+                    }
+                }
+                if let Ok(i) = t.parse::<i32>() {
+                    tokens.push(Token((0, 0), TkValue::Int(i)));
+                }
+            }
+        } else {
+            break;
         }
     }
+    tokens
 }
 
 #[cfg(test)]
@@ -38,8 +50,14 @@ mod tests {
     }
 
     #[test]
-    fn create_lexer() {
-        let lexer = Lexer::from("some code");
-        assert_eq!(String::from("some code"), lexer.source);
+    fn lex_return_tokens() {
+        assert_eq!(lex("1"), vec![Token((0, 0), TkValue::Int(1))]);
+        assert_eq!(
+            lex("1, 2"),
+            vec![
+                Token((0, 0), TkValue::Int(1)),
+                Token((0, 0), TkValue::Int(2)),
+            ]
+        );
     }
 }
