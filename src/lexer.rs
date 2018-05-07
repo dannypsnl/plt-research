@@ -1,39 +1,53 @@
 #[derive(Debug, PartialEq)]
 pub enum TkValue {
+    EOF,
     Int(i32),
 }
 
 #[derive(Debug, PartialEq)]
 pub struct Token((i32, i32), TkValue);
 
-pub fn lex<'a>(code: &'a str) -> Vec<Token> {
-    let mut tokens = Vec::<Token>::new();
+struct lexer<'a> {
+    code: &'a str,
+    pos: u32,
+    line: u32,
+    index: usize,
+}
 
-    let mut line = 1;
-    let mut pos = -1;
-    let mut chars = code.chars();
-    loop {
-        if let Some(c) = chars.next() {
-            pos = pos + 1;
-            if c.is_digit(10) {
-                let mut t = String::new();
-                t.push(c);
-                while let Some(c) = chars.next() {
-                    if c.is_digit(10) {
-                        t.push(c);
-                    } else {
-                        break;
-                    }
-                }
-                if let Ok(i) = t.parse::<i32>() {
-                    tokens.push(Token((line, pos), TkValue::Int(i)));
-                }
-            }
-            pos = pos + 1;
-        } else {
-            break;
+impl<'a> lexer<'a> {
+    fn new(code: &'a str) -> lexer {
+        lexer {
+            code: code,
+            pos: 0,
+            line: 0,
+            index: 0,
         }
     }
+
+    fn next_char(&mut self) -> char {
+        self.index += 1;
+        self.code.next()
+    }
+
+    fn next(&mut self) -> Token {
+        Token((0, 0), TkValue::EOF)
+    }
+}
+
+pub fn lex<'a>(code: &'a str) -> Vec<Token> {
+    let mut tokens = Vec::<Token>::new();
+    let mut lexer = lexer::new(code);
+
+    loop {
+        let tk = lexer.next();
+        match tk {
+            Token(_, EOF) => {
+                break;
+            }
+        }
+        tokens.push(tk);
+    }
+
     tokens
 }
 
