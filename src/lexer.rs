@@ -13,7 +13,6 @@ struct lexer<'a> {
     code: str::Chars<'a>,
     pos: u32,
     line: u32,
-    index: usize,
 }
 
 impl<'a> lexer<'a> {
@@ -22,12 +21,10 @@ impl<'a> lexer<'a> {
             code: code.chars(),
             pos: 0,
             line: 0,
-            index: 0,
         }
     }
 
     fn next_char(&mut self) -> char {
-        self.index += 1;
         self.pos += 1;
         let c = self.code.next();
         if let Some(c) = c {
@@ -47,8 +44,11 @@ impl<'a> lexer<'a> {
         let c = self.next_char();
         if c == '\0' {
             self.new_token(TkValue::EOF)
+        } else if c.is_digit(10) {
+            println!("number");
+            self.new_token(TkValue::Int(10))
         } else {
-            self.new_token(TkValue::Int(0))
+            self.new_token(TkValue::EOF)
         }
     }
 }
@@ -60,9 +60,10 @@ pub fn lex<'a>(code: &'a str) -> Vec<Token> {
     loop {
         let tk = lexer.next();
         match tk {
-            Token(_, EOF) => {
+            Token(_, TkValue::EOF) => {
                 break;
             }
+            _ => (),
         }
         tokens.push(tk);
     }
