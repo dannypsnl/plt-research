@@ -46,7 +46,7 @@ impl<'a> lexer<'a> {
             self.new_token(TkValue::EOF)
         } else if c.is_digit(10) {
             println!("number");
-            self.new_token(TkValue::Num(10))
+            self.new_token(TkValue::Num(10.0))
         } else {
             self.new_token(TkValue::EOF)
         }
@@ -78,20 +78,20 @@ mod tests {
 
     #[test]
     fn compare_tkvalue() {
-        assert_eq!(Num(10), Num(10));
+        assert_eq!(Num(10.0), Num(10.0));
     }
 
     #[test]
     fn compare_token() {
-        assert_eq!(Token((0, 0), Num(3)), Token((0, 0), Num(3)));
+        assert_eq!(Token((0, 0), Num(3.0)), Token((0, 0), Num(3.0)));
     }
 
     #[test]
     fn lex_return_tokens() {
-        assert_eq!(lex("1"), vec![Token((1, 0), Num(1))]);
+        assert_eq!(lex("1"), vec![Token((1, 0), Num(1.0))]);
         assert_eq!(
             lex("1 2"),
-            vec![Token((1, 0), Num(1)), Token((1, 2), Num(2))]
+            vec![Token((1, 0), Num(1.0)), Token((1, 2), Num(2.0))]
         );
     }
 }
