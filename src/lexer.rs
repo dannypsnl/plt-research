@@ -1,7 +1,7 @@
 #[derive(Debug, PartialEq)]
 pub enum TkValue {
     EOF,
-    Int(i32),
+    Num(f64),
 }
 
 #[derive(Debug, PartialEq)]
@@ -46,7 +46,7 @@ impl<'a> lexer<'a> {
             self.new_token(TkValue::EOF)
         } else if c.is_digit(10) {
             println!("number");
-            self.new_token(TkValue::Int(10))
+            self.new_token(TkValue::Num(10))
         } else {
             self.new_token(TkValue::EOF)
         }
@@ -74,24 +74,24 @@ pub fn lex<'a>(code: &'a str) -> Vec<Token> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use self::TkValue::Int;
+    use self::TkValue::Num;
 
     #[test]
     fn compare_tkvalue() {
-        assert_eq!(Int(10), Int(10));
+        assert_eq!(Num(10), Num(10));
     }
 
     #[test]
     fn compare_token() {
-        assert_eq!(Token((0, 0), Int(3)), Token((0, 0), Int(3)));
+        assert_eq!(Token((0, 0), Num(3)), Token((0, 0), Num(3)));
     }
 
     #[test]
     fn lex_return_tokens() {
-        assert_eq!(lex("1"), vec![Token((1, 0), Int(1))]);
+        assert_eq!(lex("1"), vec![Token((1, 0), Num(1))]);
         assert_eq!(
             lex("1 2"),
-            vec![Token((1, 0), Int(1)), Token((1, 2), Int(2))]
+            vec![Token((1, 0), Num(1)), Token((1, 2), Num(2))]
         );
     }
 }
