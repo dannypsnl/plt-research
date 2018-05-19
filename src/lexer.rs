@@ -5,10 +5,12 @@ pub enum TkValue {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Token((i32, i32), TkValue);
+pub struct Token((u32, u32), TkValue);
+
+use std::str;
 
 struct lexer<'a> {
-    code: &'a str,
+    code: str::Chars<'a>,
     pos: u32,
     line: u32,
     index: usize,
@@ -17,7 +19,7 @@ struct lexer<'a> {
 impl<'a> lexer<'a> {
     fn new(code: &'a str) -> lexer {
         lexer {
-            code: code,
+            code: code.chars(),
             pos: 0,
             line: 0,
             index: 0,
@@ -26,11 +28,28 @@ impl<'a> lexer<'a> {
 
     fn next_char(&mut self) -> char {
         self.index += 1;
-        self.code.next()
+        self.pos += 1;
+        let c = self.code.next();
+        if let Some(c) = c {
+            if c == '\n' {
+                self.line += 1;
+            }
+            c
+        } else {
+            '\0'
+        }
+    }
+    fn new_token(&mut self, typ: TkValue) -> Token {
+        Token((self.pos, self.line), typ)
     }
 
     fn next(&mut self) -> Token {
-        Token((0, 0), TkValue::EOF)
+        let c = self.next_char();
+        if c == '\0' {
+            self.new_token(TkValue::EOF)
+        } else {
+            self.new_token(TkValue::Int(0))
+        }
     }
 }
 
