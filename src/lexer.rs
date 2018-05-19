@@ -27,9 +27,9 @@ impl<'a> Lexer<'a> {
     }
 
     fn next_char(&mut self) -> char {
-        self.pos += 1;
         let c = self.code.next();
         if let Some(c) = c {
+            self.pos += 1;
             if c == '\n' {
                 self.line += 1;
             }
@@ -55,6 +55,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn get_number(&mut self) -> Token {
+        let at = (self.pos, self.line);
         let mut tmp: String = String::new();
         tmp.push(self.cur);
 
@@ -63,13 +64,9 @@ impl<'a> Lexer<'a> {
             tmp.push(c);
             c = self.next_char();
         }
-        if c == '\0' {
-            self.new_token(TkValue::EOF)
-        } else {
-            match tmp.parse::<f64>() {
-                Ok(num) => self.new_token(TkValue::Num(num)),
-                Err(_) => self.new_token(TkValue::EOF),
-            }
+        match tmp.parse::<f64>() {
+            Ok(num) => Token(at, TkValue::Num(num)),
+            Err(_) => self.new_token(TkValue::EOF),
         }
     }
 }
@@ -112,7 +109,7 @@ mod tests {
         assert_eq!(lex("1"), vec![Token((1, 0), Num(1.0))]);
         assert_eq!(
             lex("1 2"),
-            vec![Token((1, 0), Num(1.0)), Token((1, 2), Num(2.0))]
+            vec![Token((1, 0), Num(1.0)), Token((3, 0), Num(2.0))]
         );
     }
 }
