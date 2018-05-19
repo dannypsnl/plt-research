@@ -26,7 +26,7 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    fn next_char(&mut self) -> char {
+    fn next_char(&mut self) {
         let c = self.code.next();
         if let Some(c) = c {
             self.pos += 1;
@@ -34,9 +34,8 @@ impl<'a> Lexer<'a> {
                 self.line += 1;
             }
             self.cur = c;
-            c
         } else {
-            '\0'
+            self.cur = '\0';
         }
     }
     fn new_token(&mut self, typ: TkValue) -> Token {
@@ -44,7 +43,8 @@ impl<'a> Lexer<'a> {
     }
 
     fn next(&mut self) -> Token {
-        let c = self.next_char();
+        self.next_char();
+        let c = self.cur;
         if c == '\0' {
             self.new_token(TkValue::EOF)
         } else if c.is_digit(10) {
@@ -59,10 +59,10 @@ impl<'a> Lexer<'a> {
         let mut tmp: String = String::new();
         tmp.push(self.cur);
 
-        let mut c = self.next_char();
-        while c.is_digit(10) {
-            tmp.push(c);
-            c = self.next_char();
+        self.next_char();
+        while self.cur.is_digit(10) {
+            tmp.push(self.cur);
+            self.next_char();
         }
         match tmp.parse::<f64>() {
             Ok(num) => Token(at, TkValue::Num(num)),
