@@ -74,29 +74,24 @@ pub fn lex<'a>(code: &'a str) -> Vec<Token> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use self::TkValue::Int;
 
     #[test]
     fn compare_tkvalue() {
-        assert_eq!(TkValue::Int(10), TkValue::Int(10));
+        assert_eq!(Int(10), Int(10));
     }
 
     #[test]
     fn compare_token() {
-        assert_eq!(
-            Token((0, 0), TkValue::Int(3)),
-            Token((0, 0), TkValue::Int(3))
-        );
+        assert_eq!(Token((0, 0), Int(3)), Token((0, 0), Int(3)));
     }
 
     #[test]
     fn lex_return_tokens() {
-        assert_eq!(lex("1"), vec![Token((1, 0), TkValue::Int(1))]);
+        assert_eq!(lex("1"), vec![Token((1, 0), Int(1))]);
         assert_eq!(
             lex("1 2"),
-            vec![
-                Token((1, 0), TkValue::Int(1)),
-                Token((1, 2), TkValue::Int(2)),
-            ]
+            vec![Token((1, 0), Int(1)), Token((1, 2), Int(2))]
         );
     }
 }
