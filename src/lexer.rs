@@ -13,6 +13,7 @@ struct Lexer<'a> {
     code: str::Chars<'a>,
     pos: u32,
     line: u32,
+    cur: char,
 }
 
 impl<'a> Lexer<'a> {
@@ -21,6 +22,7 @@ impl<'a> Lexer<'a> {
             code: code.chars(),
             pos: 0,
             line: 0,
+            cur: '\0',
         }
     }
 
@@ -31,6 +33,7 @@ impl<'a> Lexer<'a> {
             if c == '\n' {
                 self.line += 1;
             }
+            self.cur = c;
             c
         } else {
             '\0'
@@ -45,10 +48,28 @@ impl<'a> Lexer<'a> {
         if c == '\0' {
             self.new_token(TkValue::EOF)
         } else if c.is_digit(10) {
-            println!("number");
-            self.new_token(TkValue::Num(10.0))
+            self.get_number()
         } else {
             self.new_token(TkValue::EOF)
+        }
+    }
+
+    fn get_number(&mut self) -> Token {
+        let mut tmp: String = String::new();
+        tmp.push(self.cur);
+
+        let mut c = self.next_char();
+        while c.is_digit(10) {
+            tmp.push(c);
+            c = self.next_char();
+        }
+        if c == '\0' {
+            self.new_token(TkValue::EOF)
+        } else {
+            match tmp.parse::<f64>() {
+                Ok(num) => self.new_token(TkValue::Num(num)),
+                Err(_) => self.new_token(TkValue::EOF),
+            }
         }
     }
 }
