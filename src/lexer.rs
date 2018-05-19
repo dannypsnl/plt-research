@@ -9,15 +9,15 @@ pub struct Token((u32, u32), TkValue);
 
 use std::str;
 
-struct lexer<'a> {
+struct Lexer<'a> {
     code: str::Chars<'a>,
     pos: u32,
     line: u32,
 }
 
-impl<'a> lexer<'a> {
-    fn new(code: &'a str) -> lexer {
-        lexer {
+impl<'a> Lexer<'a> {
+    fn new(code: &'a str) -> Lexer {
+        Lexer {
             code: code.chars(),
             pos: 0,
             line: 0,
@@ -55,7 +55,7 @@ impl<'a> lexer<'a> {
 
 pub fn lex<'a>(code: &'a str) -> Vec<Token> {
     let mut tokens = Vec::<Token>::new();
-    let mut lexer = lexer::new(code);
+    let mut lexer = Lexer::new(code);
 
     loop {
         let tk = lexer.next();
