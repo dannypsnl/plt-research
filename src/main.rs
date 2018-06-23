@@ -2,7 +2,7 @@ mod lexer;
 mod parser;
 
 fn main() {
-    // let lexer = lexer::Lexer::new();
+    let res = lexer::lex("abc");
+    println!("Lex result: {:?}", res);
     // let parser = parser::Parser::new();
-    println!("Hello, world!");
 }
