@@ -65,11 +65,14 @@ impl Lexer {
 }
 
 fn whitespace(lexer: &mut Lexer) -> StateFn {
-    while let Some(c) = lexer.next() {
-        if c != ' ' || c != '\n' {
+    while let Some(c) = lexer.peek() {
+        if c == ' ' || c == '\n' {
+            lexer.next();
+        } else {
             break;
         }
     }
+    lexer.ignore();
 
     match lexer.peek() {
         Some(_c @ '0'...'9') => StateFn::Some(number),
@@ -104,7 +107,7 @@ mod tests {
 
     #[test]
     fn compare_tkvalue() {
-        let ts = lex("10");
+        let ts = lex(" 10");
         assert_eq!(ts, vec![Token((1,0), Num, "10".to_string())]);
     }
 }
