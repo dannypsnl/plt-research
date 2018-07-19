@@ -1,115 +1,110 @@
 #[derive(Debug, PartialEq)]
-pub enum TkValue {
+pub enum TkType {
     EOF,
-    Num(f64),
+    Num,
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Token((u32, u32), TkValue);
+pub struct Token((u32, u32), TkType, String);
 
-use std::str;
+enum StateFn {
+    Some(fn(&mut Lexer) -> StateFn),
+    EOF,
+}
 
-struct Lexer<'a> {
-    code: str::Chars<'a>,
+struct Lexer {
+    code: String,
+    tokens: Vec<Token>,
+    state_fn: StateFn,
+    start: usize,
+    offset: usize,
+    // (line, pos) represent the position for user
     pos: u32,
     line: u32,
-    cur: char,
 }
 
-impl<'a> Lexer<'a> {
-    fn new(code: &'a str) -> Lexer {
+impl Lexer {
+    fn new(code: String) -> Lexer {
         Lexer {
-            code: code.chars(),
+            code: code,
+            tokens: vec![],
+            state_fn: StateFn::Some(whitespace),
+            start: 0,
+            offset: 0,
             pos: 0,
-            line: 0,
-            cur: '\0',
+            line: 1,
         }
     }
 
-    fn next_char(&mut self) {
-        let c = self.code.next();
-        if let Some(c) = c {
-            self.pos += 1;
-            if c == '\n' {
+    fn ignore(&mut self) {
+        self.start = self.offset;
+    }
+    fn peek(&self) -> Option<char> {
+        self.code.chars().nth(self.offset)
+    }
+    fn next(&mut self) -> Option<char> {
+        self.offset += 1;
+        let c = self.code.chars().nth(self.offset);
+        match c {
+            Some('\n') => {
+                self.pos = 0;
                 self.line += 1;
+                c
             }
-            self.cur = c;
-        } else {
-            self.cur = '\0';
+            _ => c,
         }
     }
-    fn new_token(&mut self, typ: TkValue) -> Token {
-        Token((self.pos, self.line), typ)
-    }
-
-    fn next(&mut self) -> Token {
-        self.next_char();
-        let c = self.cur;
-        if c == '\0' {
-            self.new_token(TkValue::EOF)
-        } else if c.is_digit(10) {
-            self.get_number()
-        } else {
-            self.new_token(TkValue::EOF)
+    fn emit(&mut self, token_type: TkType) {
+        unsafe {
+            let s = self.code.get_unchecked(self.start..self.offset);
+            self.tokens
+                .push(Token((self.line, self.pos), token_type, s.to_string()));
         }
-    }
-
-    fn get_number(&mut self) -> Token {
-        let at = (self.pos, self.line);
-        let mut tmp: String = String::new();
-        tmp.push(self.cur);
-
-        self.next_char();
-        while self.cur.is_digit(10) {
-            tmp.push(self.cur);
-            self.next_char();
-        }
-        match tmp.parse::<f64>() {
-            Ok(num) => Token(at, TkValue::Num(num)),
-            Err(_) => self.new_token(TkValue::EOF),
-        }
+        self.ignore();
     }
 }
 
-pub fn lex<'a>(code: &'a str) -> Vec<Token> {
-    let mut tokens = Vec::<Token>::new();
-    let mut lexer = Lexer::new(code);
-
-    loop {
-        let tk = lexer.next();
-        match tk {
-            Token(_, TkValue::EOF) => {
-                break;
-            }
-            _ => (),
+fn whitespace(lexer: &mut Lexer) -> StateFn {
+    while let Some(c) = lexer.next() {
+        if c != ' ' || c != '\n' {
+            break;
         }
-        tokens.push(tk);
     }
 
-    tokens
+    match lexer.peek() {
+        Some(_c @ '0'...'9') => StateFn::Some(number),
+        None => StateFn::EOF,
+        _ => StateFn::Some(whitespace)
+    }
+}
+
+fn number(lexer: &mut Lexer) -> StateFn {
+    println!("{:?}", lexer.peek());
+    while let Some(c) = lexer.next() {
+        if !c.is_digit(10) {
+            break;
+        }
+    }
+    lexer.emit(TkType::Num);
+    StateFn::Some(whitespace)
+}
+
+fn lex<'a>(source: &'a str) -> Vec<Token> {
+    let mut lexer = Lexer::new(source.to_string());
+    while let StateFn::Some(f) = lexer.state_fn {
+        lexer.state_fn = f(&mut lexer);
+    }
+    lexer.tokens
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use self::TkValue::Num;
+    use self::TkType::{Num};
 
     #[test]
     fn compare_tkvalue() {
-        assert_eq!(Num(10.0), Num(10.0));
-    }
-
-    #[test]
-    fn compare_token() {
-        assert_eq!(Token((0, 0), Num(3.0)), Token((0, 0), Num(3.0)));
-    }
-
-    #[test]
-    fn lex_return_tokens() {
-        assert_eq!(lex("1"), vec![Token((1, 0), Num(1.0))]);
-        assert_eq!(
-            lex("1 2"),
-            vec![Token((1, 0), Num(1.0)), Token((3, 0), Num(2.0))]
-        );
+        let ts = lex("10");
+        assert_eq!(ts, vec![Token((1,0), Num, "10".to_string())]);
     }
 }
