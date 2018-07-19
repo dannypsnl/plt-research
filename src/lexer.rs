@@ -7,15 +7,15 @@ pub enum TkType {
 #[derive(Debug, PartialEq)]
 pub struct Token((u32, u32), TkType, String);
 
-enum StateFn {
-    Some(fn(&mut Lexer) -> StateFn),
+enum State {
+    Fn(fn(&mut Lexer) -> State),
     EOF,
 }
 
 struct Lexer {
     code: String,
     tokens: Vec<Token>,
-    state_fn: StateFn,
+    state_fn: State,
     start: usize,
     offset: usize,
     // (line, pos) represent the position for user
@@ -28,7 +28,7 @@ impl Lexer {
         Lexer {
             code: code,
             tokens: vec![],
-            state_fn: StateFn::Some(whitespace),
+            state_fn: State::Fn(whitespace),
             start: 0,
             offset: 0,
             pos: 0,
@@ -64,7 +64,7 @@ impl Lexer {
     }
 }
 
-fn whitespace(lexer: &mut Lexer) -> StateFn {
+fn whitespace(lexer: &mut Lexer) -> State {
     while let Some(c) = lexer.peek() {
         if c == ' ' || c == '\n' {
             lexer.next();
@@ -75,13 +75,13 @@ fn whitespace(lexer: &mut Lexer) -> StateFn {
     lexer.ignore();
 
     match lexer.peek() {
-        Some(_c @ '0'...'9') => StateFn::Some(number),
-        None => StateFn::EOF,
-        _ => StateFn::Some(whitespace)
+        Some(_c @ '0'...'9') => State::Fn(number),
+        None => State::EOF,
+        _ => State::Fn(whitespace)
     }
 }
 
-fn number(lexer: &mut Lexer) -> StateFn {
+fn number(lexer: &mut Lexer) -> State {
     println!("{:?}", lexer.peek());
     while let Some(c) = lexer.next() {
         if !c.is_digit(10) {
@@ -89,12 +89,12 @@ fn number(lexer: &mut Lexer) -> StateFn {
         }
     }
     lexer.emit(TkType::Num);
-    StateFn::Some(whitespace)
+    State::Fn(whitespace)
 }
 
 fn lex<'a>(source: &'a str) -> Vec<Token> {
     let mut lexer = Lexer::new(source.to_string());
-    while let StateFn::Some(f) = lexer.state_fn {
+    while let State::Fn(f) = lexer.state_fn {
         lexer.state_fn = f(&mut lexer);
     }
     lexer.tokens
