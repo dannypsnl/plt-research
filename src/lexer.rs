@@ -37,6 +37,7 @@ impl Lexer {
     }
 
     fn ignore(&mut self) {
+        self.pos += (self.offset - self.start) as u32;
         self.start = self.offset;
     }
     fn peek(&self) -> Option<char> {
@@ -108,6 +109,6 @@ mod tests {
     #[test]
     fn compare_tkvalue() {
         let ts = lex(" 10");
-        assert_eq!(ts, vec![Token((1,0), Num, "10".to_string())]);
+        assert_eq!(ts, vec![Token((1,1), Num, "10".to_string())]);
     }
 }
