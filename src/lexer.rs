@@ -1,6 +1,5 @@
 #[derive(Debug, PartialEq)]
 pub enum TkType {
-    EOF,
     Num,
 }
 
@@ -78,7 +77,7 @@ fn whitespace(lexer: &mut Lexer) -> State {
     match lexer.peek() {
         Some(_c @ '0'...'9') => State::Fn(number),
         None => State::EOF,
-        _ => State::Fn(whitespace)
+        _ => State::Fn(whitespace),
     }
 }
 
@@ -103,12 +102,18 @@ fn lex<'a>(source: &'a str) -> Vec<Token> {
 
 #[cfg(test)]
 mod tests {
+    use self::TkType::Num;
     use super::*;
-    use self::TkType::{Num};
 
     #[test]
-    fn compare_tkvalue() {
-        let ts = lex(" 10");
-        assert_eq!(ts, vec![Token((1,1), Num, "10".to_string())]);
+    fn get_number_tokens() {
+        let ts = lex("10 30");
+        assert_eq!(
+            ts,
+            vec![
+                Token((1, 0), Num, "10".to_string()),
+                Token((1, 3), Num, "30".to_string()),
+            ]
+        );
     }
 }
