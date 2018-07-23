@@ -1,5 +1,6 @@
 #[derive(Debug, PartialEq)]
 pub enum TkType {
+    Ident,
     Num,
 }
 
@@ -76,13 +77,24 @@ fn whitespace(lexer: &mut Lexer) -> State {
 
     match lexer.peek() {
         Some(_c @ '0'...'9') => State::Fn(number),
+        Some(_c @ 'a'...'z') => State::Fn(ident),
+        Some(_c @ 'A'...'Z') => State::Fn(ident),
         None => State::EOF,
         _ => State::Fn(whitespace),
     }
 }
 
+fn ident(lexer: &mut Lexer) -> State {
+    while let Some(c) = lexer.next() {
+        if !c.is_alphanumeric() {
+            break;
+        }
+    }
+    lexer.emit(TkType::Ident);
+    State::Fn(whitespace)
+}
+
 fn number(lexer: &mut Lexer) -> State {
-    println!("{:?}", lexer.peek());
     while let Some(c) = lexer.next() {
         if !c.is_digit(10) {
             break;
@@ -102,7 +114,7 @@ fn lex<'a>(source: &'a str) -> Vec<Token> {
 
 #[cfg(test)]
 mod tests {
-    use self::TkType::Num;
+    use self::TkType::*;
     use super::*;
 
     #[test]
@@ -115,5 +127,11 @@ mod tests {
                 Token((1, 3), Num, "30".to_string()),
             ]
         );
+    }
+
+    #[test]
+    fn get_ident_tokens() {
+        let ts = lex(" abc6");
+        assert_eq!(ts, vec![Token((1, 1), Ident, "abc6".to_string())])
     }
 }
