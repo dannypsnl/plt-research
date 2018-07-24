@@ -104,7 +104,7 @@ fn number(lexer: &mut Lexer) -> State {
     State::Fn(whitespace)
 }
 
-fn lex<'a>(source: &'a str) -> Vec<Token> {
+pub fn lex<'a>(source: &'a str) -> Vec<Token> {
     let mut lexer = Lexer::new(source.to_string());
     while let State::Fn(f) = lexer.state_fn {
         lexer.state_fn = f(&mut lexer);
