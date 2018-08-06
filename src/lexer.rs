@@ -122,7 +122,7 @@ pub fn lex<'a>(source: &'a str) -> Vec<Token> {
     while let State::Fn(f) = lexer.state_fn {
         lexer.state_fn = f(&mut lexer);
     }
-    lexer.emit(TkType::EOF)
+    lexer.emit(TkType::EOF);
     lexer.tokens
 }
 
@@ -139,6 +139,7 @@ mod tests {
             vec![
                 Token((1, 0), Num, "10".to_string()),
                 Token((1, 3), Num, "30".to_string()),
+                Token((1, 5), EOF, "".to_string()),
             ]
         );
     }
@@ -146,6 +147,9 @@ mod tests {
     #[test]
     fn get_ident_tokens() {
         let ts = lex(" abc6");
-        assert_eq!(ts, vec![Token((1, 1), Ident, "abc6".to_string())])
+        assert_eq!(ts, vec![
+                   Token((1, 1), Ident, "abc6".to_string()),
+                   Token((1, 5), EOF, "".to_string()),
+        ])
     }
 }

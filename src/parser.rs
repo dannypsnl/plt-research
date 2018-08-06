@@ -30,7 +30,7 @@ impl Parser {
 
     fn program(&mut self) {
         let token = self.peek(0);
-        while token.tk_type() != TkType::EOF {}
+        while *token.tk_type() != TkType::EOF {}
     }
 }
 
