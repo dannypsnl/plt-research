@@ -1,11 +1,24 @@
 #[derive(Debug, PartialEq)]
 pub enum TkType {
+    EOF,
     Ident,
     Num,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct Token((u32, u32), TkType, String);
+
+impl Token {
+    pub fn location(&self) -> &(u32,u32) {
+        &self.0
+    }
+    pub fn tk_type(&self) -> &TkType {
+        &self.1
+    }
+    pub fn value(&self) -> &String {
+        &self.2
+    }
+}
 
 enum State {
     Fn(fn(&mut Lexer) -> State),
@@ -109,6 +122,7 @@ pub fn lex<'a>(source: &'a str) -> Vec<Token> {
     while let State::Fn(f) = lexer.state_fn {
         lexer.state_fn = f(&mut lexer);
     }
+    lexer.emit(TkType::EOF)
     lexer.tokens
 }
 
