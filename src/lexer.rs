@@ -1,8 +1,9 @@
 #[derive(Debug, PartialEq)]
 pub enum TkType {
     EOF,
-    Ident,
-    Num,
+    Ident, // e.g. a, ab, foo
+    Match, // =
+    Num, // e.g. 1, 10, 34
 }
 
 #[derive(Debug, PartialEq)]
@@ -93,7 +94,7 @@ fn whitespace(lexer: &mut Lexer) -> State {
         Some(_c @ 'a'...'z') => State::Fn(ident),
         Some(_c @ 'A'...'Z') => State::Fn(ident),
         None => State::EOF,
-        _ => State::Fn(whitespace),
+        Some(c) => panic!("Not implemented for {} yet", c),
     }
 }
 

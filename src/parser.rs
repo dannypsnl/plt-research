@@ -9,7 +9,8 @@
 // [add: x, y]     # function call
 // |x| {x+1}       # lambda
 
-use super::lexer::{TkType, Token, lex};
+use super::lexer;
+use super::lexer::{TkType, Token};
 
 struct Parser {
     tokens: Vec<Token>,
@@ -28,15 +29,26 @@ impl Parser {
         &self.tokens[self.offset+n]
     }
 
-    fn program(&mut self) {
-        let token = self.peek(0);
-        while *token.tk_type() != TkType::EOF {}
+    fn matched(&self, token_type: &TkType, expected_type: TkType) -> bool {
+        *token_type == expected_type
     }
+}
+
+// ident = expression
+// TODO: using Num now instead of expression, because haven't implement it
+fn binding(parser: &mut Parser) {
+    let token = parser.peek(0);
+    parser.matched(token.tk_type(), TkType::Ident);
+    let token = parser.peek(1);
+    parser.matched(token.tk_type(), TkType::Match);
+    let token = parser.peek(2);
+    parser.matched(token.tk_type(), TkType::Num);
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::lexer::lex;
 
     #[test]
     fn new_parser() {
