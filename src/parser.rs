@@ -26,7 +26,7 @@ impl Parser {
     }
 
     fn peek(&self, n: usize) -> &Token {
-        &self.tokens[self.offset+n]
+        &self.tokens[self.offset + n]
     }
 
     fn matched(&self, token_type: &TkType, expected_type: TkType) -> bool {
@@ -47,8 +47,8 @@ fn binding(parser: &mut Parser) {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::lexer::lex;
+    use super::*;
 
     #[test]
     fn new_parser() {

@@ -3,14 +3,14 @@ pub enum TkType {
     EOF,
     Ident, // e.g. a, ab, foo
     Match, // =
-    Num, // e.g. 1, 10, 34
+    Num,   // e.g. 1, 10, 34
 }
 
 #[derive(Debug, PartialEq)]
 pub struct Token((u32, u32), TkType, String);
 
 impl Token {
-    pub fn location(&self) -> &(u32,u32) {
+    pub fn location(&self) -> &(u32, u32) {
         &self.0
     }
     pub fn tk_type(&self) -> &TkType {
@@ -148,9 +148,12 @@ mod tests {
     #[test]
     fn get_ident_tokens() {
         let ts = lex(" abc6");
-        assert_eq!(ts, vec![
-                   Token((1, 1), Ident, "abc6".to_string()),
-                   Token((1, 5), EOF, "".to_string()),
-        ])
+        assert_eq!(
+            ts,
+            vec![
+                Token((1, 1), Ident, "abc6".to_string()),
+                Token((1, 5), EOF, "".to_string()),
+            ]
+        )
     }
 }
