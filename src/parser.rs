@@ -52,9 +52,7 @@ mod tests {
 
     #[test]
     fn new_parser() {
-        let parser = Parser::from(lex("lalala"));
-        let token = &parser.tokens[0];
-        assert_eq!(*token.location(), (1, 0));
-        assert_eq!(*token.value(), "lalala".to_string());
+        let mut parser = Parser::from(lex("a = 1"));
+        binding(&mut parser);
     }
 }

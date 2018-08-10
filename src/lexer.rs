@@ -93,9 +93,16 @@ fn whitespace(lexer: &mut Lexer) -> State {
         Some(_c @ '0'...'9') => State::Fn(number),
         Some(_c @ 'a'...'z') => State::Fn(ident),
         Some(_c @ 'A'...'Z') => State::Fn(ident),
+        Some('=') => State::Fn(match_symbol),
         None => State::EOF,
         Some(c) => panic!("Not implemented for {} yet", c),
     }
+}
+
+fn match_symbol(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::Match);
+    lexer.next();
+    State::Fn(whitespace)
 }
 
 fn ident(lexer: &mut Lexer) -> State {
