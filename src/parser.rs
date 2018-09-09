@@ -17,6 +17,7 @@ struct Parser {
     offset: usize,
 }
 
+// Parsing helper
 impl Parser {
     fn from(tokens: Vec<Token>) -> Parser {
         Parser {
@@ -34,15 +35,38 @@ impl Parser {
     }
 }
 
+struct AstTree {
+    rules: Vec<Binding>,
+}
+// AST emit helper
+impl AstTree {
+    fn new() -> AstTree {
+        AstTree { rules: Vec::new() }
+    }
+    fn add_binding(&mut self, b: Binding) {
+        self.rules.push(b);
+    }
+}
+
+struct Binding((u32, u32), String, Num);
+struct Num((u32, u32), String);
 // ident = expression
 // TODO: using Num now instead of expression, because haven't implement it
-fn binding(parser: &mut Parser) {
-    let token = parser.peek(0);
-    parser.matched(token.tk_type(), TkType::Ident);
-    let token = parser.peek(1);
-    parser.matched(token.tk_type(), TkType::Match);
-    let token = parser.peek(2);
-    parser.matched(token.tk_type(), TkType::Num);
+fn binding(parser: &Parser, astTree: &mut AstTree) {
+    let token1 = parser.peek(0);
+    let r0 = parser.matched(token1.tk_type(), TkType::Ident);
+    let token2 = parser.peek(1);
+    let r1 = parser.matched(token2.tk_type(), TkType::Match);
+    let token3 = parser.peek(2);
+    let r2 = parser.matched(token3.tk_type(), TkType::Num);
+
+    if r0 && r1 && r2 {
+        astTree.add_binding(Binding(
+            token1.location(),
+            token1.value(),
+            Num(token3.location(), token3.value()),
+        ));
+    }
 }
 
 #[cfg(test)]
@@ -52,7 +76,9 @@ mod tests {
 
     #[test]
     fn new_parser() {
-        let mut parser = Parser::from(lex("a = 1"));
-        binding(&mut parser);
+        let mut tree = AstTree::new();
+        let parser = Parser::from(lex("a = 1"));
+        binding(&parser, &mut tree);
+        assert_eq!(tree.rules.len(), 1);
     }
 }

@@ -10,14 +10,14 @@ pub enum TkType {
 pub struct Token((u32, u32), TkType, String);
 
 impl Token {
-    pub fn location(&self) -> &(u32, u32) {
-        &self.0
+    pub fn location(&self) -> (u32, u32) {
+        self.0
     }
     pub fn tk_type(&self) -> &TkType {
         &self.1
     }
-    pub fn value(&self) -> &String {
-        &self.2
+    pub fn value(&self) -> String {
+        self.2.clone()
     }
 }
 
