@@ -46,19 +46,62 @@ impl Parser {
     }
 }
 
+// int, int*
+fn parse_type(parser: &mut Parser) -> Result<Type, ParseError> {
+    if parser.predict(vec![TkType::Ident]) != -1 {
+        return Err(ParseError {});
+    }
+    if parser.predict(vec![TkType::Ident, TkType::Pointer]) == -1 {
+        let r = Ok(Type(true, parser.take().value()));
+        parser.drop();
+        return r;
+    }
+    Ok(Type(false, parser.take().value()))
+}
+fn parse_parameters(parser: &mut Parser) -> Result<Vec<Parameter>, ParseError> {
+    let mut params = vec![];
+    loop {
+        let t = parse_type(parser);
+        if t.is_err() {
+            return Err(t.unwrap_err());
+        }
+        if parser.predict(vec![TkType::Ident, TkType::Comma]) == -1 {
+            params.push(Parameter(t.unwrap(), parser.take().value()));
+            parser.drop();
+        } else if parser.predict(vec![TkType::Ident, TkType::RParen]) == -1 {
+            params.push(Parameter(t.unwrap(), parser.take().value()));
+            parser.drop();
+            break;
+        } else {
+            return Err(ParseError {});
+        }
+    }
+    Ok(params)
+}
 // int add(int i, int j);
 //
 // int add(int i, int j) {
 //   return i + j;
 // }
 fn parse_function(parser: &mut Parser) -> Result<Top, ParseError> {
-    if parser.predict(vec![TkType::Ident, TkType::Ident, TkType::LParen]) != -1 {
+    let typ = parse_type(parser);
+    if typ.is_err() {
+        return Err(typ.unwrap_err());
+    }
+    if parser.predict(vec![TkType::Ident, TkType::LParen]) != -1 {
         return Err(ParseError {});
     }
-    let return_type = parser.take();
     let function_name = parser.take();
-    parser.drop();
-    Ok(Top::Func(return_type.value(), function_name.value()))
+    parser.drop(); // drop Left Parent: (
+    let params = parse_parameters(parser);
+    if params.is_err() {
+        return Err(params.unwrap_err());
+    }
+    Ok(Top::Func(
+        typ.unwrap(),
+        function_name.value(),
+        params.unwrap(),
+    ))
 }
 
 #[cfg(test)]
@@ -68,9 +111,19 @@ mod tests {
 
     #[test]
     fn function_parse() {
-        let p = &mut Parser::from(lex("int add()"));
+        let p = &mut Parser::from(lex("int add(int x, int y)"));
         let r = parse_function(p);
-        assert_eq!(r.unwrap(), Top::Func("int".to_string(), "add".to_string()));
+        assert_eq!(
+            r.unwrap(),
+            Top::Func(
+                Type(false, "int".to_string()),
+                "add".to_string(),
+                vec![
+                    Parameter(Type(false, "int".to_string()), "x".to_string()),
+                    Parameter(Type(false, "int".to_string()), "y".to_string()),
+                ]
+            )
+        );
     }
 }
 

@@ -1,11 +1,13 @@
 #[derive(Clone, Debug, PartialEq)]
 pub enum TkType {
     EOF,
-    Ident,  // e.g. a, ab, foo
-    Assign, // =
-    Num,    // e.g. 1, 10, 34
-    LParen, // (
-    RParen, // )
+    Ident,   // e.g. a, ab, foo
+    Num,     // e.g. 1, 10, 34
+    Pointer, // *
+    Comma,   // ,
+    Assign,  // =
+    LParen,  // (
+    RParen,  // )
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -96,6 +98,8 @@ fn whitespace(lexer: &mut Lexer) -> State {
         Some(_c @ 'a'...'z') => State::Fn(ident),
         Some(_c @ 'A'...'Z') => State::Fn(ident),
         Some('=') => State::Fn(assign),
+        Some(',') => State::Fn(comma),
+        Some('*') => State::Fn(pointer),
         Some('(') => State::Fn(left_paren),
         Some(')') => State::Fn(right_paren),
         None => State::EOF,
@@ -103,6 +107,16 @@ fn whitespace(lexer: &mut Lexer) -> State {
     }
 }
 
+fn comma(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::Comma);
+    lexer.next();
+    State::Fn(whitespace)
+}
+fn pointer(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::Pointer);
+    lexer.next();
+    State::Fn(whitespace)
+}
 fn left_paren(lexer: &mut Lexer) -> State {
     lexer.emit(TkType::LParen);
     lexer.next();
