@@ -1,16 +1,9 @@
-// Syntax:
-// 6               # f64
-// x = 3           # Assignment
-// "hello"         # string
-// <1, 2, 3>       # list
-// ("Dog", 13)     # tuple
-//
-// add x y = x + y # function def
-// [add: x, y]     # function call
-// |x| {x+1}       # lambda
-
+use super::ast::*;
 use super::lexer;
 use super::lexer::{TkType, Token};
+
+use std::error::Error;
+use std::fmt;
 
 struct Parser {
     tokens: Vec<Token>,
@@ -30,43 +23,42 @@ impl Parser {
         &self.tokens[self.offset + n]
     }
 
-    fn matched(&self, token_type: &TkType, expected_type: TkType) -> bool {
-        *token_type == expected_type
+    fn drop(&mut self) {
+        self.take();
+    }
+    fn take(&mut self) -> Token {
+        self.offset += 1;
+        self.tokens[self.offset - 1].clone()
+    }
+
+    fn matched(&self, token_type: &TkType, expected_type: &TkType) -> bool {
+        *token_type == *expected_type
+    }
+
+    fn predict(&self, wants: Vec<TkType>) -> i64 {
+        for (i, v) in wants.iter().enumerate() {
+            let tk = self.peek(i);
+            if !self.matched(tk.tk_type(), v) {
+                return i as i64;
+            }
+        }
+        -1 // -1 means all matched
     }
 }
 
-struct AstTree {
-    rules: Vec<Binding>,
-}
-// AST emit helper
-impl AstTree {
-    fn new() -> AstTree {
-        AstTree { rules: Vec::new() }
+// int add(int i, int j);
+//
+// int add(int i, int j) {
+//   return i + j;
+// }
+fn parse_function(parser: &mut Parser) -> Result<Top, ParseError> {
+    if parser.predict(vec![TkType::Ident, TkType::Ident, TkType::LParen]) != -1 {
+        return Err(ParseError {});
     }
-    fn add_binding(&mut self, b: Binding) {
-        self.rules.push(b);
-    }
-}
-
-struct Binding((u32, u32), String, Num);
-struct Num((u32, u32), String);
-// ident = expression
-// TODO: using Num now instead of expression, because haven't implement it
-fn binding(parser: &Parser, astTree: &mut AstTree) {
-    let token1 = parser.peek(0);
-    let r0 = parser.matched(token1.tk_type(), TkType::Ident);
-    let token2 = parser.peek(1);
-    let r1 = parser.matched(token2.tk_type(), TkType::Match);
-    let token3 = parser.peek(2);
-    let r2 = parser.matched(token3.tk_type(), TkType::Num);
-
-    if r0 && r1 && r2 {
-        astTree.add_binding(Binding(
-            token1.location(),
-            token1.value(),
-            Num(token3.location(), token3.value()),
-        ));
-    }
+    let return_type = parser.take();
+    let function_name = parser.take();
+    parser.drop();
+    Ok(Top::Func(return_type.value(), function_name.value()))
 }
 
 #[cfg(test)]
@@ -75,10 +67,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn new_parser() {
-        let mut tree = AstTree::new();
-        let parser = Parser::from(lex("a = 1"));
-        binding(&parser, &mut tree);
-        assert_eq!(tree.rules.len(), 1);
+    fn function_parse() {
+        let p = &mut Parser::from(lex("int add()"));
+        let r = parse_function(p);
+        assert_eq!(r.unwrap(), Top::Func("int".to_string(), "add".to_string()));
+    }
+}
+
+#[derive(Debug)]
+struct ParseError;
+impl fmt::Display for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "ParseError")
+    }
+}
+impl Error for ParseError {
+    fn description(&self) -> &str {
+        "parse error"
     }
 }

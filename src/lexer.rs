@@ -1,12 +1,14 @@
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum TkType {
     EOF,
-    Ident, // e.g. a, ab, foo
-    Match, // =
-    Num,   // e.g. 1, 10, 34
+    Ident,  // e.g. a, ab, foo
+    Assign, // =
+    Num,    // e.g. 1, 10, 34
+    LParen, // (
+    RParen, // )
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Token((u32, u32), TkType, String);
 
 impl Token {
@@ -93,14 +95,26 @@ fn whitespace(lexer: &mut Lexer) -> State {
         Some(_c @ '0'...'9') => State::Fn(number),
         Some(_c @ 'a'...'z') => State::Fn(ident),
         Some(_c @ 'A'...'Z') => State::Fn(ident),
-        Some('=') => State::Fn(match_symbol),
+        Some('=') => State::Fn(assign),
+        Some('(') => State::Fn(left_paren),
+        Some(')') => State::Fn(right_paren),
         None => State::EOF,
         Some(c) => panic!("Not implemented for {} yet", c),
     }
 }
 
-fn match_symbol(lexer: &mut Lexer) -> State {
-    lexer.emit(TkType::Match);
+fn left_paren(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::LParen);
+    lexer.next();
+    State::Fn(whitespace)
+}
+fn right_paren(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::RParen);
+    lexer.next();
+    State::Fn(whitespace)
+}
+fn assign(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::Assign);
     lexer.next();
     State::Fn(whitespace)
 }
