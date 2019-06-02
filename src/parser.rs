@@ -1,9 +1,23 @@
 use super::ast::*;
-use super::lexer;
 use super::lexer::{TkType, Token};
 
 use std::error::Error;
 use std::fmt;
+
+type Result<T> = std::result::Result<T, ParseError>;
+
+#[derive(Debug)]
+struct ParseError;
+impl fmt::Display for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "ParseError")
+    }
+}
+impl Error for ParseError {
+    fn description(&self) -> &str {
+        "parse error"
+    }
+}
 
 struct Parser {
     tokens: Vec<Token>,
@@ -47,7 +61,7 @@ impl Parser {
 }
 
 // int, int*
-fn parse_type(parser: &mut Parser) -> Result<Type, ParseError> {
+fn parse_type(parser: &mut Parser) -> Result<Type> {
     if parser.predict(vec![TkType::Ident]) != -1 {
         return Err(ParseError {});
     }
@@ -58,7 +72,7 @@ fn parse_type(parser: &mut Parser) -> Result<Type, ParseError> {
     }
     Ok(Type(false, parser.take().value()))
 }
-fn parse_parameters(parser: &mut Parser) -> Result<Vec<Parameter>, ParseError> {
+fn parse_parameters(parser: &mut Parser) -> Result<Vec<Parameter>> {
     let mut params = vec![];
     loop {
         let t = parse_type(parser);
@@ -83,7 +97,7 @@ fn parse_parameters(parser: &mut Parser) -> Result<Vec<Parameter>, ParseError> {
 // int add(int i, int j) {
 //   return i + j;
 // }
-fn parse_function(parser: &mut Parser) -> Result<Top, ParseError> {
+fn parse_function(parser: &mut Parser) -> Result<Top> {
     let typ = parse_type(parser);
     if typ.is_err() {
         return Err(typ.unwrap_err());
@@ -106,7 +120,7 @@ fn parse_function(parser: &mut Parser) -> Result<Top, ParseError> {
 
 #[cfg(test)]
 mod tests {
-    use super::lexer::lex;
+    use super::super::lexer::lex;
     use super::*;
 
     #[test]
@@ -124,18 +138,5 @@ mod tests {
                 ]
             )
         );
-    }
-}
-
-#[derive(Debug)]
-struct ParseError;
-impl fmt::Display for ParseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "ParseError")
-    }
-}
-impl Error for ParseError {
-    fn description(&self) -> &str {
-        "parse error"
     }
 }
