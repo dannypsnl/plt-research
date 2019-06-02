@@ -169,7 +169,7 @@ mod tests {
 
     #[test]
     fn get_number_tokens() {
-        let ts = lex("10 30");
+        let ts = lex("10 30".to_string());
         assert_eq!(
             ts,
             vec![
@@ -182,7 +182,7 @@ mod tests {
 
     #[test]
     fn get_ident_tokens() {
-        let ts = lex(" abc6");
+        let ts = lex(" abc6".to_string());
         assert_eq!(
             ts,
             vec![
