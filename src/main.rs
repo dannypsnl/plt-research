@@ -1,6 +1,6 @@
-mod ast;
-mod lexer;
-mod parser;
+pub mod ast;
+pub mod lexer;
+pub mod parser;
 
 use std::env::args;
 use std::fs;
