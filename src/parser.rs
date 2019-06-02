@@ -58,65 +58,67 @@ impl Parser {
         }
         -1 // -1 means all matched
     }
-}
 
-// int, int*
-fn parse_type(parser: &mut Parser) -> Result<Type> {
-    if parser.predict(vec![TkType::Ident]) != -1 {
-        return Err(ParseError {});
-    }
-    if parser.predict(vec![TkType::Ident, TkType::Pointer]) == -1 {
-        let r = Ok(Type(true, parser.take().value()));
-        parser.drop();
-        return r;
-    }
-    Ok(Type(false, parser.take().value()))
-}
-fn parse_parameters(parser: &mut Parser) -> Result<Vec<Parameter>> {
-    let mut params = vec![];
-    loop {
-        let t = parse_type(parser);
-        if t.is_err() {
-            return Err(t.unwrap_err());
-        }
-        if parser.predict(vec![TkType::Ident, TkType::Comma]) == -1 {
-            params.push(Parameter(t.unwrap(), parser.take().value()));
-            parser.drop();
-        } else if parser.predict(vec![TkType::Ident, TkType::RParen]) == -1 {
-            params.push(Parameter(t.unwrap(), parser.take().value()));
-            parser.drop();
-            break;
-        } else {
+    /// parse_type
+    ///
+    /// format:
+    /// ```
+    /// int, int*
+    /// ```
+    fn parse_type(&mut self) -> Result<Type> {
+        if self.predict(vec![TkType::Ident]) != -1 {
             return Err(ParseError {});
         }
+        if self.predict(vec![TkType::Ident, TkType::Pointer]) == -1 {
+            let r = Ok(Type(true, self.take().value()));
+            self.drop();
+            return r;
+        }
+        Ok(Type(false, self.take().value()))
     }
-    Ok(params)
-}
-
-// int add(int i, int j);
-//
-// int add(int i, int j) {
-//   return i + j;
-// }
-fn parse_function(parser: &mut Parser) -> Result<Top> {
-    let typ = parse_type(parser);
-    if typ.is_err() {
-        return Err(typ.unwrap_err());
+    /// parse_parameters
+    ///
+    /// format:
+    /// ```
+    /// type param (, type param)*
+    /// ```
+    fn parse_parameters(&mut self) -> Result<Vec<Parameter>> {
+        let mut params = vec![];
+        loop {
+            let typ = self.parse_type()?;
+            if self.predict(vec![TkType::Ident, TkType::Comma]) == -1 {
+                params.push(Parameter(typ, self.take().value()));
+                self.drop();
+            } else if self.predict(vec![TkType::Ident, TkType::RParen]) == -1 {
+                params.push(Parameter(typ, self.take().value()));
+                self.drop();
+                break;
+            } else {
+                return Err(ParseError {});
+            }
+        }
+        Ok(params)
     }
-    if parser.predict(vec![TkType::Ident, TkType::LParen]) != -1 {
-        return Err(ParseError {});
+    /// parse_function
+    ///
+    /// format:
+    /// ```
+    /// int add(int i, int j);
+    ///
+    /// int add(int i, int j) {
+    ///   return i + j;
+    /// }
+    /// ```
+    pub fn parse_function(&mut self) -> Result<Top> {
+        let typ = self.parse_type()?;
+        if self.predict(vec![TkType::Ident, TkType::LParen]) != -1 {
+            return Err(ParseError {});
+        }
+        let function_name = self.take();
+        self.drop(); // drop Left Parent: (
+        let params = self.parse_parameters()?;
+        Ok(Top::Func(typ, function_name.value(), params))
     }
-    let function_name = parser.take();
-    parser.drop(); // drop Left Parent: (
-    let params = parse_parameters(parser);
-    if params.is_err() {
-        return Err(params.unwrap_err());
-    }
-    Ok(Top::Func(
-        typ.unwrap(),
-        function_name.value(),
-        params.unwrap(),
-    ))
 }
 
 #[cfg(test)]
@@ -126,8 +128,8 @@ mod tests {
 
     #[test]
     fn function_parse() {
-        let p = &mut Parser::from(lex("int add(int x, int y)".to_string()));
-        let r = parse_function(p);
+        let mut p = Parser::from(lex("int add(int x, int y)".to_string()));
+        let r = p.parse_function();
         assert_eq!(
             r.unwrap(),
             Top::Func(
