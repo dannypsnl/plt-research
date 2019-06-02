@@ -4,10 +4,10 @@ use super::lexer::{TkType, Token};
 use std::error::Error;
 use std::fmt;
 
-type Result<T> = std::result::Result<T, ParseError>;
+pub type Result<T> = std::result::Result<T, ParseError>;
 
 #[derive(Debug)]
-struct ParseError;
+pub struct ParseError;
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "ParseError")
@@ -19,14 +19,14 @@ impl Error for ParseError {
     }
 }
 
-struct Parser {
+pub struct Parser {
     tokens: Vec<Token>,
     offset: usize,
 }
 
 // Parsing helper
 impl Parser {
-    fn from(tokens: Vec<Token>) -> Parser {
+    pub fn from(tokens: Vec<Token>) -> Parser {
         Parser {
             tokens: tokens,
             offset: 0,
@@ -92,6 +92,7 @@ fn parse_parameters(parser: &mut Parser) -> Result<Vec<Parameter>> {
     }
     Ok(params)
 }
+
 // int add(int i, int j);
 //
 // int add(int i, int j) {
@@ -125,7 +126,7 @@ mod tests {
 
     #[test]
     fn function_parse() {
-        let p = &mut Parser::from(lex("int add(int x, int y)"));
+        let p = &mut Parser::from(lex("int add(int x, int y)".to_string()));
         let r = parse_function(p);
         assert_eq!(
             r.unwrap(),
