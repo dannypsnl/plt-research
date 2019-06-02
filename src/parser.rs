@@ -1,4 +1,5 @@
 use super::ast::*;
+use super::lexer;
 use super::lexer::{TkType, Token};
 
 use std::error::Error;
@@ -35,7 +36,11 @@ pub struct Parser {
 }
 
 impl Parser {
-    pub fn from(tokens: Vec<Token>) -> Parser {
+    pub fn new(code: String) -> Parser {
+        let tokens = lexer::lex(code);
+        Parser::from(tokens)
+    }
+    fn from(tokens: Vec<Token>) -> Parser {
         Parser {
             tokens: tokens,
             offset: 0,
@@ -142,12 +147,11 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
-    use super::super::lexer::lex;
     use super::*;
 
     #[test]
     fn function_parse() {
-        let mut p = Parser::from(lex("int add(int x, int* y)".to_string()));
+        let mut p = Parser::new("int add(int x, int* y)".to_string());
         let r = p.parse_function();
         assert_eq!(
             r.unwrap(),

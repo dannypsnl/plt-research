@@ -7,7 +7,6 @@ use std::fs;
 
 fn main() {
     let code = fs::read_to_string(args().nth(1).unwrap()).unwrap();
-    let tokens = lexer::lex(code);
-    let mut parser = parser::Parser::from(tokens);
+    let mut parser = parser::Parser::new(code);
     parser.parse_function().unwrap();
 }
