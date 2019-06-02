@@ -2,9 +2,6 @@ use super::ast::*;
 use super::lexer;
 use super::lexer::{TkType, Token};
 
-use std::error::Error;
-use std::fmt;
-
 pub type Result<T> = std::result::Result<T, ParseError>;
 
 #[derive(Debug)]
@@ -18,12 +15,12 @@ impl ParseError {
     }
 }
 
-impl fmt::Display for ParseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Display for ParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "ParseError: {}", self.descript)
     }
 }
-impl Error for ParseError {
+impl std::error::Error for ParseError {
     fn description(&self) -> &str {
         "parse error"
     }
