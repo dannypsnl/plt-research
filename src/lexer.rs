@@ -1,13 +1,14 @@
 #[derive(Clone, Debug, PartialEq)]
 pub enum TkType {
     EOF,
-    Ident,   // e.g. a, ab, foo
-    Num,     // e.g. 1, 10, 34
-    Pointer, // *
-    Comma,   // ,
-    Assign,  // =
-    LParen,  // (
-    RParen,  // )
+    Ident,     // e.g. a, ab, foo
+    Num,       // e.g. 1, 10, 34
+    Pointer,   // *
+    Comma,     // ,
+    Assign,    // =
+    LParen,    // (
+    RParen,    // )
+    Semicolon, // ;
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -102,6 +103,7 @@ fn whitespace(lexer: &mut Lexer) -> State {
         Some('*') => State::Fn(pointer),
         Some('(') => State::Fn(left_paren),
         Some(')') => State::Fn(right_paren),
+        Some(';') => State::Fn(semicolon),
         None => State::EOF,
         Some(c) => panic!("Not implemented for {} yet", c),
     }
@@ -124,6 +126,11 @@ fn left_paren(lexer: &mut Lexer) -> State {
 }
 fn right_paren(lexer: &mut Lexer) -> State {
     lexer.emit(TkType::RParen);
+    lexer.next();
+    State::Fn(whitespace)
+}
+fn semicolon(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::Semicolon);
     lexer.next();
     State::Fn(whitespace)
 }

@@ -144,6 +144,7 @@ impl Parser {
         let function_name = self.take()?;
         self.consume()?; // consume left parent: (
         let params = self.parse_parameters()?;
+        self.predict(vec![TkType::Semicolon])?;
         Ok(Top::Func(typ, function_name.value(), params))
     }
 }
@@ -153,8 +154,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn function_parse() {
-        let mut p = Parser::new("int add(int x, int* y)".to_string());
+    fn parse_function_declaration() {
+        let mut p = Parser::new("int add(int x, int* y);".to_string());
         let r = p.parse_function();
         assert_eq!(
             r.unwrap(),
