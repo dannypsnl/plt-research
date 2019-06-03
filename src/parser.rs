@@ -33,37 +33,43 @@ pub struct Parser {
 }
 
 impl Parser {
+    /// new create Parser from code
     pub fn new(code: String) -> Parser {
         let tokens = lexer::lex(code);
-        Parser::from(tokens)
-    }
-    fn from(tokens: Vec<Token>) -> Parser {
         Parser {
             tokens: tokens,
             offset: 0,
         }
     }
     /// peek get the token by current add n
-    fn peek(&self, n: usize) -> &Token {
-        &self.tokens[self.offset + n]
+    pub fn peek(&self, n: usize) -> Result<Token> {
+        self.get_token(self.offset + n)
     }
     /// consume take the token but don't use it
-    fn consume(&mut self) {
-        self.take();
+    pub fn consume(&mut self) -> Result<()> {
+        self.take()?;
+        Ok(())
     }
     /// take add current token position
-    fn take(&mut self) -> Token {
+    pub fn take(&mut self) -> Result<Token> {
         self.offset += 1;
-        self.tokens[self.offset - 1].clone()
+        self.get_token(self.offset - 1)
+    }
+    fn get_token(&self, n: usize) -> Result<Token> {
+        if self.tokens.len() <= n {
+            Err(ParseError::new("eof".to_string()))
+        } else {
+            Ok(self.tokens[n].clone())
+        }
     }
 
     fn matched(&self, token_type: &TkType, expected_type: &TkType) -> bool {
         *token_type == *expected_type
     }
 
-    fn predict(&self, wants: Vec<TkType>) -> Result<()> {
+    pub fn predict(&self, wants: Vec<TkType>) -> Result<()> {
         for (i, v) in wants.iter().enumerate() {
-            let tk = self.peek(i);
+            let tk = self.peek(i)?;
             if !self.matched(tk.tk_type(), v) {
                 return Err(ParseError::new(format!(
                     "expected: {:?} but got {:?} at {:?}",
@@ -82,12 +88,12 @@ impl Parser {
     /// int
     /// int*
     /// ```
-    fn parse_type(&mut self) -> Result<Type> {
+    pub fn parse_type(&mut self) -> Result<Type> {
         self.predict(vec![TkType::Ident])?;
-        let typ = self.take().value();
+        let typ = self.take()?.value();
         if self.predict(vec![TkType::Pointer]).is_ok() {
             // consume pointer: *
-            self.consume();
+            self.consume()?;
             Ok(Type(true, typ))
         } else {
             Ok(Type(false, typ))
@@ -99,24 +105,24 @@ impl Parser {
     /// ```
     /// type param (, type param)*
     /// ```
-    fn parse_parameters(&mut self) -> Result<Vec<Parameter>> {
+    pub fn parse_parameters(&mut self) -> Result<Vec<Parameter>> {
         let mut params = vec![];
         loop {
             let typ = self.parse_type()?;
             self.predict(vec![TkType::Ident])?;
-            params.push(Parameter(typ, self.take().value()));
+            params.push(Parameter(typ, self.take()?.value()));
             if self.predict(vec![TkType::Comma]).is_ok() {
                 // consume comma: ,
-                self.consume();
+                self.consume()?;
                 continue;
             } else if self.predict(vec![TkType::RParen]).is_ok() {
                 // consume right parent: )
-                self.consume();
+                self.consume()?;
                 break;
             } else {
                 return Err(ParseError::new(format!(
                     "expected comma or right paren but got unexpected: {:?}",
-                    self.peek(0),
+                    self.peek(0)?,
                 )));
             }
         }
@@ -135,8 +141,8 @@ impl Parser {
     pub fn parse_function(&mut self) -> Result<Top> {
         let typ = self.parse_type()?;
         self.predict(vec![TkType::Ident, TkType::LParen])?;
-        let function_name = self.take();
-        self.consume(); // consume left parent: (
+        let function_name = self.take()?;
+        self.consume()?; // consume left parent: (
         let params = self.parse_parameters()?;
         Ok(Top::Func(typ, function_name.value(), params))
     }
