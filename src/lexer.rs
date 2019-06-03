@@ -109,35 +109,33 @@ fn whitespace(lexer: &mut Lexer) -> State {
     }
 }
 
-fn comma(lexer: &mut Lexer) -> State {
-    lexer.emit(TkType::Comma);
-    lexer.next();
-    State::Fn(whitespace)
-}
-fn pointer(lexer: &mut Lexer) -> State {
-    lexer.emit(TkType::Pointer);
-    lexer.next();
-    State::Fn(whitespace)
-}
-fn left_paren(lexer: &mut Lexer) -> State {
-    lexer.emit(TkType::LParen);
-    lexer.next();
-    State::Fn(whitespace)
-}
-fn right_paren(lexer: &mut Lexer) -> State {
-    lexer.emit(TkType::RParen);
-    lexer.next();
-    State::Fn(whitespace)
-}
-fn semicolon(lexer: &mut Lexer) -> State {
-    lexer.emit(TkType::Semicolon);
+fn consume(lexer: &mut Lexer) -> State {
     lexer.next();
     State::Fn(whitespace)
 }
 fn assign(lexer: &mut Lexer) -> State {
     lexer.emit(TkType::Assign);
-    lexer.next();
-    State::Fn(whitespace)
+    State::Fn(consume)
+}
+fn comma(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::Comma);
+    State::Fn(consume)
+}
+fn pointer(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::Pointer);
+    State::Fn(consume)
+}
+fn left_paren(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::LParen);
+    State::Fn(consume)
+}
+fn right_paren(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::RParen);
+    State::Fn(consume)
+}
+fn semicolon(lexer: &mut Lexer) -> State {
+    lexer.emit(TkType::Semicolon);
+    State::Fn(consume)
 }
 
 fn ident(lexer: &mut Lexer) -> State {
