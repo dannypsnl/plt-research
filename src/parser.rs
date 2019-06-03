@@ -91,13 +91,13 @@ impl Parser {
     pub fn parse_type(&mut self) -> Result<Type> {
         self.predict(vec![TkType::Ident])?;
         let typ = self.take()?.value();
-        if self.predict(vec![TkType::Pointer]).is_ok() {
-            // consume pointer: *
+
+        let mut result = Type::Normal(typ);
+        while self.predict(vec![TkType::Pointer]).is_ok() {
             self.consume()?;
-            Ok(Type(true, typ))
-        } else {
-            Ok(Type(false, typ))
+            result = Type::Pointer(Box::new(result));
         }
+        Ok(result)
     }
     /// parse_parameters
     ///
@@ -156,17 +156,32 @@ mod tests {
     #[test]
     fn parse_function_declaration() {
         let mut p = Parser::new("int add(int x, int* y);".to_string());
-        let r = p.parse_function();
+        let r = p.parse_function().unwrap();
         assert_eq!(
-            r.unwrap(),
+            r,
             Top::Func(
-                Type(false, "int".to_string()),
+                Type::Normal("int".to_string()),
                 "add".to_string(),
                 vec![
-                    Parameter(Type(false, "int".to_string()), "x".to_string()),
-                    Parameter(Type(true, "int".to_string()), "y".to_string()),
+                    Parameter(Type::Normal("int".to_string()), "x".to_string()),
+                    Parameter(
+                        Type::Pointer(Box::new(Type::Normal("int".to_string()))),
+                        "y".to_string()
+                    ),
                 ]
             )
+        );
+    }
+
+    #[test]
+    fn parse_type_format() {
+        let mut p = Parser::new("int***".to_string());
+        let r = p.parse_type().unwrap();
+        assert_eq!(
+            r,
+            Type::Pointer(Box::new(Type::Pointer(Box::new(Type::Pointer(Box::new(
+                Type::Normal("int".to_string())
+            ))))))
         );
     }
 }
