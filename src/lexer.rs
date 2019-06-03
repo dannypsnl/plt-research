@@ -96,8 +96,7 @@ fn whitespace(lexer: &mut Lexer) -> State {
 
     match lexer.peek() {
         Some(_c @ '0'...'9') => State::Fn(number),
-        Some(_c @ 'a'...'z') => State::Fn(ident),
-        Some(_c @ 'A'...'Z') => State::Fn(ident),
+        Some(_c @ 'a'...'z') | Some(_c @ 'A'...'Z') => State::Fn(ident),
         Some('=') => State::Fn(assign),
         Some(',') => State::Fn(comma),
         Some('*') => State::Fn(pointer),
