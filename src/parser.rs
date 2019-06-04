@@ -114,11 +114,10 @@ impl Parser {
             if self.predict(vec![TkType::Comma]).is_ok() {
                 // consume comma: ,
                 self.consume()?;
-                continue;
             } else if self.predict(vec![TkType::RParen]).is_ok() {
                 // consume right parent: )
                 self.consume()?;
-                break;
+                return Ok(params);
             } else {
                 return Err(ParseError::new(format!(
                     "expected comma or right paren but got unexpected: {:?}",
@@ -126,7 +125,6 @@ impl Parser {
                 )));
             }
         }
-        Ok(params)
     }
     /// parse_function
     ///
