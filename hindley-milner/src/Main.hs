@@ -16,13 +16,20 @@ main = do
     Left err -> print err
     Right val -> print $ runInfer $ infer emptyTypeEnv val
 
+instance Show Type where
+  show TInt = "int"
+  show TString = "string"
+  show TBool = "bool"
+  show (TArrow t1 t2) = show t1 ++ " -> " ++ show t2
+  show (TypeVar name) = name
+
 data Type =
   TInt
   | TString
   | TBool
   | TArrow Type Type
   | TypeVar String
-  deriving (Show, Eq)
+  deriving (Eq)
 
 newtype TypeError = TypeError String deriving (Show)
 -- Unique is standing for storing new type variable in environment

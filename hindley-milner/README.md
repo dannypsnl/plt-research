@@ -10,11 +10,11 @@ Even though I use Haskell, I mostly would give binding a nice type, since those 
 
 ```
 $ hm-lang "1"
-TInt
+int
 $ hm-lang "1 /= 2"
-TBool
+bool
 $ hm-lang "let f = fn x = x in f"
-TArrow (TypeVar "a") (TypeVar "a")
-$ hm-lang "let f = fn x = x in call f 1"
-TInt
+a -> a
+$ hm-lang "let f = fn x = x in call f false"
+bool
 ```
