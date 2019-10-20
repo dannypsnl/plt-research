@@ -11,9 +11,8 @@ case class Lambda(param: String, body: Term) extends Term
 case class LiteralInt(i: Int) extends Term
 
 object Main extends App {
-  var env = new Env(None)
   val runner = new Runner()
-  val result = runner.eval(env,
+  val result = runner.run(
     Application(
       Lambda("x", Variable("x")),
       LiteralInt(1)
@@ -45,6 +44,10 @@ case class VInt(i: Int) extends Value
 case class VClosure(param: String, body: Term, env: Env) extends Value
 
 class Runner {
+  var env = new Env(None)
+  def run(term: Term): Value = {
+    eval(env, term)
+  }
   def eval(env: Env, term: Term): Value = {
     term match {
       case LiteralInt(i) => VInt(i)
