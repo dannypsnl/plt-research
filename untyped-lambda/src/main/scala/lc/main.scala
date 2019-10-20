@@ -52,7 +52,7 @@ class Runner {
     term match {
       case LiteralInt(i) => VInt(i)
       case Variable(name) => env.get(name)
-      case Application(func, arg) =>{
+      case Application(func, arg) => {
         val VClosure(param, body, lambdaEnv) = eval(env, func)
         val v = eval(env, arg)
         lambdaEnv.set(param, v)
