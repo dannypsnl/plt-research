@@ -1,15 +1,19 @@
+import lc.cps._
 import lc.lang._
 import lc.interpreter._
 
 object Main extends App {
   val runner = new Runner()
-  val result = runner.run(
+  println(runner.run(
     Application(
       Lambda("x", Variable("x")),
       LiteralInt(1)
     )
-  )
-  println(result)
+  ))
+  println(NaiveM.nt(Application(Variable("g"), Variable("a")), AVar("halt")))
+  // ((lambda ($f1)
+  //   ((lambda ($e1)
+  //     ($f1 $e1 halt)) a)) g)
 }
 
 class Runner {
