@@ -1,14 +1,5 @@
-import scala.collection.mutable.HashMap
-
-sealed class Term
-// var
-case class Variable(name: String) extends Term
-// func arg
-case class Application(func: Term, arg: Term) extends Term
-// \param.body
-case class Lambda(param: String, body: Term) extends Term
-// 1, 2, 3
-case class LiteralInt(i: Int) extends Term
+import lc.lang._
+import lc.interpreter._
 
 object Main extends App {
   val runner = new Runner()
@@ -20,28 +11,6 @@ object Main extends App {
   )
   println(result)
 }
-
-class Env(parent: Option[Env]) {
-  var internalMap = new HashMap[String, Value]()
-  def get(name: String) : Value = {
-    val r = internalMap.get(name)
-    if (r.isEmpty && parent.isDefined) {
-      parent.get.get(name)
-    } else if (r.isDefined) {
-      r.get
-    } else {
-      throw new NotFoundException(name)
-    }
-  }
-  def set(name: String, value: Value) = {
-    internalMap.put(name, value)
-    ()
-  }
-}
-
-sealed class Value
-case class VInt(i: Int) extends Value
-case class VClosure(param: String, body: Term, env: Env) extends Value
 
 class Runner {
   var env = new Env(None)
@@ -62,5 +31,3 @@ class Runner {
     }
   }
 }
-
-class NotFoundException(name: String) extends Exception {}
