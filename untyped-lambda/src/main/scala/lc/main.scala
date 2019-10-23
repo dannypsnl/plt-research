@@ -10,10 +10,18 @@ object Main extends App {
       LiteralInt(1)
     )
   ))
+  // From: (g a) with continuation: 'halt
   println(NaiveM.nt(Application(Variable("g"), Variable("a")), AVar("halt")))
   // ((lambda ($f1)
   //   ((lambda ($e1)
   //     ($f1 $e1 halt)) a)) g)
+
+  // From: '(g a) with high order continuation: (λ (ans) `(halt ,ans))
+  println(HighOrderM.t(
+    Application(Variable("g"), Variable("a")),
+    ans => CApplication(AVar("halt"), List(ans))
+  ))
+  // (g a (lambda ($rv1) (halt $rv1)))
 }
 
 class Runner {
