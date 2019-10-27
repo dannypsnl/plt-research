@@ -26,6 +26,23 @@ object Main extends App {
   // with continuation: 'halt
   println(HybridTransformM.transform_c(test, AVar("halt")))
   // (g a halt)
+
+  var testRealLangExtend = MultipleApplication(Variable("g"), List(Variable("a")))
+  // with continuation: 'halt
+  println(RealLangM.transform_c(testRealLangExtend, AVar("halt")))
+  // (g a halt)
+  testRealLangExtend = MultipleApplication(
+    CallWithCurrentContinuation(),
+    List(MultipleLambda(
+      List("halt"),
+      MultipleApplication(Variable("halt"), List(LiteralInt(5)))
+    ))
+  )
+  println(RealLangM.transform_c(testRealLangExtend, AVar("halt")))
+  // ((lambda (f cc) (f (lambda (x _) (cc x)) cc)) ;; Here is call/cc
+  //   (lambda (halt $k1) (halt 5 $k1)) ;; our f
+  //   halt ;; top level cc
+  // )
 }
 
 class Runner {
