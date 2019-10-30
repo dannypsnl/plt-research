@@ -3,7 +3,6 @@
 #include <vector>
 
 class StackOverflowException : std::exception {};
-class UnknownOpcodeException : std::exception {};
 class TypeMismatchingException : std::exception {};
 
 enum class ValueType {
@@ -33,24 +32,16 @@ public:
     }
     return this->v.i;
   }
-
-private:
 };
 
-enum OpCode {
-  OP_PUSH,
-  OP_ADD,
-  OP_SUB,
-  OP_MUL,
-  OP_DIV,
-};
+class VM;
 
 struct Instruction {
-  explicit Instruction(OpCode opcode) : _opcode{opcode} {}
-  Instruction(OpCode opcode, Value *operand)
+  explicit Instruction(void (VM::*opcode)()) : _opcode{opcode} {}
+  Instruction(void (VM::*opcode)(), Value *operand)
       : _opcode{opcode}, _operand{operand} {}
 
-  OpCode _opcode;
+  void (VM::*_opcode)();
   Value *_operand;
 };
 
@@ -65,34 +56,28 @@ public:
 
   void run() {
     for (auto ins : _instructions) {
-      switch (ins._opcode) {
-      case OP_PUSH:
-        push(ins._operand);
-        break;
-      case OP_ADD: {
-        BINARY_OP()
-        push(Value::Int(l + r));
-        break;
-      }
-      case OP_SUB: {
-        BINARY_OP()
-        push(Value::Int(l - r));
-        break;
-      }
-      case OP_MUL: {
-        BINARY_OP()
-        push(Value::Int(l * r));
-        break;
-      }
-      case OP_DIV: {
-        BINARY_OP()
-        push(Value::Int(l / r));
-        break;
-      }
-      default:
-        throw new UnknownOpcodeException();
-      }
+      _opcode = ins._opcode;
+      _operand = ins._operand;
+      (*this.*_opcode)();
     }
+  }
+
+  void execute_push() { push(_operand); }
+  void execute_add() {
+    BINARY_OP()
+    push(Value::Int(l + r));
+  }
+  void execute_sub() {
+    BINARY_OP()
+    push(Value::Int(l - r));
+  }
+  void execute_mul() {
+    BINARY_OP()
+    push(Value::Int(l * r));
+  }
+  void execute_div() {
+    BINARY_OP()
+    push(Value::Int(l / r));
   }
 
   Value *pop() {
@@ -108,10 +93,18 @@ public:
   }
 
 private:
+  void (VM::*_opcode)();
+  Value *_operand = nullptr;
   std::vector<Instruction> _instructions;
   std::array<Value *, STACK_MAX> _stack{};
   int _stack_pointer = 0;
 };
+
+void (VM::*OP_PUSH)() = &VM::execute_push;
+void (VM::*OP_ADD)() = &VM::execute_add;
+void (VM::*OP_SUB)() = &VM::execute_sub;
+void (VM::*OP_MUL)() = &VM::execute_mul;
+void (VM::*OP_DIV)() = &VM::execute_div;
 
 int main() {
   VM vm{
@@ -123,7 +116,6 @@ int main() {
   };
 
   vm.run();
-  std::cout << "VM Result: "
-            << ", top of stack: " << vm.pop()->get_int() << std::endl;
+  std::cout << "top of stack: " << vm.pop()->get_int() << std::endl;
   return 0;
 }
