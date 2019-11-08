@@ -1,3 +1,7 @@
-gocc
-.idea
-.ccls-cache
+*
+!*.c
+!*.go
+!*.sum
+!*.mod
+!*.md
+!Makefile
