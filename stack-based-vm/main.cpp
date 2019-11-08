@@ -2,37 +2,9 @@
 #include <iostream>
 #include <vector>
 
+#include "Value.h"
+
 class StackOverflowException : std::exception {};
-class TypeMismatchingException : std::exception {};
-
-enum class ValueType {
-  Int,
-};
-
-union VariantValue {
-  int i;
-};
-
-class Value {
-private:
-  ValueType _value_type;
-  VariantValue v;
-
-public:
-  static Value *Int(int i) {
-    auto v = new Value;
-    v->_value_type = ValueType ::Int;
-    v->v.i = i;
-    return v;
-  }
-
-  int get_int() {
-    if (_value_type != ValueType::Int) {
-      throw new TypeMismatchingException();
-    }
-    return this->v.i;
-  }
-};
 
 class VM;
 

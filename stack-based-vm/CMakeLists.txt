@@ -3,4 +3,4 @@ project(stack_based_vm)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(stack_based_vm main.cpp)
+add_executable(stack_based_vm main.cpp Value.h Value.cpp)
