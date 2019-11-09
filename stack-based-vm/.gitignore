@@ -1,2 +1,5 @@
-cmake-build-debug
-.idea
+*
+!.gitignore
+!*.rs
+!Cargo.toml
+!Cargo.lock
