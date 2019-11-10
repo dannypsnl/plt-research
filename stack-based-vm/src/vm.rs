@@ -89,3 +89,68 @@ impl Instruction {
 pub enum RuntimeError {
     StackOverflow,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+
+    #[test]
+    fn vm_add() {
+        let mut vm = VM::new();
+        vm.run(vec![
+            Instruction::op_code_and_operand(PUSH, Value::Int(1)),
+            Instruction::op_code_and_operand(PUSH, Value::Int(2)),
+            Instruction::op_code(ADD),
+        ]).unwrap();
+        assert_eq!(Value::Int(3), vm.pop());
+    }
+
+    #[test]
+    fn vm_sub() {
+        let mut vm = VM::new();
+        vm.run(vec![
+            Instruction::op_code_and_operand(PUSH, Value::Int(1)),
+            Instruction::op_code_and_operand(PUSH, Value::Int(3)),
+            Instruction::op_code(SUB),
+        ]).unwrap();
+        assert_eq!(Value::Int(2), vm.pop());
+    }
+
+    #[test]
+    fn vm_mul() {
+        let mut vm = VM::new();
+        vm.run(vec![
+            Instruction::op_code_and_operand(PUSH, Value::Int(2)),
+            Instruction::op_code_and_operand(PUSH, Value::Int(5)),
+            Instruction::op_code(MUL),
+        ]).unwrap();
+        assert_eq!(Value::Int(10), vm.pop());
+    }
+
+    #[test]
+    fn vm_div() {
+        let mut vm = VM::new();
+        vm.run(vec![
+            Instruction::op_code_and_operand(PUSH, Value::Int(3)),
+            Instruction::op_code_and_operand(PUSH, Value::Int(3)),
+            Instruction::op_code(DIV),
+        ]).unwrap();
+        assert_eq!(Value::Int(1), vm.pop());
+    }
+
+    #[bench]
+    fn bench_vm(b: &mut Bencher) {
+        b.iter(|| {
+            let mut vm = VM::new();
+            vm.run(vec![
+                Instruction::op_code_and_operand(PUSH, Value::Int(3)),
+                Instruction::op_code_and_operand(PUSH, Value::Int(1)),
+                Instruction::op_code_and_operand(PUSH, Value::Int(2)),
+                Instruction::op_code(ADD),
+                Instruction::op_code(DIV),
+            ]).unwrap()
+        });
+    }
+}
+
