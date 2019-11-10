@@ -1,3 +1,5 @@
+#![feature(repeat_generic_slice)]
+
 #![feature(test)]
 extern crate test;
 

@@ -68,6 +68,7 @@ pub const SUB: OpCode = VM::execute_sub;
 pub const MUL: OpCode = VM::execute_mul;
 pub const DIV: OpCode = VM::execute_div;
 
+#[derive(Copy, Clone)]
 pub struct Instruction {
     operand: Value,
     op_code: OpCode,
@@ -145,16 +146,44 @@ mod tests {
 
     #[bench]
     fn bench_vm(b: &mut Bencher) {
+        let mut ins =  vec![Instruction::op_code_and_operand(PUSH, Value::Int(1))].repeat(300);
+        ins.extend(vec![Instruction::op_code(ADD)].repeat(299));
         b.iter(|| {
             let mut vm = VM::new();
-            vm.run(vec![
-                Instruction::op_code_and_operand(PUSH, Value::Int(3)),
-                Instruction::op_code_and_operand(PUSH, Value::Int(1)),
-                Instruction::op_code_and_operand(PUSH, Value::Int(2)),
-                Instruction::op_code(ADD),
-                Instruction::op_code(DIV),
-            ])
-            .unwrap()
+            vm.run(ins.clone()).unwrap()
         });
+    }
+
+    #[bench]
+    fn bench_vm_run2(b: &mut Bencher) {
+        use Instruction2::*;
+        let mut ins =  vec![PUSH(Value::Int(1))].repeat(300);
+        ins.extend(vec![ADD].repeat(299));
+        b.iter(|| {
+            let mut vm = VM::new();
+            vm.run2(ins.clone()).unwrap()
+        });
+    }
+
+    impl VM {
+        fn run2(&mut self, instructions: Vec<Instruction2>) -> Result<()> {
+            for ins in instructions {
+                use Instruction2::*;
+                match ins {
+                    PUSH(operand) => self.push(operand)?,
+                    ADD => {
+                        let (l, r) = (self.pop(), self.pop());
+                        self.push(l + r)?;
+                    }
+                }
+            }
+            Ok(())
+        }
+    }
+
+    #[derive(Copy, Clone)]
+    enum Instruction2 {
+        PUSH(Value),
+        ADD,
     }
 }
