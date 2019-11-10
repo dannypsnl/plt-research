@@ -102,7 +102,8 @@ mod tests {
             Instruction::op_code_and_operand(PUSH, Value::Int(1)),
             Instruction::op_code_and_operand(PUSH, Value::Int(2)),
             Instruction::op_code(ADD),
-        ]).unwrap();
+        ])
+        .unwrap();
         assert_eq!(Value::Int(3), vm.pop());
     }
 
@@ -113,7 +114,8 @@ mod tests {
             Instruction::op_code_and_operand(PUSH, Value::Int(1)),
             Instruction::op_code_and_operand(PUSH, Value::Int(3)),
             Instruction::op_code(SUB),
-        ]).unwrap();
+        ])
+        .unwrap();
         assert_eq!(Value::Int(2), vm.pop());
     }
 
@@ -124,7 +126,8 @@ mod tests {
             Instruction::op_code_and_operand(PUSH, Value::Int(2)),
             Instruction::op_code_and_operand(PUSH, Value::Int(5)),
             Instruction::op_code(MUL),
-        ]).unwrap();
+        ])
+        .unwrap();
         assert_eq!(Value::Int(10), vm.pop());
     }
 
@@ -135,7 +138,8 @@ mod tests {
             Instruction::op_code_and_operand(PUSH, Value::Int(3)),
             Instruction::op_code_and_operand(PUSH, Value::Int(3)),
             Instruction::op_code(DIV),
-        ]).unwrap();
+        ])
+        .unwrap();
         assert_eq!(Value::Int(1), vm.pop());
     }
 
@@ -149,8 +153,8 @@ mod tests {
                 Instruction::op_code_and_operand(PUSH, Value::Int(2)),
                 Instruction::op_code(ADD),
                 Instruction::op_code(DIV),
-            ]).unwrap()
+            ])
+            .unwrap()
         });
     }
 }
-

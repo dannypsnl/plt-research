@@ -1,6 +1,6 @@
 use stack_based_vm::value::Value;
-use stack_based_vm::vm::{Instruction, ADD, DIV, PUSH, VM};
 use stack_based_vm::vm::Result;
+use stack_based_vm::vm::{Instruction, ADD, DIV, PUSH, VM};
 
 fn main() -> Result<()> {
     let mut vm = VM::new();
