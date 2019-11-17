@@ -66,7 +66,7 @@ class TypeChecker {
       case (v@TypeVariable(_), t) => unify(t, v)
       case (t, v@TypeVariable(_)) => {
         val sub = new SubstMap
-        if (t == v || v.occurs(t)) {
+        if (t == v || !v.occurs(t)) {
           sub.addSubst(v, t)
         }
         sub
