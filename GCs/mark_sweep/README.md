@@ -1,3 +1,18 @@
+# Mark Sweep
+
+### Commands
+
+```sh
+mkdir cmake-build-debug && cd cmake-build-debug
+# now we in build dir
+cmake ..
+make # generate binary
+# or
+make test # run test
+```
+
+### Introduction
+
 How mark-sweep work?
 
 It split to two part, `mark` & `sweep`
