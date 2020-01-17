@@ -1,3 +1,3 @@
-# compiler researchs
+# PLT researchs
 
-This repository contains several PLT/Compiler related sub-projects that I created for learning these certain subjects.
+This repository contains several PLT related sub-projects that I created for learning these certain subjects.
