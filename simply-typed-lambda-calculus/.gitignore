@@ -1,4 +1,6 @@
-*
-!.gitignore
-!*.scala
-!build.sbt
+project/
+target/
+katex/
+*.js
+*.css
+
