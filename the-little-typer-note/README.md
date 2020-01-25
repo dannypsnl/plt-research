@@ -1,4 +1,4 @@
-# NOTE: A little typer
+# NOTE: The little typer
 
 ### Dependencies
 
