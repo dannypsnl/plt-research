@@ -81,3 +81,27 @@ The four forms of Judgement.
 ]
 
 @pie[(add1 _n)] will be @pie[target]
+
+@section{recursive is not an option}
+
+To define a @pie[+] for @pie[Nat], we might first write down the following definition, unfortunately, we would get an error: @bold{Unknown variable +}
+
+@pieblock[
+(claim + (-> Nat Nat Nat))
+(define +
+  (lambda (n j)
+    (which-Nat n
+      j
+      (lambda (n-1) (add1 (+ n-1 j))))))
+]
+
+Because in Pie, recursive was not an option, the pre-condition was we must have value for each expression, so if there was a recursion, we could get:
+
+@pieblock[
+(claim forever (-> Nat Atom))
+(define forever
+  (lambda (and-ever)
+    (forever and-ever)))
+]
+
+To avoid it, recursive is not an option.
