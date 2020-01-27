@@ -67,3 +67,17 @@ The four forms of Judgement.
 
 @pie[U] is Universe, @pie[Nat] is natural
 
+@section{eliminator}
+
+@pie[which-Nat] is an eliminator of @pie[Nat], it takes three parameters: @pie[target], @pie[base] and @pie[step], here are examples:
+
+@ex[
+(which-Nat 0
+  'u
+  (lambda (_n) 's))
+(which-Nat 10
+  'u
+  (lambda (_n) 's))
+]
+
+@pie[(add1 _n)] will be @pie[target]
