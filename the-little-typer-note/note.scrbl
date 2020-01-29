@@ -105,3 +105,10 @@ Because in Pie, recursive was not an option, the pre-condition was we must have 
 ]
 
 To avoid it, recursive is not an option.
+
+@section{total function}
+
+A function assigns a value to every possible argument is called a total function. In Pie, all functions are total.
+
+Total function is important that we always want to get a value from application.
+
