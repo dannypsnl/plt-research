@@ -112,3 +112,7 @@ A function assigns a value to every possible argument is called a total function
 
 Total function is important that we always want to get a value from application.
 
+@section{why is @pie[rec-Nat] always safe to use}
+
+The reason is because @pie[rec-Nat] guaranteed to reach the base.
+Every @pie[Nat] is @pie[zero] or @pie[(add1 n)], where @pie[n] is a smaller @pie[Nat].
