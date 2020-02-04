@@ -116,3 +116,59 @@ Total function is important that we always want to get a value from application.
 
 The reason is because @pie[rec-Nat] guaranteed to reach the base.
 Every @pie[Nat] is @pie[zero] or @pie[(add1 n)], where @pie[n] is a smaller @pie[Nat].
+
+@section{elim-Pair to Π}
+
+@pieblock[
+(elim-Pair
+  A D
+  X
+  p
+  f)
+]
+
+where @pie[p] is a @pie[(Pair A D)], and @pie[f] takes values of the expression from @pie[car] and @pie[cdr] from @pie[p].
+
+Candidate type of @pie[elim-Pair]
+
+@pieblock[
+(-> A D
+  X
+  (Pair A D)
+  (-> A D
+    X)
+  X)
+]
+
+But this cannot be true. So we need @pie[Π].
+
+Example of @pie[Π]
+
+@pieblock[
+(claim flip
+  (Π ((A U) (D U))
+    (-> (Pair A D)
+      (Pair D A))))
+(define flip
+  (lambda (A D)
+    (lambda (p)
+      (cons (cdr p) (car p)))))
+]
+
+So basically @pie[Π] says there has @pie[A] is @pie[U] and @pie[D] is @pie[U], and the body of @pie[Π] following this truth. This also means lambda-expression's type can be a @pie[U]-expression.
+
+In the expression
+
+@pieblock[
+(Π ((A U) (D U)
+  (-> (Pair A D)
+    (Pair D A))))
+]
+
+the body of it was:
+
+@pieblock[
+(-> (Pair A D)
+  (Pair D A))
+]
+
