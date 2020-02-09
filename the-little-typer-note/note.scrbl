@@ -172,3 +172,18 @@ the body of it was:
   (Pair D A))
 ]
 
+Now, we know how to @pie[claim] type of @pie[elim-Pair]:
+
+@pieblock[
+(claim elim-Pair
+  (Π ((A U)
+      (D U)
+      (X U))
+    (-> (Pair A D)
+        (-> A D
+          X)
+      X)))
+(define elim-Pair
+  (lambda (A D X)
+    (lambda (p f) (f (car p) (cdr p)))))
+]
