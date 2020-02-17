@@ -17,16 +17,12 @@ main = do
     Right val -> print $ runInfer $ infer emptyTypeEnv val
 
 instance Show Type where
-  show TInt = "int"
-  show TString = "string"
-  show TBool = "bool"
+  show (TPrimitive name) = name
   show (TArrow t1 t2) = show t1 ++ " -> " ++ show t2
   show (TypeVar name) = name
 
 data Type =
-  TInt
-  | TString
-  | TBool
+  TPrimitive String
   | TArrow Type Type
   | TypeVar String
   deriving (Eq)
@@ -79,16 +75,15 @@ substEnv :: SubstMap -> TypeEnv -> TypeEnv
 substEnv substs (TypeEnv env) = TypeEnv (foldr Data.Map.map env substs)
 
 subst :: SubstMap -> Type -> Type
-subst _ TInt = TInt
-subst _ TBool = TBool
-subst _ TString = TString
+subst _ t@(TPrimitive _) = t
 subst sub (TArrow t1 t2) = TArrow (subst sub t1) (subst sub t2)
 subst sub v@(TypeVar _) = substType sub v
 
 unify :: Type -> Type -> Env SubstMap
-unify TInt TInt = return emptySubst
-unify TBool TBool = return emptySubst
-unify TString TString = return emptySubst
+unify t@(TPrimitive t1) (TPrimitive t2) =
+  if t1 == t2
+  then return emptySubst
+  else error $ "unable to unify type: " ++ show t1 ++ " and " ++ show t2 ++ ""
 unify (TArrow t1 t2) (TArrow t1' t2') = do
   subst1 <- unify t1 t1'
   subst2 <- unify (substType subst1 t2) (substType subst1 t2')
@@ -101,17 +96,15 @@ unify v@(TypeVar _) t = unify t v
 unify t1 t2 = error $ "unable to unify type: " ++ show t1 ++ " and " ++ show t2 ++ ""
 
 occurs :: Type -> Type -> Bool
-occurs _ TInt = False
-occurs _ TBool = False
-occurs _ TString = False
+occurs _ (TPrimitive _) = False
 occurs v (TArrow t1 t2) = occurs v t1 || occurs v t2
 occurs v t@(TypeVar _) = v == t
 
 -- Now, let's infer!
 infer :: TypeEnv -> Expr -> Env (Type, SubstMap)
-infer _ (Int _) = return (TInt, emptySubst)
-infer _ (Bool _) = return (TBool, emptySubst)
-infer _ (String _) = return (TString, emptySubst)
+infer _ (Int _) = return (TPrimitive "int", emptySubst)
+infer _ (Bool _) = return (TPrimitive "bool", emptySubst)
+infer _ (String _) = return (TPrimitive "string", emptySubst)
 infer env (Var x) = return (getType x env, emptySubst)
 infer env (Func x expr) = do
   freeVar <- fresh
@@ -137,15 +130,15 @@ infer env (Binary op e1 e2) = do
   return (opType op, s4 ++ s3 ++ s2 ++ s1)
 
 opType :: Op -> Type
-opType op | op `elem` [Equal, NotEqual] = TBool
-          | op `elem` [Add, Sub, Div, Mul] = TInt
+opType op | op `elem` [Equal, NotEqual] = TPrimitive "bool"
+          | op `elem` [Add, Sub, Div, Mul] = TPrimitive "int"
           | otherwise = error $ "Unknown operator" ++ show op
 
 leftOperandType :: t -> Type
-leftOperandType _ = TInt
+leftOperandType _ = TPrimitive "int"
 
 rightOperandType :: t -> Type
-rightOperandType _ = TInt
+rightOperandType _ = TPrimitive "int"
 
 inferExpr :: TypeEnv -> Expr -> Type
 inferExpr env = runInfer . infer env
