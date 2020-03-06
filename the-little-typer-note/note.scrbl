@@ -187,3 +187,42 @@ Now, we know how to @pie[claim] type of @pie[elim-Pair]:
   (lambda (A D X)
     (lambda (p f) (f (car p) (cdr p)))))
 ]
+
+@section{more Π}
+
+@bold{Type} can dependent on @bold{Term}, @pie[Vec] is an example:
+
+@itemlist[
+  @item{If @pie[E] is a type and @pie[k] is a @pie[Nat], then @pie[(Vec E k)] is a type.}
+  @item{@pie[vecnil] is a @pie[(Vec E zero)]}
+  @item{If @pie[e] is an @pie[E] and @pie[es] is a @pie[(Vec E k)], @pie[(vec:: e es)] is a @pie[(Vec E (add1 k))]}
+]
+
+To get first element from @pie[List] in Pie is impossible. Because we cannot sure that's safe, @pie[nil] has no entry!
+But get first element from @pie[(Vec E (add1 k))] is possible for every @pie[k] is @pie[Nat].
+
+To define such function, it's easy to guess @pie[Π] also takes @bold{Term} as parameter.
+
+Here we go(with eliminator @pie[head] and @pie[tail]):
+
+@pieblock[
+(claim first
+  (Π ((E U)
+      (l Nat))
+    (-> (Vec E (add1 l))
+      E)))
+(define first
+  (lambda (E l)
+    (lambda (es)
+      (head es))))
+]
+
+and @pie[->]-expressions is a shorter way of writing @pie[Π]-expressions when argument name is not used in the @pie[Π]-expression's body. Therefore, the following definition is the same as above:
+
+@pieblock[
+(claim first
+  (Π ((E U)
+      (l Nat))
+    (Π ((es (Vec E (add1 l))))
+      E)))
+]
