@@ -226,3 +226,115 @@ and @pie[->]-expressions is a shorter way of writing @pie[Π]-expressions when a
     (Π ((es (Vec E (add1 l))))
       E)))
 ]
+
+@section{dependent type}
+
+A type is determined by something that is not a type called dependent type.
+
+Now considering a term `peas` produces many pea. We can though out type quickly:
+
+@pieblock[
+(claim peas
+  (Π ((how-many-peas Nat))
+    (Vec Atom how-many-peas)))
+]
+
+Then we use @pie[rec-Nat] to implement it:
+
+@pieblock[
+(define peas
+  (lambda (how-many-peas)
+    (rec-Nat how-many-peas
+      vecnil
+      (lambda (l-1 peas-l-1)
+        (vec:: 'pea peas-l-1)))))
+]
+
+Unfortunately, we would get @bold{Can't determine a type} as error message.
+
+The problem here is to use @pie[rec-Nat], base must has the same type as @pie[peas-l-1] argument to the step.
+But here we get @pie[(Vec Atom how-many-peas)] and @pie[(Vec Atom 0)].
+Therefore, we need something else to complete this job.
+
+@section{@pie[ind-Nat], induction on @pie[Nat]}
+
+To create @pie[peas], we need @pie[ind-Nat].
+@pie[ind-Nat] just like @pie[rec-Nat], but allows the types of the base and the almost-answer in the step.
+@pie[ind-Nat] is used for dependent types. And @pie[(Vec Atom how-many-peas)] is a dependent type, when @pie[how-many-peas] is not a @bold{Type}!
+
+To work with dependent types, @pie[ind-Nat] takes one more argument.
+To state how the types of the base and step's almost-answer depend on target Nat.
+This argument called the @italic{motive}, can be any @pieblock[(-> Nat U)].
+@italic{Motive} explains why the target is to be eliminated.
+
+@pieblock[
+(claim motive-peas
+  (-> Nat
+    U))
+(define motive-peas
+  (lambda (k)
+    (Vec Atom k)))
+]
+
+The base type of @pie[peas] is surely @pie[(Vec Atom 0)]. The base value of @pie[peas] is surely @pie[vecnil], because it's only value has type @pie[(Vec Atom 0)].
+@pie[(Vec Atom 0)] is the same type as @pie[(motive-peas 0)].
+
+The step type:
+
+@pieblock[
+(Π ((n-1 Nat))
+  (-> (motive n-1)
+    (motive (add1 n-1))))
+]
+
+The almost-answer's type is @italic{motive} applied to @pie[n-1].
+
+Step for @pie[peas]:
+
+@pieblock[
+(claim step-peas
+  (Π ((l-1 Nat))
+    (-> (motive-peas l-1)
+      (motive-peas (add1 l-1)))))
+(define step-peas
+  (lambda (l-1)
+    (lambda (peas-l-1)
+      (vec:: 'pea peas-l-1))))
+]
+
+Whatever what @pie[Nat] @pie[l-1] is, @pie[step-peas] can take a @pieblock[(Vec Atom l-1)] and produce a @pieblock[(Vec Atom (add1 l-1))]
+
+Finally, the definition of @pie[peas]:
+
+@pieblock[
+(claim peas
+  (Π ((how-many-peas Nat))
+    (Vec Atom how-many-peas)))
+(define peas
+  (lambda (how-many-peas)
+    (ind-Nat how-many-peas
+      motive-peas
+      vecnil
+      step-peas)))
+]
+
+Building a value of any natural number by giving a value for zero and a way to transform a value for @italic{n} into a value @italic{n+1} called @italic{induction on natural numbers}.
+
+And we can define a @pie[rec-Nat] based on @pie[ind-Nat]:
+
+@pieblock[
+(claim rec-Nat-2
+  (Π ((X U))
+    (-> Nat
+        X
+        (-> Nat X
+          X)
+      X)))
+(define rec-Nat-2
+  (lambda (X)
+    (lambda (target base step)
+      (ind-Nat target
+        (lambda (k) X)
+        base
+        step))))
+]
