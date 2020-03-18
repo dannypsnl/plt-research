@@ -338,3 +338,28 @@ And we can define a @pie[rec-Nat] based on @pie[ind-Nat]:
         base
         step))))
 ]
+
+@section{type is statement}
+
+An expression @pieblock[(= X from to)] is a type if @pie[X] is a type, @pie[from] is an @pie[X], and @pie[to] is an @pie[X].
+
+The expression @pieblock[(same e)] is an @pieblock[(= X e e)] if @pie[e] is an @pie[X].
+
+The type @pieblock[(= Atom 'apple 'apple)] can be read:
+
+  @italic{The expressions 'apple and 'apple are equal Atoms}.
+
+@pieblock[
+(Π ((n Nat))
+  (= Nat (+ 1 n) (add1 n)))
+] can be read as:
+
+  @italic{For every @pie[Nat] @pie[n], @pie[(+ 1 n)] equals @pie[(add1 n)]}.
+
+The expression @pieblock[
+(-> X
+  Y)
+]
+can be read as:
+
+  @italic{if @pie[X] then @pie[Y]}.
