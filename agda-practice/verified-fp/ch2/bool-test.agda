@@ -34,3 +34,10 @@ or-same {false} = refl
 
 test-or-same : (false || false) ≡ false
 test-or-same = or-same {false}
+
+-- absurd: `()`
+||≡ff₁ : ∀ {b1 b2} → b1 || b2 ≡ false → false ≡ b1
+||≡ff₁ {false} p = refl
+-- wrong definition: ||≡ff₁ {true} p = refl
+-- would get: `false != true of type Bool`
+||≡ff₁ {true} ()
