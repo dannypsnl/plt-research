@@ -45,3 +45,11 @@ test-or-same = or-same {false}
 -- cong
 ||-cong₁ : ∀ {b1 b1' b2} → b1 ≡ b1' → b1 || b2 ≡ b1' || b2
 ||-cong₁ refl = refl
+
+||-cong₂ : ∀ {b1 b2 b2'} → b2 ≡ b2' → b1 || b2 ≡ b1 || b2'
+-- p : b2 ≡ b2'
+-- rewrite tell Agda write occurence of b2 in
+--   b1 || b2 ≡ b1 || b2'
+-- to
+--   b1 || b2' ≡ b1 || b2'
+||-cong₂ p rewrite p = refl
