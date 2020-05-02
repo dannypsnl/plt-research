@@ -17,6 +17,9 @@ _&&_ : Bool → Bool → Bool
 true && b = b
 false && b = false
 
-and-same : ∀ (b : Bool) → b && b ≡ b
-and-same true = refl
-and-same false = refl
+and-same : ∀ {b} → b && b ≡ b
+and-same {true} = refl
+and-same {false} = refl
+
+test-and-same : (true && true) ≡ true
+test-and-same = and-same {true}
