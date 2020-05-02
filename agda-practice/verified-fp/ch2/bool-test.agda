@@ -53,3 +53,9 @@ test-or-same = or-same {false}
 -- to
 --   b1 || b2' ≡ b1 || b2'
 ||-cong₂ p rewrite p = refl
+
+ite-same : ∀ {a} {A : Set a} →
+           ∀ (b : Bool) (x : A) →
+           (if b then x else x) ≡ x
+ite-same true x = refl
+ite-same false x = refl
