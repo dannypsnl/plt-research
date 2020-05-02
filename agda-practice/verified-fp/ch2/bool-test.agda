@@ -41,3 +41,7 @@ test-or-same = or-same {false}
 -- wrong definition: ||≡ff₁ {true} p = refl
 -- would get: `false != true of type Bool`
 ||≡ff₁ {true} ()
+
+-- cong
+||-cong₁ : ∀ {b1 b1' b2} → b1 ≡ b1' → b1 || b2 ≡ b1' || b2
+||-cong₁ refl = refl
