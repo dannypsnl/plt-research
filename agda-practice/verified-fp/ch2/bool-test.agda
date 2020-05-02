@@ -23,3 +23,14 @@ and-same {false} = refl
 
 test-and-same : (true && true) ≡ true
 test-and-same = and-same {true}
+
+_||_ : Bool → Bool → Bool
+true || b = true
+false || b = b
+
+or-same : ∀ {b} → b || b ≡ b
+or-same {true} = refl
+or-same {false} = refl
+
+test-or-same : (false || false) ≡ false
+test-or-same = or-same {false}
