@@ -41,6 +41,10 @@ test-or-same = or-same {false}
 -- wrong definition: ||≡ff₁ {true} p = refl
 -- would get: `false != true of type Bool`
 ||≡ff₁ {true} ()
+Bool-contradiction : false ≡ true → ∀ {P : Set} → P
+-- there has nothing need to check `false ≡ true`
+-- therefore, we give an absurd pattern `()`
+Bool-contradiction ()
 
 -- cong
 ||-cong₁ : ∀ {b1 b1' b2} → b1 ≡ b1' → b1 || b2 ≡ b1' || b2
