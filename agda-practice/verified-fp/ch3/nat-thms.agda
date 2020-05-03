@@ -41,3 +41,7 @@ open import Relation.Binary.PropositionalEquality
 *commutativity : ∀ (x y : ℕ) → x * y ≡ y * x
 *commutativity zero y rewrite *0 y = refl
 *commutativity (suc x) y rewrite *suc y x | *commutativity x y = refl
+
+*associativity : ∀ (x y z : ℕ) → x * (y * z) ≡ (x * y) * z
+*associativity zero y z = refl
+*associativity (suc x) y z rewrite *associativity x y z | *right-distributivity y (x * y) z = refl
