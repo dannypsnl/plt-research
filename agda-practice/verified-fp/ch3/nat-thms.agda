@@ -26,3 +26,18 @@ open import Relation.Binary.PropositionalEquality
 +commutativity : ∀ (x y : ℕ) → x + y ≡ y + x
 +commutativity zero y rewrite +0 y = refl
 +commutativity (suc x) y rewrite +suc y x | +commutativity x y = refl
+
+-- distributivity
+*right-distributivity : ∀ (x y z : ℕ) → (x + y) * z ≡ x * z + y * z
+*right-distributivity zero y z = refl
+*right-distributivity (suc x) y z rewrite *right-distributivity x y z = +associativity z (x * z) (y * z)
+
+*0 : ∀ (x : ℕ) → x * 0 ≡ 0
+*0 zero = refl
+*0 (suc x) rewrite *0 x = refl
+*suc : ∀ (x y : ℕ) → x * (suc y) ≡ x + (x * y)
+*suc zero y = refl
+*suc (suc x) y rewrite *suc x y | +associativity y x (x * y) | +associativity x y (x * y) | +commutativity y x = refl
+*commutativity : ∀ (x y : ℕ) → x * y ≡ y * x
+*commutativity zero y rewrite *0 y = refl
+*commutativity (suc x) y rewrite *suc y x | *commutativity x y = refl
