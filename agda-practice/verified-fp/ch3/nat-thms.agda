@@ -18,3 +18,11 @@ open import Relation.Binary.PropositionalEquality
 +associativity zero y z = refl
 -- reduce x to zero
 +associativity (suc x) y z rewrite +associativity x y z = refl
+
++suc : ∀ (x y : ℕ) → x + (suc y) ≡ suc (x + y)
++suc zero y = refl
++suc (suc x) y rewrite +suc x y = refl
+-- commutativity
++commutativity : ∀ (x y : ℕ) → x + y ≡ y + x
++commutativity zero y rewrite +0 y = refl
++commutativity (suc x) y rewrite +suc y x | +commutativity x y = refl
