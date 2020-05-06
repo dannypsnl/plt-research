@@ -1,6 +1,7 @@
 module nat-thms where
 
 open import Data.Nat
+open import Data.Bool hiding (_<_)
 open import Relation.Binary.PropositionalEquality
 
 0+ : ∀ (x : ℕ) → 0 + x ≡ x
@@ -45,3 +46,18 @@ open import Relation.Binary.PropositionalEquality
 *associativity : ∀ (x y z : ℕ) → x * (y * z) ≡ (x * y) * z
 *associativity zero y z = refl
 *associativity (suc x) y z rewrite *associativity x y z | *right-distributivity y (x * y) z = refl
+
+-- current problem: `(x < 0) ≡ false` occurs error: `Bool !=< Set`
+-- <-0 : ∀ (x : ℕ) → (x < 0) ≡ false
+-- <-0 0 = refl
+-- <-0 (suc x) = refl
+-- Bool-contra : false ≡ true → ∀ {P : Set} → P
+-- Bool-contra false≡true = ?
+-- <-transitivity : ∀ {x y z : ℕ} →
+--                  (x < y) ≡ true → (y < z) ≡ true → (x < z) ≡ true
+-- <-transitivity {x} {0} x<y y<z rewrite <-0 x = Bool-contra x<y
+-- <-transitivity {0} {suc y} {0} x<y ()
+-- <-transitivity {0} {suc y} {suc z} x<y y<z = ?
+-- <-transitivity {suc x} {suc y} {0} x<y ()
+-- <-transitivity {suc x} {suc y} {suc z} x<y y<z =
+--   <-transitivity {x} {y} {z} x<y y<z
