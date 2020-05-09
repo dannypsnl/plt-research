@@ -27,21 +27,20 @@ length-++ (h ∷ t) l₂ rewrite length-++ t l₂ = refl
 ≤-suc zero = z≤n
 ≤-suc (suc n) = s≤s (≤-suc n)
 
-length-filter : ∀ {level} {A : Set} {P : Pred A level} (P? : Decidable P) (xs : List A)
-                → (length (filter P? xs)) ≤ length xs
-length-filter P? [] = z≤n
-length-filter P? (h ∷ t) with does (P? h)
--- when P? returns true, value would be keep
-... | true = s≤s (length-filter P? t)
--- when P? returns false, value would be drop
--- then we proof transitivity: (length (filter P? t)) ≤ (length t) ≤ suc (length t)
-... | false = ≤-trans (length-filter P? t) (≤-suc (length t))
-
 private
   variable
     a  p : Level
     A : Set a
 module _ {P : Pred A p} (P? : Decidable P) where
+
+  length-filter : ∀ xs → length (filter P? xs) ≤ length xs
+  length-filter [] = z≤n
+  length-filter (x ∷ xs) with does (P? x)
+  -- when P? returns true, value would be keep
+  ... | true = s≤s (length-filter xs)
+  -- when P? returns false, value would be drop
+  -- then we proof ≤-step: (length-filter xs) ≤ 1 + (length-filter xs)
+  ... | false = ≤-step (length-filter xs)
 
   filter-idempotent : filter P? ∘ filter P? ≗ filter P?
   filter-idempotent [] = refl
