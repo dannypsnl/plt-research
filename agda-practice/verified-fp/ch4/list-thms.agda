@@ -12,6 +12,7 @@ open import Relation.Unary
 open import Relation.Nullary
 open import Relation.Nullary.Negation
 open import Relation.Binary.PropositionalEquality
+open ≡-Reasoning
 
 length-++ : ∀ {A : Set} (l₁ l₂ : List A)
   → length (l₁ ++ l₂) ≡ (length l₁) + (length l₂)
@@ -48,3 +49,29 @@ module _ {P : Pred A p} (P? : Decidable P) where
   -- in this branch `P?` removes head, so have to check rest list follow the rule
   ... | false | _ = filter-idempotent xs
   ... | true | [ eq ] rewrite eq = cong (x ∷_) (filter-idempotent xs)
+
+  length-ʳ++ : ∀ (xs {ys} : List A) →
+             length (xs ʳ++ ys) ≡ length xs + length ys
+  length-ʳ++ [] = refl
+  length-ʳ++ (x ∷ xs) {ys} =
+    begin
+      length ((x ∷ xs) ʳ++ ys)
+    ≡⟨⟩
+      length (xs ʳ++ x ∷ ys)
+    ≡⟨ length-ʳ++ xs ⟩
+      length xs + length (x ∷ ys)
+    ≡⟨ +-suc _ _ ⟩
+      length (x ∷ xs) + length ys
+    ∎
+
+  length-reverse : ∀ (xs : List A) → length (reverse xs) ≡ length xs
+  length-reverse xs =
+    begin
+      length (reverse xs)
+    ≡⟨⟩
+      length (xs ʳ++ [])
+    ≡⟨ length-ʳ++ xs ⟩
+      (length xs + 0)
+    ≡⟨ +-identityʳ _ ⟩
+      length xs
+    ∎
