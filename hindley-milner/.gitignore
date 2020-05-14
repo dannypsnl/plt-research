@@ -1,9 +1,0 @@
-*
-!LICENSE
-!.gitignore
-!*.yaml
-!*.md
-!*.cabal
-!*.hs
-!*.scala
-!*.sbt
