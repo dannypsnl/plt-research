@@ -11,16 +11,16 @@
 (struct bterm:application bterm [(t1 : bterm) (t2 : bterm)] #:transparent)
 
 ;;; convert lambda calculus to de-bruijn index form
-(: convert (->* [term] [(Mutable-HashTable String Integer)] bterm))
-(define (convert t [rename-to : (Mutable-HashTable String Integer) (make-hash '())])
+(: convert (->* [term] [(Immutable-HashTable String Integer)] bterm))
+(define (convert t [rename-to (make-immutable-hash '())])
   (match t
     ;; get index from environment
     ([term:var name] (bterm:var (hash-ref rename-to name)))
     ([term:lambda p b]
-     ;; bind parameter name to an index
-     (hash-set! rename-to p (hash-count rename-to))
      (bterm:lambda
-      (convert b rename-to)))
+      (convert b
+               ;; bind parameter name to an index
+               (hash-set rename-to p (hash-count rename-to)))))
     ([term:application t1 t2]
      (bterm:application
       (convert t1 rename-to)
