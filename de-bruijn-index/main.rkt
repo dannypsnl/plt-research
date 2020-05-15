@@ -11,22 +11,41 @@
 (struct bterm:application bterm [(t1 : bterm) (t2 : bterm)] #:transparent)
 
 ;;; convert lambda calculus to de-bruijn index form
-(: convert (-> term bterm))
-(define (convert t)
+(: convert (->* [term] [(Mutable-HashTable String Integer)] bterm))
+(define (convert t [rename-to : (Mutable-HashTable String Integer) (make-hash '())])
   (match t
-    ([term:var v] (bterm:var 0))
+    ;; get index from environment
+    ([term:var name] (bterm:var (hash-ref rename-to name)))
     ([term:lambda p b]
-      (bterm:lambda
-        (convert b)))
+     ;; bind parameter name to an index
+     (hash-set! rename-to p (hash-count rename-to))
+     (bterm:lambda
+      (convert b rename-to)))
     ([term:application t1 t2]
-      (bterm:application
-        (convert t1)
-        (convert t2)))))
+     (bterm:application
+      (convert t1 rename-to)
+      (convert t2 rename-to)))))
 
 (module+ test
   (require typed/rackunit))
 
 (module+ test
- (check-equal? (convert (term:lambda "x" (term:var "x")))
-               (bterm:lambda (bterm:var 0)))
- )
+  (check-equal? (convert (term:lambda "x" (term:var "x")))
+                (bterm:lambda (bterm:var 0)))
+  (check-equal? (convert (term:lambda "f"
+                                      (term:application
+                                       (term:lambda "x"
+                                                    (term:application (term:application (term:var "f")  (term:var "x")) (term:var "x")))
+                                       (term:lambda "x"
+                                                    (term:application (term:application (term:var "f")  (term:var "x")) (term:var "x"))))))
+                (bterm:lambda
+                 (bterm:application
+                  (bterm:lambda
+                   (bterm:application
+                    (bterm:application
+                     (bterm:var 0) (bterm:var 1)) (bterm:var 1)))
+                  (bterm:lambda
+                   (bterm:application
+                    (bterm:application
+                     (bterm:var 0) (bterm:var 1)) (bterm:var 1))))))
+  )
