@@ -54,7 +54,7 @@
 ; since bterm using de-bruijn index, lifting after beta-reduction is required
 ; to know which level we are, must count λ
 (: beta-reduction (->* [bterm] [Integer (Immutable-HashTable Integer bterm)] bterm))
-(define (beta-reduction t [de-bruijn-level 0] [subst : (Immutable-HashTable Integer bterm) #hash()])
+(define (beta-reduction t [de-bruijn-level 0] [subst (make-immutable-hash '())])
   (match t
     ([bterm:var i]
      (hash-ref subst i (λ () t)))
