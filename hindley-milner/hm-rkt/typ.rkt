@@ -3,7 +3,8 @@
 (provide typ
          typ:builtin
          typ:freevar
-         typ:constructor)
+         typ:constructor
+         typ:arrow)
 
 (struct typ [] #:transparent)
 (struct typ:builtin typ [(name : String)] #:transparent)
@@ -12,3 +13,4 @@
   [(name : String)
    (arg : (Listof typ))]
   #:transparent)
+(struct typ:arrow typ [(from : typ) (to : typ)] #:transparent)
