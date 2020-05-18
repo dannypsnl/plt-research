@@ -3,5 +3,5 @@
 (provide typ
          typ:builtin)
 
-(struct typ [])
-(struct typ:builtin typ [(name : String)])
+(struct typ [] #:transparent)
+(struct typ:builtin typ [(name : String)] #:transparent)
