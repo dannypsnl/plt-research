@@ -3,12 +3,37 @@
 (require "lang.rkt"
          "typ.rkt")
 
-(struct Context
-  [(freevar-counter : Integer)]
+(struct env
+  [(parent : (Option env))
+   (type-env : (Mutable-HashTable String typ))]
   #:transparent
   #:mutable)
+(: env/new (->* () ((Option env)) env))
+(define (env/new [parent #f])
+  (env parent (make-hash '())))
+(: env/lookup (-> env String typ))
+(define (env/lookup env var-name)
+  (hash-ref (env-type-env env) var-name
+            (λ ()
+              (match env
+                (e (env/lookup e var-name))
+                (#f (raise (format "no variable named: `~a`" var-name)))))))
+;;; env/bind-var should record a form `x : A` into env, when lookup the variable `x` should get type `A`
+(: env/bind-var (-> env String typ Void))
+(define (env/bind-var env var-name typ)
+  (let ([env (env-type-env env)])
+    (if (hash-has-key? env var-name)
+        (raise (format "redefined: `~a`" var-name))
+        (hash-set! env var-name typ))))
+
+(struct Context
+  [(freevar-counter : Integer)
+   (type-env : env)]
+  #:transparent
+  #:mutable)
+(: Context/new (-> Context))
 (define (Context/new)
-  (Context 0))
+  (Context 0 (env/new)))
 (: Context/freevar! (-> Context Integer))
 (define (Context/freevar! ctx)
   (let ([cur-count (Context-freevar-counter ctx)])
@@ -37,4 +62,6 @@
                                 (typ:freevar (Context/freevar! ctx))
                                 ; use first element type as type of all elements
                                 (type/infer (car elems))))))
+    ;;; infer variable would rely on lookup in context
+    ([expr:variable name] (env/lookup (Context-type-env ctx) name))
     (_ (raise "unimplemented yet"))))
