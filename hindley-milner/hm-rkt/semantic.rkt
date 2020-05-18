@@ -11,14 +11,19 @@
 (: env/new (->* () ((Option env)) env))
 (define (env/new [parent #f])
   (env parent (make-hash '())))
+;;; env/lookup take variable name such as `x` to get a type from env
 (: env/lookup (-> env String typ))
 (define (env/lookup env var-name)
+  ; try to get value from table
   (hash-ref (env-type-env env) var-name
+            ; if fail, handler would take
             (λ ()
-              (match env
-                (e (env/lookup e var-name))
+              (match parent-env
+                ; dispatch to parent if we have one
+                (parent (env/lookup parent var-name))
+                ; really fail if we have no parent environment
                 (#f (raise (format "no variable named: `~a`" var-name)))))))
-;;; env/bind-var should record a form `x : A` into env, when lookup the variable `x` should get type `A`
+;;; env/bind-var records form `x : A` into env, when lookup the variable `x` should get type `A`
 (: env/bind-var (-> env String typ Void))
 (define (env/bind-var env var-name typ)
   (let ([env (env-type-env env)])
