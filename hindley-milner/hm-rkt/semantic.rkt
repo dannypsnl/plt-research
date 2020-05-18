@@ -85,4 +85,17 @@
                          (map (λ (_) (Context/new-freevar! ctx)) params))]
            [body-typ (type/infer body ctx)])
        (typ:arrow param-types body-typ)))
+    ;;; next we infer `let` binding
+    ; people familiar with Racket might though: let binding is a lambda immediately be called
+    ; in Racket, which make sense, in HM inference algorithm would make trouble
+    ; the problem is **polymorphism lambda calculus(also known as System F)** is undecidable.
+    ; only values bound in let-polymorphism construct are subject to instantiation.
+    ([expr:let bindings exp]
+     (: bind-to-context (-> (Pairof String expr) Void))
+     (define bind-to-context (λ (bind)
+                               (match bind
+                                 ([cons name init]
+                                  (Env/bind-var (Context-type-env ctx) name (type/infer init ctx))))))
+     (map bind-to-context bindings)
+     (type/infer exp ctx))
     (_ (raise "unimplemented yet"))))
