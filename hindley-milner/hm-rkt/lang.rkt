@@ -1,5 +1,15 @@
 #lang typed/racket
 
+(provide expr
+         expr:int
+         expr:bool
+         expr:string
+         expr:list
+         expr:variable
+         expr:lambda
+         expr:application
+         expr:let)
+
 ;;; expressions
 (struct expr [])
 (struct expr:int expr [(v : Integer)])
