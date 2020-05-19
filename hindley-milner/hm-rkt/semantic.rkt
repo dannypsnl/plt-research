@@ -65,14 +65,11 @@
 (: unify (-> typ typ Void))
 (define (unify t1 t2)
   (match (cons t1 t2)
-    ([cons (typ:builtin a) (typ:builtin b)]
-     #:when (string=? a b)
-     (void))
     ([cons (typ:constructor a al) (typ:constructor b bl)]
      #:when (string=? a b)
      (for-each (λ ((ae : typ) (be : typ))
-                (unify ae be))
-              al bl))
+                 (unify ae be))
+               al bl))
     ([cons (typ:arrow p1 r1) (typ:arrow p2 r2)]
      (unify p1 p2)
      (unify r1 r2))
@@ -119,7 +116,10 @@
      ; params use new freevars as their type
      (let ([param-types (typ:constructor
                          "pair"
-                         (map (λ (_) (Context/new-freevar! ctx)) params))]
+                         (map (λ ([param-name : String])
+                                (let ([r (Context/new-freevar! ctx)])
+                                  (Env/bind-var (Context-type-env ctx) param-name r)
+                                  r)) params))]
            [body-typ (type/infer body ctx)])
        (typ:arrow param-types body-typ)))
     ;;; next we infer `let` binding
@@ -144,3 +144,32 @@
            [fresh (Context/new-freevar! ctx)])
        (unify fn-typ (typ:arrow (typ:constructor "pair" args-typ) fresh))
        fresh))))
+
+(module+ test
+  (require typed/rackunit))
+(module+ test
+  (test-case
+   "infer type of simple expression"
+   (check-equal? (type/infer (expr:int 1))
+                 (typ:builtin "int"))
+   (check-equal? (type/infer (expr:bool #f))
+                 (typ:builtin "bool"))
+   (check-equal? (type/infer (expr:string "know"))
+                 (typ:builtin "string")))
+
+  (test-case
+   "list is a little bit free"
+   (check-equal? (type/infer (expr:list '()))
+                 (typ:constructor "list" (list (typ:freevar 0 #f)))))
+
+  (test-case
+   "let id function"
+   (define exp (expr:let
+                (list
+                 (cons "id" (expr:lambda (list "x") (expr:variable "x"))))
+                (expr:variable "id")))
+   (check-equal? (type/infer exp)
+                 ; expect: `(?0) -> ?0`
+                 (typ:arrow (typ:constructor "pair" (list (typ:freevar 0 #f))) (typ:freevar 0 #f))))
+
+  )

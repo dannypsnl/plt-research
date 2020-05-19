@@ -7,7 +7,6 @@
          typ:arrow)
 
 (struct typ [] #:transparent)
-(struct typ:builtin typ [(name : String)] #:transparent)
 (struct typ:freevar typ
   [(index : Integer)
    (substituted : (Option typ))]
@@ -17,6 +16,9 @@
   [(name : String)
    (arg : (Listof typ))]
   #:transparent)
+(: typ:builtin (-> String typ:constructor))
+(define (typ:builtin name)
+  (typ:constructor name '()))
 (struct typ:arrow typ [(from : typ) (to : typ)] #:transparent)
 
 (: subst (-> typ:freevar typ typ:freevar))
