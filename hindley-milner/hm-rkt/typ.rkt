@@ -2,7 +2,7 @@
 
 (provide typ
          typ:builtin
-         typ:freevar subst
+         typ:freevar subst!
          typ:constructor
          typ:arrow)
 
@@ -21,7 +21,9 @@
   (typ:constructor name '()))
 (struct typ:arrow typ [(from : typ) (to : typ)] #:transparent)
 
-(: subst (-> typ:freevar typ typ:freevar))
-(define (subst freevar substituted)
-  (set-typ:freevar-substituted! freevar substituted)
-  freevar)
+(: subst! (-> typ:freevar typ Void))
+(define (subst! fv s)
+  (let ([ns (match s
+              ([typ:freevar _ s] s)
+              (s s))])
+    (set-typ:freevar-substituted! fv ns)))

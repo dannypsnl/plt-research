@@ -75,13 +75,13 @@
      (unify r1 r2))
     ;;; freevar type is only important thing in `unify` function
     ((and
-      [cons (typ:freevar _ _) t2]
-      [cons t1 t2])
-     (if (or (eqv? t1 t2) (not (occurs t1 t2)))
-         (subst t1 t2)
+      [cons _ (typ:freevar _ _)]
+      [cons t v])
+     (if (or (eqv? v t) (not (occurs v t)))
+         (subst! v t)
          (void))
      (void))
-    ([cons t1 (typ:freevar _ _)] (unify t2 t1))
+    ([cons (typ:freevar _ _) t2] (unify t2 t1))
     (_ (raise (format "cannot unify type ~a and ~a" t1 t2)))))
 
 (: type/infer (->* (expr) (Context) typ))
@@ -171,5 +171,14 @@
    (check-equal? (type/infer exp)
                  ; expect: `(?0) -> ?0`
                  (typ:arrow (typ:constructor "pair" (list (typ:freevar 0 #f))) (typ:freevar 0 #f))))
+
+  (test-case
+   "let id function and apply"
+   (define exp-app (expr:let
+                    (list
+                     (cons "id" (expr:lambda (list "x") (expr:variable "x"))))
+                    (expr:application (expr:variable "id") (list (expr:bool #t)))))
+   (check-equal? (type/infer exp-app)
+                 (typ:freevar 1 (typ:builtin "bool"))))
 
   )
