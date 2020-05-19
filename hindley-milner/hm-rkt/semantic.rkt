@@ -50,10 +50,22 @@
     (set-Context-freevar-counter! ctx (+ 1 (Context-freevar-counter ctx)))
     (typ:freevar cur-count)))
 
-(: unify (->* (typ typ) (Context) typ))
-(define (unify t1 t2 [ctx (Context/new)])
+(: unify (-> typ typ Void))
+(define (unify t1 t2)
   (match (cons t1 t2)
-    (_ (raise "unimplemented"))))
+    ([cons (typ:builtin a) (typ:builtin b)]
+     #:when (string=? a b)
+     (void))
+    ([cons (typ:constructor a al) (typ:constructor b bl)]
+     #:when (string=? a b)
+     (map (λ ((ae : typ) (be : typ))
+            (unify ae be))
+          al bl)
+     (void))
+    ([cons (typ:arrow p1 r1) (typ:arrow p2 r2)]
+     (unify p1 p2)
+     (unify r1 r2))
+    (_ (raise (format "cannot unify type ~a and ~a" t1 t2)))))
 
 (: type/infer (->* (expr) (Context) typ))
 (define (type/infer exp [ctx (Context/new)])
@@ -110,4 +122,5 @@
      (let ([fn-typ (type/infer fn ctx)]
            [args-typ (map (λ ((arg : expr)) (type/infer arg ctx)) args)]
            [fresh (Context/new-freevar! ctx)])
-       (unify fn-typ (typ:arrow (typ:constructor "pair" args-typ) fresh))))))
+       (unify fn-typ (typ:arrow (typ:constructor "pair" args-typ) fresh))
+       fresh))))
