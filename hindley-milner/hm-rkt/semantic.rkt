@@ -50,6 +50,11 @@
     (set-Context-freevar-counter! ctx (+ 1 (Context-freevar-counter ctx)))
     (typ:freevar cur-count)))
 
+(: unify (->* (typ typ) (Context) typ))
+(define (unify t1 t2 [ctx (Context/new)])
+  (match (cons t1 t2)
+    (_ (raise "unimplemented"))))
+
 (: type/infer (->* (expr) (Context) typ))
 (define (type/infer exp [ctx (Context/new)])
   (match exp
@@ -98,4 +103,11 @@
                                   (Env/bind-var (Context-type-env ctx) name (type/infer init ctx))))))
      (map bind-to-context bindings)
      (type/infer exp ctx))
-    (_ (raise "unimplemented yet"))))
+    ;;; the final expression is application
+    ; infer application would require a new function called `unify`,
+    ; which unified freevar and concrete type to give freevar a binding
+    ([expr:application fn args]
+     (let ([fn-typ (type/infer fn ctx)]
+           [args-typ (map (λ ((arg : expr)) (type/infer arg ctx)) args)]
+           [fresh (Context/new-freevar! ctx)])
+       (unify fn-typ (typ:arrow (typ:constructor "pair" args-typ) fresh))))))
