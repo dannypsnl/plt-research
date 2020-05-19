@@ -48,7 +48,19 @@
 (define (Context/new-freevar! ctx)
   (let ([cur-count (Context-freevar-counter ctx)])
     (set-Context-freevar-counter! ctx (+ 1 (Context-freevar-counter ctx)))
-    (typ:freevar cur-count)))
+    (typ:freevar cur-count #f)))
+
+(: occurs (-> typ typ Boolean))
+(define (occurs v t)
+  (match (cons v t)
+    ([cons v (typ:freevar _ _)] (eqv? v t))
+    ([cons v (typ:arrow t1 t2)] (or (occurs v t1) (occurs v t2)))
+    ([cons v (typ:constructor _ type-params)]
+     (foldl (λ ([t : typ] [pre-bool : Boolean])
+              (or pre-bool (occurs v t)))
+            #f
+            type-params))
+    (_ false)))
 
 (: unify (-> typ typ Void))
 (define (unify t1 t2)
@@ -58,13 +70,21 @@
      (void))
     ([cons (typ:constructor a al) (typ:constructor b bl)]
      #:when (string=? a b)
-     (map (λ ((ae : typ) (be : typ))
-            (unify ae be))
-          al bl)
-     (void))
+     (for-each (λ ((ae : typ) (be : typ))
+                (unify ae be))
+              al bl))
     ([cons (typ:arrow p1 r1) (typ:arrow p2 r2)]
      (unify p1 p2)
      (unify r1 r2))
+    ;;; freevar type is only important thing in `unify` function
+    ((and
+      [cons (typ:freevar _ _) t2]
+      [cons t1 t2])
+     (if (or (eqv? t1 t2) (not (occurs t1 t2)))
+         (subst t1 t2)
+         (void))
+     (void))
+    ([cons t1 (typ:freevar _ _)] (unify t2 t1))
     (_ (raise (format "cannot unify type ~a and ~a" t1 t2)))))
 
 (: type/infer (->* (expr) (Context) typ))
