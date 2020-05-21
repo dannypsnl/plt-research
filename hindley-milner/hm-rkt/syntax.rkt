@@ -7,7 +7,7 @@
 
 (provide #%module-begin
          #%top-interaction
-         (rename-out [hm:lambda lambda]
+         (rename-out [hm:lambda λ]
                      [hm:datum #%datum]))
 
 ;;; (λ (a b c) a)
