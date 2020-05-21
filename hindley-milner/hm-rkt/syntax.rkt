@@ -14,7 +14,6 @@
 (define-syntax (hm:lambda stx)
   (syntax-parse stx
     ([_ (params*:id ...) body]
-     ;(define r (stx->map (λ (p) (id->string p)) #'(params* ...)))
      #'(expr:lambda (list (symbol->string 'params*) ...) body))))
 
 (define-syntax (hm:datum stx)
