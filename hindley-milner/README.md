@@ -14,8 +14,5 @@ This is just a simple(and of course buggy) language for showing how to inference
 
 TODO:
 
-- let binding syntax
 - list literal
-- variable
-- application
 - automatically eval type and eval result
