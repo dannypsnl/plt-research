@@ -11,6 +11,7 @@
                      [hm:app #%app]
                      [hm:datum #%datum]
                      [hm:let let]
+                     [hm:list quote]
                      [hm:identifier #%top]))
 
 ;;; (λ (a b c) a)
@@ -35,6 +36,11 @@
   (syntax-parse stx
     ([_ f arg* ...]
      #'(expr:application f (list arg* ...)))))
+
+(define-syntax (hm:list stx)
+  (syntax-parse stx
+    ([_ elem* ...]
+     #'(expr:list (list elem* ...)))))
 
 (define-syntax (hm:identifier stx)
   (syntax-parse stx
