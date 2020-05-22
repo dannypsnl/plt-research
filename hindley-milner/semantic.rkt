@@ -1,7 +1,8 @@
 #lang typed/racket
 
 (require "lang.rkt"
-         "typ.rkt")
+         "typ.rkt"
+         "pretty-print.rkt")
 
 (struct Env
   [(parent : (Option Env))
@@ -82,7 +83,7 @@
          (void))
      (void))
     ([cons (typ:freevar _ _) t2] (unify t2 t1))
-    (_ (raise (format "cannot unify type ~a and ~a" t1 t2)))))
+    (_ (raise (format "cannot unify type ~a and ~a" (pretty-print t1) (pretty-print t2))))))
 
 (: type/infer (->* (expr) (Context) typ))
 (define (type/infer exp [ctx (Context/new)])
