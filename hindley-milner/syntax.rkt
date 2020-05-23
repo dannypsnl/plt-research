@@ -4,7 +4,8 @@
          racket/syntax
          syntax/stx)
 (require "lang.rkt"
-         "semantic.rkt")
+         "semantic.rkt"
+         "pretty-print.rkt")
 
 (provide (except-out (all-from-out racket) #%module-begin)
          (rename-out [module-begin #%module-begin]
@@ -37,7 +38,7 @@
    (define all-form (list (parse EXPR) ...))
    (for-each (λ (form)
                (displayln form)
-               (displayln (type/infer form)))
+               (printf "type:- ~a~n" (pretty-print-typ (type/infer form))))
              all-form)))
 ;(parse
 ; (let ([a 1]
