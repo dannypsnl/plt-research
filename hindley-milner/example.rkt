@@ -1,5 +1,14 @@
 #lang s-exp "syntax.rkt"
 
+;;; integer
+1
+;;; bool
+#t
+#f
+;;; string
+"a"
+;;; list
+'(1 2 3)
 ;;; lambda
 (λ (a) "")
 (λ () #t)
@@ -8,5 +17,3 @@
 (let ([a 1]
       [b (λ (x) x)])
   (b a))
-;;; list
-'(1 2 3)
