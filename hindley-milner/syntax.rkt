@@ -7,9 +7,9 @@
          "semantic.rkt"
          "pretty-print.rkt")
 
-(provide (except-out (all-from-out racket) #%module-begin)
+(provide (except-out (all-from-out racket) #%module-begin #%top-interaction)
          (rename-out [module-begin #%module-begin]
-                     ; [#%top-interaction]
+                     [top-interaction #%top-interaction]
                      ))
 
 (define-syntax (parse stx)
@@ -26,13 +26,10 @@
     (`[(~literal λ) (ps* ...) body] #'(expr:lambda (list (symbol->string 'ps*) ...) (parse body)))
     (`[(~literal quote) (elem* ...)] #'(expr:list (list (parse elem*) ...)))
     (`[f arg* ...] #'(expr:application (parse f) (list (parse arg*) ...)))
-    
-    ;(`[quote elem* ...] #'(expr:list (list (parse elem*) ...)))
     (`v:id #'(expr:variable (symbol->string 'v)))
     (`s:string #'(expr:string (#%datum . s)))
     (`b:boolean #'(expr:bool (#%datum . b)))
-    (`i:exact-integer #'(expr:int (#%datum . i)))
-    ))
+    (`i:exact-integer #'(expr:int (#%datum . i)))))
 
 (define-syntax-rule (module-begin EXPR ...)
   (#%module-begin
@@ -41,3 +38,6 @@
                (displayln form)
                (printf "type:- ~a~n" (pretty-print-typ (type/infer form))))
              all-form)))
+
+(define-syntax-rule (top-interaction . exp)
+  (pretty-print-typ (type/infer (parse exp))))
