@@ -14,4 +14,4 @@ This is just a simple(and of course buggy) language for showing how to inference
 
 TODO:
 
-- automatically eval type and eval result
+- automatically eval result
