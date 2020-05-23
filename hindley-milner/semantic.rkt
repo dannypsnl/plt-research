@@ -1,5 +1,7 @@
 #lang typed/racket
 
+(provide type/infer)
+
 (require "lang.rkt"
          "typ.rkt"
          "pretty-print.rkt")

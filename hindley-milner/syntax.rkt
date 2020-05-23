@@ -3,50 +3,43 @@
 (require (for-syntax syntax/parse)
          racket/syntax
          syntax/stx)
-(require "lang.rkt")
+(require "lang.rkt"
+         "semantic.rkt")
 
-(provide #%module-begin
-         #%top-interaction
-         (rename-out [hm:lambda λ]
-                     [hm:app #%app]
-                     [hm:datum #%datum]
-                     [hm:let let]
-                     [hm:list quote]
-                     [hm:identifier #%top]))
+(provide (except-out (all-from-out racket) #%module-begin)
+         (rename-out [module-begin #%module-begin]
+                     ; [#%top-interaction]
+                     ))
 
-;;; (λ (a b c) a)
-(define-syntax (hm:lambda stx)
-  (syntax-parse stx
-    ([_ (params*:id ...) body]
-     #'(expr:lambda (list (symbol->string 'params*) ...) body))))
-
-;;; (let ([a 1] [b (λ (x) x)])
-;;;   (b a))
-(define-syntax (hm:let stx)
+(define-syntax (parse stx)
   (define-syntax-class bind
     (pattern (bind-name:id bind-expr)
              #:with bind
-             #'(cons (symbol->string 'bind-name) bind-expr)))
+             #'(cons (symbol->string 'bind-name) (parse bind-expr))))
   (syntax-parse stx
-    ([_ (binding*:bind ...) body]
-     #'(expr:let (list binding*.bind ...) body))))
+    (`[λ (ps* ...) body] #'(expr:lambda (list (symbol->string 'ps*) ...) (parse body)))
+    ; (let ([a 1]
+    ;       [b (λ (x) x)])
+    ;   (b a))
+    (`[let (binding*:bind ...) body]
+     #'(expr:let (list binding*.bind ...) (parse body)))
+    (`[quote elem* ...] #'(expr:list (list (parse elem*) ...)))
+    (`v:id #'(expr:variable (symbol->string 'v)))
+    (`s:string #'(expr:string (#%datum . s)))
+    (`b:boolean #'(expr:bool (#%datum . b)))
+    (`i:exact-integer #'(expr:int (#%datum . i)))
+    (`[f (arg* ...)]
+     #'(expr:application f (list arg* ...)))
+    ))
 
-;;; (f arg)
-(define-syntax (hm:app stx)
-  (syntax-parse stx
-    ([_ f arg* ...]
-     #'(expr:application f (list arg* ...)))))
-
-(define-syntax (hm:list stx)
-  (syntax-parse stx
-    ([_ elem* ...]
-     #'(expr:list (list elem* ...)))))
-
-(define-syntax (hm:identifier stx)
-  (syntax-parse stx
-    ([_ . v:id] #'(expr:variable (symbol->string 'v)))))
-(define-syntax (hm:datum stx)
-  (syntax-parse stx
-    ([_ . s:string] #'(expr:string (#%datum . s)))
-    ([_ . b:boolean] #'(expr:bool (#%datum . b)))
-    ([_ . i:exact-integer] #'(expr:int (#%datum . i)))))
+(define-syntax-rule (module-begin EXPR ...)
+  (#%module-begin
+   (define all-form (list (parse EXPR) ...))
+   (for-each (λ (form)
+               (displayln form)
+               (displayln (type/infer form)))
+             all-form)))
+;(parse
+; (let ([a 1]
+;      [b (λ (x) x)])
+; (b a)))
