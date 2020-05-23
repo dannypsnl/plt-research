@@ -21,11 +21,13 @@
     ; (let ([a 1]
     ;       [b (λ (x) x)])
     ;   (b a))
-    (`[let (binding*:bind ...) body]
+    (`[(~literal let) (binding*:bind ...) body]
      #'(expr:let (list binding*.bind ...) (parse body)))
-    (`[λ (ps* ...) body] #'(expr:lambda (list (symbol->string 'ps*) ...) (parse body)))
+    (`[(~literal λ) (ps* ...) body] #'(expr:lambda (list (symbol->string 'ps*) ...) (parse body)))
+    (`[(~literal quote) (elem* ...)] #'(expr:list (list (parse elem*) ...)))
     (`[f arg* ...] #'(expr:application (parse f) (list (parse arg*) ...)))
-    (`[elem* ...] #'(expr:list (list (parse elem*) ...)))
+    
+    ;(`[quote elem* ...] #'(expr:list (list (parse elem*) ...)))
     (`v:id #'(expr:variable (symbol->string 'v)))
     (`s:string #'(expr:string (#%datum . s)))
     (`b:boolean #'(expr:bool (#%datum . b)))
@@ -39,9 +41,3 @@
                (displayln form)
                (printf "type:- ~a~n" (pretty-print-typ (type/infer form))))
              all-form)))
-(parse (a a a))
-(parse '(a a))
-(parse
- (let ([a 1]
-       [b (λ (x) x)])
-   (b a)))
