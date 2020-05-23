@@ -1,4 +1,4 @@
-#lang s-exp "syntax.rkt"
+#lang hindley-milner
 
 ;;; integer
 1
