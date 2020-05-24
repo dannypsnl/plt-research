@@ -121,13 +121,15 @@
     ; we say `A -> B` is a type if `A` and `B` both is a type.
     ([expr:lambda params body]
      ; params use new freevars as their type
-     (let ([param-types (typ:constructor
+     (letrec ([λ-env : Env (Env/new (Context-type-env ctx))]
+           [param-types (typ:constructor
                          "pair"
                          (map (λ ([param-name : String])
                                 (let ([r (Context/new-freevar! ctx)])
-                                  (Env/bind-var (Context-type-env ctx) param-name r)
-                                  r)) params))]
-           [body-typ (type/infer body ctx)])
+                                  (Env/bind-var λ-env param-name r)
+                                  r)) params))])
+       (set-Context-type-env! ctx λ-env)
+       (define body-typ (type/infer body ctx))
        (typ:arrow param-types body-typ)))
     ;;; next we infer `let` binding
     ; people familiar with Racket might though: let binding is a lambda immediately be called
@@ -135,13 +137,14 @@
     ; the problem is **polymorphism lambda calculus(also known as System F)** is undecidable.
     ; only values bound in let-polymorphism construct are subject to instantiation.
     ([expr:let bindings exp]
-     (: bind-to-context (-> (Pairof String expr) Void))
-     (define bind-to-context (λ (bind)
-                               (match bind
-                                 ([cons name init]
-                                  (Env/bind-var (Context-type-env ctx) name (type/infer init ctx))))))
-     (map bind-to-context bindings)
-     (type/infer exp ctx))
+     (letrec ([let-env : Env (Env/new (Context-type-env ctx))]
+              [bind-to-context (λ ([bind : (Pairof String expr)])
+                                 (match bind
+                                   ([cons name init]
+                                    (Env/bind-var let-env name (type/infer init ctx)))))])
+       (map bind-to-context bindings)
+       (set-Context-type-env! ctx let-env)
+       (type/infer exp ctx)))
     ;;; the final expression is application
     ; infer application would require a new function called `unify`,
     ; which unified freevar and concrete type to give freevar a binding
@@ -172,7 +175,7 @@
   (test-case
    "inconsistent element in list"
    (check-exn string? (λ ()
-                          (type/infer (expr:list (list (expr:int 1) (expr:bool #t)))))))
+                        (type/infer (expr:list (list (expr:int 1) (expr:bool #t)))))))
 
   (test-case
    "let id function"
