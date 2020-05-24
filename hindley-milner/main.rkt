@@ -9,8 +9,7 @@
 
 (provide (except-out (all-from-out racket) #%module-begin #%top-interaction)
          (rename-out [module-begin #%module-begin]
-                     [top-interaction #%top-interaction]
-                     ))
+                     [top-interaction #%top-interaction]))
 
 (define-syntax (parse stx)
   (define-syntax-class bind
