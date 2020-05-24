@@ -85,7 +85,7 @@
          (void))
      (void))
     ([cons (typ:freevar _ _) t2] (unify t2 t1))
-    (_ (raise (format "cannot unify type ~a and ~a" (pretty-print t1) (pretty-print t2))))))
+    (_ (raise (format "cannot unify type ~a and ~a" (pretty-print-typ t1) (pretty-print-typ t2))))))
 
 (: type/infer (->* (expr) (Context) typ))
 (define (type/infer exp [ctx (Context/new)])
@@ -108,7 +108,11 @@
                       (list (if (empty? elems)
                                 (Context/new-freevar! ctx)
                                 ; use first element type as type of all elements
-                                (type/infer (car elems))))))
+                                (let ([elem-typ (type/infer (car elems))])
+                                  ; check all elements follow first element type
+                                  (for-each (λ ([elem : expr]) (unify elem-typ (type/infer elem)))
+                                            (cdr elems))
+                                  elem-typ)))))
     ;;; infer variable would rely on lookup in context
     ([expr:variable name] (Env/lookup (Context-type-env ctx) name))
     ;;; infer lambda can be fun
@@ -164,6 +168,11 @@
    "list is a little bit free"
    (check-equal? (type/infer (expr:list '()))
                  (typ:constructor "list" (list (typ:freevar 0 #f)))))
+
+  (test-case
+   "inconsistent element in list"
+   (check-exn string? (λ ()
+                          (type/infer (expr:list (list (expr:int 1) (expr:bool #t)))))))
 
   (test-case
    "let id function"
