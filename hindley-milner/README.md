@@ -1,6 +1,6 @@
 # hindley milner
 
-This is just a simple(and of course buggy) language for showing how to inference expression and get automatically type.
+This is just a simple(and of course buggy) language for showing how to inference expression to automatically get type.
 
 ### Example
 
