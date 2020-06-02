@@ -19,3 +19,11 @@
        [e1*
         `(,e1* ,e2)])]
     [e e]))
+;;; normalize : T → NF
+(define (normalize e)
+  (match (evaluate e)
+    [`(λ (,x) ,e)
+     `(λ (,x) ,(normalize e))]
+    [`(,e1 ,e2)
+     `(,(normalize e1) ,(normalize e2))]
+    [x x]))
