@@ -11,22 +11,6 @@ object Main extends App {
     )
   ))
 
-  // From: (g a)
-  val test = Application(Variable("g"), Variable("a"))
-  // with continuation: 'halt
-  println(NaiveM.nt(test, AVar("halt")))
-  // ((lambda ($f1)
-  //   ((lambda ($e1)
-  //     ($f1 $e1 halt)) a)) g)
-
-  // with high order continuation: (λ (ans) `(halt ,ans))
-  println(HighOrderM.t(test, ans => CApplication(AVar("halt"), List(ans))))
-  // (g a (lambda ($rv1) (halt $rv1)))
-
-  // with continuation: 'halt
-  println(HybridTransformM.transform_c(test, AVar("halt")))
-  // (g a halt)
-
   var testRealLangExtend = MultipleApplication(Variable("g"), List(Variable("a")))
   // with continuation: 'halt
   println(RealLangM.transform_c(testRealLangExtend, AVar("halt")))
