@@ -26,3 +26,6 @@
 (struct exp:sigma exp () #:transparent)
 (struct exp:0 exp () #:transparent)
 (struct exp:1 exp () #:transparent)
+(struct exp:c exp () #:transparent)
+(struct exp:fun exp () #:transparent)
+(struct exp:d exp () #:transparent)
