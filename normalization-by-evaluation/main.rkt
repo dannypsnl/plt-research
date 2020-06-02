@@ -9,7 +9,7 @@
 ;    | (λ (X) NF)
 ; NEU = X
 ;    | (NEU NF)
-;;; evaluate : EXP → EXP
+;;; evaluate : T → T
 (define (evaluate e)
   (match e
     [`(,e1 ,e2)
