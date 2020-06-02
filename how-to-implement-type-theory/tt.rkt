@@ -1,5 +1,19 @@
 #lang typed/racket
 
+(provide ty
+         (struct-out exp)
+         (struct-out exp:var)
+         (struct-out exp:typ)
+         (struct-out exp:prod)
+         (struct-out exp:lambda)
+         (struct-out exp:app)
+         (struct-out exp:ascribe)
+         (struct-out stmt)
+         (struct-out stmt:def)
+         (struct-out stmt:check)
+         (struct-out stmt:eval)
+         (struct-out stmt:axiom))
+
 (define-type ty exp)
 (struct exp () #:transparent)
 (struct exp:var exp ([idx : Integer]) #:transparent)
