@@ -1,7 +1,8 @@
-project/
+compiled/
+doc/
 target/
 katex/
 *.js
 *.css
 *.html
-
+*.bak
