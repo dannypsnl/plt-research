@@ -20,3 +20,15 @@
   ([e : exp]
    [t : ty])
   #:transparent)
+
+(struct stmt () #:transparent)
+(struct stmt:def stmt
+  ([name : String]
+   [expr : exp])
+  #:transparent)
+(struct stmt:check stmt ([e : exp]) #:transparent)
+(struct stmt:eval stmt ([e : exp]) #:transparent)
+(struct stmt:axiom stmt
+  ([name : String]
+   [e : exp])
+  #:transparent)
