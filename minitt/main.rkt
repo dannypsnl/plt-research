@@ -12,3 +12,17 @@
   #:transparent)
 ; ignore pattern
 (struct pattern:ignore pattern () #:transparent)
+
+;;; expression
+(struct exp () #:transparent)
+(struct exp:λ exp () #:transparent)
+(struct exp:var exp () #:transparent)
+(struct exp:app exp () #:transparent)
+(struct exp:pi exp () #:transparent)
+(struct exp:U exp () #:transparent)
+(struct exp:pair exp () #:transparent)
+(struct exp:car exp () #:transparent)
+(struct exp:cdr exp () #:transparent)
+(struct exp:sigma exp () #:transparent)
+(struct exp:0 exp () #:transparent)
+(struct exp:1 exp () #:transparent)
