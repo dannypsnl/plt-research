@@ -8,11 +8,13 @@
 ;;; subst
 (define (subst e x s)
   (match e
-    [`(λ (,xi-1) ,b)
-     (if (equal? `,xi-1 `,x)
-         `,e
-         `(λ (,xi-1)
-            ,(subst b x s)))]
+    [`(λ (,i) ,b)
+     (cond
+       [(equal? `,i `,x) `,e]
+       [(equal? `,i `,s)
+        `(λ (,(gensym `,i)) `,b)]
+       [#t `(λ (,i)
+              ,(subst b x s))])]
     [`(,e1 ,e2)
      `(,(subst e1 x s) ,(subst e2 x s))]
     [`,e
