@@ -12,7 +12,9 @@
      (cond
        [(equal? `,i `,x) `,e]
        [(equal? `,i `,s)
-        `(λ (,(gensym `,i)) `,b)]
+        (define fi (gensym `,i))
+        (define fb (subst b i fi))
+        `(λ (,fi) ,(subst fb x s))]
        [#t `(λ (,i)
               ,(subst b x s))])]
     [`(,e1 ,e2)
