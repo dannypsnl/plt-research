@@ -27,5 +27,13 @@ module mltt where
 --
 -- For a given universe U, we denote by U⁺ for its successor universe, so if U is U0, U⁺ would be U1.
 -- According to above, U would be a type in U⁺, `U : U⁺`
+open import Universes public
 
--- TODO: create Universes.agda which rename Level to Universe and provide misc
+variable
+  𝓤 𝓥 𝓦  𝓕 : Universe
+
+data 𝟙 : 𝓤₀ ̇ where
+  * : 𝟙
+
+𝟙-induction : (A : 𝟙 → 𝓤  ̇) → A * → (x : 𝟙) → A x
+𝟙-induction A a * = a
