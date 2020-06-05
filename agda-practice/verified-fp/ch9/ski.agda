@@ -1,6 +1,7 @@
 module ski where
 
 open import Data.Nat
+open import Data.Bool
 
 data comb : Set where
   S : comb
@@ -23,3 +24,8 @@ data _↝_ : comb → comb → Set where
   ↝Cong2 : (a : comb) {b b' : comb} →
     b ↝ b' →
     (app a b) ↝ (app a b')
+
+Sfree : comb → Bool
+Sfree S = false
+Sfree K = true
+Sfree (app a b) = (Sfree a) ∧ (Sfree b)
