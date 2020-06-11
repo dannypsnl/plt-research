@@ -27,3 +27,19 @@
   (match clos
     [(CLOS env x b)
      (val (extend env x arg) b)]))
+
+(define (run-program env exprs)
+  (match exprs
+    ['() (void)]
+    [(cons `(define ,x ,e) rest)
+     (let ([v (val env e)])
+       (run-program (extend env x v) rest))]
+    [(cons e rest)
+     (displayln (val env e))
+     (run-program env e)]))
+
+(define (add-* x) (string->symbol (string-append (symbol->string x) "*")))
+(define (freshen used x)
+  (if (memv x used)
+      (freshen used (add-* x))
+      x))
