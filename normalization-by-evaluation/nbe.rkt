@@ -23,23 +23,53 @@
       (val env rator)
       (val env rand))]))
 
-(define (do-application clos arg)
-  (match clos
+(define (do-application fun arg)
+  (match fun
     [(CLOS env x b)
-     (val (extend env x arg) b)]))
+     (val (extend env x arg) b)]
+    [neutral-fun
+     (N-application fun arg)]))
 
 (define (run-program env exprs)
   (match exprs
-    ['() (void)]
-    [(cons `(define ,x ,e) rest)
+    [(list) (void)]
+    [(list `(define ,x ,e) rest ...)
      (let ([v (val env e)])
        (run-program (extend env x v) rest))]
-    [(cons e rest)
-     (displayln (val env e))
-     (run-program env e)]))
+    [(list e rest ...)
+     (displayln (norm env e))
+     (run-program env rest)]))
 
 (define (add-* x) (string->symbol (string-append (symbol->string x) "*")))
 (define (freshen used x)
   (if (memv x used)
       (freshen used (add-* x))
       x))
+
+;;; Expressions equated by zero or more α and β steps are called αβ-equivalent.
+; α-renaming and β-reduction
+;;; grammar
+; normal-form ::= <neutral>
+;               | (λ (<id>) <normal-form>)
+; neutral ::= <id>
+;           | ( <neutral> <normal-form> )
+;;; neutral variable
+(struct N-var (name))
+;;; neutral application
+(struct N-application (rator rand))
+
+(define (read-back used-names v)
+  (match v
+    [(CLOS env x body)
+     (let* ([y (freshen used-names x)]
+            [neutral-y (N-var y)])
+       `(λ (,y)
+          ,(read-back (cons y used-names)
+                      (val (extend env x neutral-y) body))))]
+    [(N-var x) x]
+    [(N-application rator rand)
+     `(,(read-back used-names rator)
+       ,(read-back used-names rand))]))
+
+(define (norm env e)
+  (read-back '() (val env e)))
