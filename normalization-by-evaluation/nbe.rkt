@@ -87,3 +87,12 @@
          [(go pat0) (go-on ([pat e] ...) result)]
          [(go v) (error 'go-on "Pattern did not match value ~v" v)]
          [(stop expr msg) (stop exp msg)]))]))
+
+(define (type=? t1 t2)
+  (match* (t1 t2)
+    [('Nat 'Nat) #t]
+    [(`(→ ,A1 ,B1) `(→ ,A2 ,B2))
+     (and (type=? A1 A2) (type=? B1 B2))]
+    [(_ _) #f]))
+(define (type? t)
+  (type=? t t))
