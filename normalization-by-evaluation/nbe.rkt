@@ -1,5 +1,6 @@
 #lang racket
 ;;; NOTE: totally from http://davidchristiansen.dk/tutorials/nbe/
+(require (for-syntax syntax/parse))
 
 ;;; closure
 (struct CLOS
@@ -73,3 +74,16 @@
 
 (define (norm env e)
   (read-back '() (val env e)))
+
+(struct go (result) #:transparent)
+(struct stop (expr message) #:transparent)
+
+(define-syntax (go-on stx)
+  (syntax-parse stx
+    [(go-on () result) (syntax/loc stx result)]
+    [(go-on ([pat0 e0] [pat e] ...) result)
+     (syntax/loc stx
+       (match e0
+         [(go pat0) (go-on ([pat e] ...) result)]
+         [(go v) (error 'go-on "Pattern did not match value ~v" v)]
+         [(stop expr msg) (stop exp msg)]))]))
