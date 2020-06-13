@@ -96,3 +96,55 @@
     [(_ _) #f]))
 (define (type? t)
   (type=? t t))
+
+;;; bidirectional typing means rule of judgement e : t be split to two forms e ⇒ t(synthesize type t from e) and e ⇐ t(check e has type t)
+; these rules produce `synth` and `check`
+(define (synth context exp)
+  (match exp
+    [`(the ,t ,e2)
+     (if (not (type? t))
+         (stop exp (format "Invalid type ~a" t))
+         (go-on ([_ (check context e2 t)])
+                (go t)))]
+    [`(rec ,type ,target ,base ,step)
+     (go-on ([target-t (synth context target)]
+             [_ (if (type=? target-t 'Nat)
+                    (go 'ok)
+                    (stop target (format "Expected Nat, got ~v" target-t)))]
+             [_ (check context base type)]
+             [_ (check context step `(→ Nat (→ ,type ,type)))])
+            (go type))]
+    [x #:when (and (symbol? x)
+                  (not (memv x '(the rec λ zero add1))))
+       (match (assv x context)
+         [#f (stop x "Variable not found")]
+         [(cons _ t) (go t)])]
+    [`(,rator ,rand)
+     (go-on ([rator-t (synth context rator)])
+            (match rator-t
+              [`(→ ,A ,B)
+               (go-on ([_ (check context rand A)])
+                (go B))]
+              [else (stop rator (format "Not a function type: ~v" rator-t))]))]))
+(define (check context e t)
+  (match e
+    ['zero (if (type=? t 'Nat)
+               (go 'ok)
+               (stop e (format "Tried to use ~v for zero" t)))]
+    [`(add1 ,n)
+     (if (type=? t 'Nat)
+         (go-on ([_ (check context n 'Nat)])
+                (go 'ok))
+         (stop e (format "Tried to use ~v for add1" t)))]
+    [`(λ (,x) ,b)
+     (match t
+       [`(→ ,A ,B) (go-on ([_ (check (extend context x A) b B)])
+                    (go 'ok))]
+       [non-arrow (stop e (format "Instead of → type, get ~a" non-arrow))])]
+    [other
+     (go-on ([t2 (synth context e)])
+            (if (type=? t t2)
+                (go 'ok)
+                (stop e
+                      (format "Synthesized type ~v where type ~v was expected"
+                              t2 t))))]))
