@@ -148,3 +148,15 @@
                 (stop e
                       (format "Synthesized type ~v where type ~v was expected"
                               t2 t))))]))
+
+(define (check-program context prog)
+  (match prog
+    ['() (go context)]
+    [(cons `(define ,x ,e) rest)
+     (go-on ([t (synth context e)])
+            (check-program (extend context x t) rest))]
+    [(cons e rest)
+     (go-on ([t (synth context e)])
+            (begin
+              (printf "~a has type ~a\n" e t)
+              (check-program context rest)))]))
