@@ -136,67 +136,67 @@
 
 ;;; bidirectional typing means rule of judgement e : t be split to two forms e ⇒ t(synthesize type t from e) and e ⇐ t(check e has type t)
 ; these rules produce `synth` and `check`
-(define (synth context exp)
+(define (synth Γ exp)
   (match exp
     [`(the ,t ,e2)
      (if (not (type? t))
          (stop exp (format "Invalid type ~a" t))
-         (go-on ([_ (check context e2 t)])
+         (go-on ([_ (check Γ e2 t)])
                 (go t)))]
     [`(rec ,type ,target ,base ,step)
-     (go-on ([target-t (synth context target)]
+     (go-on ([target-t (synth Γ target)]
              [_ (if (type=? target-t 'Nat)
                     (go 'ok)
                     (stop target (format "Expected Nat, got ~v" target-t)))]
-             [_ (check context base type)]
-             [_ (check context step `(→ Nat (→ ,type ,type)))])
+             [_ (check Γ base type)]
+             [_ (check Γ step `(→ Nat (→ ,type ,type)))])
             (go type))]
     [x #:when (and (symbol? x)
                   (not (memv x '(the rec λ zero add1))))
-       (match (assv x context)
+       (match (assv x Γ)
          [#f (stop x "Variable not found")]
          [(cons _ t) (go t)])]
     [`(,rator ,rand)
-     (go-on ([rator-t (synth context rator)])
+     (go-on ([rator-t (synth Γ rator)])
             (match rator-t
               [`(→ ,A ,B)
-               (go-on ([_ (check context rand A)])
+               (go-on ([_ (check Γ rand A)])
                 (go B))]
               [else (stop rator (format "Not a function type: ~v" rator-t))]))]))
-(define (check context e t)
+(define (check Γ e t)
   (match e
     ['zero (if (type=? t 'Nat)
                (go 'ok)
                (stop e (format "Tried to use ~v for zero" t)))]
     [`(add1 ,n)
      (if (type=? t 'Nat)
-         (go-on ([_ (check context n 'Nat)])
+         (go-on ([_ (check Γ n 'Nat)])
                 (go 'ok))
          (stop e (format "Tried to use ~v for add1" t)))]
     [`(λ (,x) ,b)
      (match t
-       [`(→ ,A ,B) (go-on ([_ (check (extend context x A) b B)])
+       [`(→ ,A ,B) (go-on ([_ (check (extend Γ x A) b B)])
                     (go 'ok))]
        [non-arrow (stop e (format "Instead of → type, get ~a" non-arrow))])]
     [other
-     (go-on ([t2 (synth context e)])
+     (go-on ([t2 (synth Γ e)])
             (if (type=? t t2)
                 (go 'ok)
                 (stop e
                       (format "Synthesized type ~v where type ~v was expected"
                               t2 t))))]))
 
-(define (check-program context prog)
+(define (check-program Γ prog)
   (match prog
-    ['() (go context)]
+    ['() (go Γ)]
     [(cons `(define ,x ,e) rest)
-     (go-on ([t (synth context e)])
-            (check-program (extend context x t) rest))]
+     (go-on ([t (synth Γ e)])
+            (check-program (extend Γ x t) rest))]
     [(cons e rest)
-     (go-on ([t (synth context e)])
+     (go-on ([t (synth Γ e)])
             (begin
               (printf "~a has type ~a\n" e t)
-              (check-program context rest)))]))
+              (check-program Γ rest)))]))
 
 (struct ZERO () #:transparent)
 (struct ADD1 (pred) #:transparent)
