@@ -75,18 +75,31 @@
 (struct N-rec (type target base step)
   #:transparent)
 
-(define (read-back used-names v)
-  (match v
-    [(CLOS env x body)
-     (let* ([y (freshen used-names x)]
-            [neutral-y (N-var y)])
-       `(λ (,y)
-          ,(read-back (cons y used-names)
-                      (val (extend env x neutral-y) body))))]
+(define (read-back used-names type value)
+  (match type
+    ['Nat
+     (match value
+       [(ZERO) 'zero]
+       [(ADD1 n) `(add1 ,(read-back used-names 'Nat n))]
+       [(NEU _ ne)
+        (read-back-neutral used-names ne)])]
+    [`(→ ,A ,B)
+     (let ([x (freshen used-names 'x)])
+       `(λ (,x)
+          ,(read-back (cons x used-names)
+                      B
+                      (do-application value (NEU A (N-var x))))))]))
+(define (read-back-neutral used-names ne)
+  (match ne
     [(N-var x) x]
-    [(N-application rator rand)
-     `(,(read-back used-names rator)
-       ,(read-back used-names rand))]))
+    [(N-application fun (THE arg-type arg))
+     `(,(read-back-neutral used-names fun)
+       ,(read-back used-names arg-type arg))]
+    [(N-rec type target (THE base-type base) (THE step-type step))
+     `(rec ,type
+           ,(read-back-neutral used-names target)
+           ,(read-back used-names base-type base)
+           ,(read-back used-names step-type step))]))
 
 (define (norm env e)
   (read-back '() (val env e)))
