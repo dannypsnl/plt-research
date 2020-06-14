@@ -12,13 +12,16 @@
 
 (define (val env exp)
   (match exp
+    [`(the ,type ,expr) (val env expr)]
+    ['zero (ZERO)]
+    [`(add1 ,n) (ADD1 (val env n))]
+    [x #:when (and (symbol? x)
+                   (not (memv x '(the zero add1 λ rec))))
+       (cdr (assv x env))]
     [`(λ (,x) ,b)
      (CLOS env x b)]
-    [x #:when (symbol? x)
-       (let ([xv (assv x env)])
-         (if xv
-             (cdr xv)
-             (error 'val "unknown variable ~a" x)))]
+    [`(rec ,type ,target ,base ,step)
+     (do-rec type (val env target) (val env base) (val env step))]
     [`(,rator ,rand)
      (do-application
       (val env rator)
@@ -28,8 +31,19 @@
   (match fun
     [(CLOS env x b)
      (val (extend env x arg) b)]
-    [neutral-fun
-     (N-application fun arg)]))
+    [(NEU `(→ ,A ,B) ne)
+     (NEU B (N-application ne (THE A arg)))]))
+(define (do-rec type target base step)
+  (match target
+    [(ZERO) base]
+    [(ADD1 n) (do-application (do-application step n)
+                              (do-rec type n base step))]
+    [(NEU 'Nat ne)
+     (NEU type
+          (N-rec type
+                 ne
+                 (THE type base)
+                 (THE `(→ Nat (→ ,type ,type)) step)))]))
 
 (define (run-program env exprs)
   (match exprs
