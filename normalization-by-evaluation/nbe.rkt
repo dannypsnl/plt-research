@@ -55,9 +55,11 @@
 ; neutral ::= <id>
 ;           | ( <neutral> <normal-form> )
 ;;; neutral variable
-(struct N-var (name))
+(struct N-var (name) #:transparent)
 ;;; neutral application
 (struct N-application (rator rand))
+(struct N-rec (type target base step)
+  #:transparent)
 
 (define (read-back used-names v)
   (match v
@@ -160,3 +162,10 @@
             (begin
               (printf "~a has type ~a\n" e t)
               (check-program context rest)))]))
+
+(struct ZERO () #:transparent)
+(struct ADD1 (pred) #:transparent)
+(struct NEU (type neu) #:transparent)
+(struct THE (type value) #:transparent)
+(define (norm? v)
+  (THE? v))
