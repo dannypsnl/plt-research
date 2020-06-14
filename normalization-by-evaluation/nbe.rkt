@@ -234,3 +234,9 @@
      Absurd ind-Absurd
      Atom quote
      the))
+
+(define (keyword? k)
+  (if (memv k keywords)
+      #t
+      #f))
+(define (var? x) (and (symbol? x) (not (keywords? x))))
