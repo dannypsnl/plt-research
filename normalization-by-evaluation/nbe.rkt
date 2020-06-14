@@ -7,8 +7,8 @@
   (env var body)
   #:transparent)
 
-(define (extend env x v)
-  (cons (cons x v) env))
+(define (extend env x typ)
+  (cons (cons x typ) env))
 
 (define (val env exp)
   (match exp
@@ -45,15 +45,23 @@
                  (THE type base)
                  (THE `(→ Nat (→ ,type ,type)) step)))]))
 
-(define (run-program env exprs)
+(define (run-program Δ exprs)
   (match exprs
-    [(list) (void)]
-    [(list `(define ,x ,e) rest ...)
-     (let ([v (val env e)])
-       (run-program (extend env x v) rest))]
-    [(list e rest ...)
-     (displayln (norm env e))
-     (run-program env rest)]))
+    ['() (go Δ)]
+    [(cons `(define ,x ,e) rest)
+     (go-on ([type (synth (defs->ctx Δ) e)])
+            (run-program (extend Δ x (def type (val (defs->env Δ) e)))
+                         rest))]
+    [(cons e rest)
+     (let ([Γ (defs->ctx Δ)]
+           [δ (defs->env Δ)])
+       (go-on ([type (synth Γ e)])
+              (let ([v (val δ e)])
+                (begin
+                  (printf "(the ~a\n   ~a)\n"
+                          type
+                          (read-back (map car Γ) type v))
+                  (run-program Δ rest)))))]))
 
 (define (add-* x) (string->symbol (string-append (symbol->string x) "*")))
 (define (freshen used x)
@@ -196,3 +204,16 @@
 (struct THE (type value) #:transparent)
 (define (norm? v)
   (THE? v))
+
+(struct def (type value) #:transparent)
+
+(define (defs->ctx Δ)
+  (match Δ
+    ['() '()]
+    [(cons (cons x (def type _)) rest)
+     (extend (defs->ctx rest) x type)]))
+(define (defs->env Δ)
+  (match Δ
+    ['() '()]
+    [(cons (cons x (def _ value)) rest)
+     (extend (defs->env rest) x value)]))
