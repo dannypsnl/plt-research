@@ -217,3 +217,20 @@
     ['() '()]
     [(cons (cons x (def _ value)) rest)
      (extend (defs->env rest) x value)]))
+
+(define keywords
+  '(define
+     U
+     Nat
+     zero
+     add1
+     ind-Nat
+     Σ Sigma
+     cons car cdr
+     Π Pi
+     λ lambda
+     = same replace
+     Trivial sole
+     Absurd ind-Absurd
+     Atom quote
+     the))
