@@ -2,6 +2,28 @@
 ;;; NOTE: totally from http://davidchristiansen.dk/tutorials/nbe/
 (require (for-syntax syntax/parse))
 
+(struct PI (domain range) #:transparent)
+(struct LAM (body) #:transparent)
+(struct SIGMA (car-type cdr-type) #:transparent)
+(struct PAIR (car cdr) #:transparent)
+(struct NAT () #:transparent)
+(struct ZERO () #:transparent)
+(struct ADD1 (pred) #:transparent)
+(struct EQ (type from to) #:transparent)
+(struct SAME () #:transparent)
+(struct TRIVIAL () #:transparent)
+(struct SOLE () #:transparent)
+(struct ABSURD () #:transparent)
+(struct ATOM () #:transparent)
+(struct QUOTE (symbol) #:transparent)
+(struct UNI () #:transparent)
+(struct NEU (type neutral) #:transparent)
+(struct H-O-CLOS (x fun) #:transparent)
+(define (closure-name c)
+  (match c
+    [(CLOS _ x _) x]
+    [(H-O-CLOS x _) x]))
+(struct THE (type value) #:transparent)
 ;;; closure
 (struct CLOS
   (env var body)
@@ -111,8 +133,8 @@
      (go-on ([new-Γ (interact Γ d)])
             (run-program new-Γ rest))]))
 
-(define (add-* x) (string->symbol (string-append (symbol->string x) "*")))
 (define (freshen used x)
+  (define (add-* x) (string->symbol (string-append (symbol->string x) "*")))
   (if (memv x used)
       (freshen used (add-* x))
       x))
@@ -133,8 +155,6 @@
 (struct N-ind-Nat (target motive base step) #:transparent)
 (struct N-replace (target motive base) #:transparent)
 (struct N-ind-Absurd (target motive) #:transparent)
-(struct N-rec (type target base step)
-  #:transparent)
 
 (define (read-back-norm Γ norm)
   (match norm
@@ -401,18 +421,6 @@
                                              (val ρ expr))))
                 (go Γ))))]))
 
-(define (check-program Γ prog)
-  (match prog
-    ['() (go Γ)]
-    [(cons `(define ,x ,e) rest)
-     (go-on ([t (synth Γ e)])
-            (check-program (extend Γ x t) rest))]
-    [(cons e rest)
-     (go-on ([t (synth Γ e)])
-            (begin
-              (printf "~a has type ~a\n" e t)
-              (check-program Γ rest)))]))
-
 (struct def (type value) #:transparent)
 (struct bind (type) #:transparent)
 
@@ -443,17 +451,6 @@
   (match c
     [(CLOS ρ x e) (val (extend ρ x v) e)]
     [(H-O-CLOS x f) (f v)]))
-
-(define (defs->ctx Δ)
-  (match Δ
-    ['() '()]
-    [(cons (cons x (def type _)) rest)
-     (extend (defs->ctx rest) x type)]))
-(define (defs->env Δ)
-  (match Δ
-    ['() '()]
-    [(cons (cons x (def _ value)) rest)
-     (extend (defs->env rest) x value)]))
 
 (define keywords
   '(define
@@ -525,33 +522,6 @@
      (and (α-equiv-aux rator1 rator2 xs1 xs2)
           (α-equiv-aux rand1 rand2 xs1 xs2))]
     [(_ _) #f]))
-
-(struct PI (domain range) #:transparent)
-(struct LAM (body) #:transparent)
-(struct SIGMA (car-type cdr-type) #:transparent)
-(struct PAIR (car cdr) #:transparent)
-(struct NAT () #:transparent)
-(struct ZERO () #:transparent)
-(struct ADD1 (pred) #:transparent)
-(struct EQ (type from to) #:transparent)
-(struct SAME () #:transparent)
-(struct TRIVIAL () #:transparent)
-(struct SOLE () #:transparent)
-(struct ABSURD () #:transparent)
-(struct ATOM () #:transparent)
-(struct QUOTE (symbol) #:transparent)
-(struct UNI () #:transparent)
-(struct NEU (type neutral) #:transparent)
-(struct H-O-CLOS (x fun) #:transparent)
-(define (closure? c)
-  (or (CLOS? c) (H-O-CLOS? c)))
-(define (closure-name c)
-  (match c
-    [(CLOS _ x _) x]
-    [(H-O-CLOS x _) x]))
-(struct THE (type value) #:transparent)
-(define (norm? v)
-  (THE? v))
 
 ;;; example
 (void
