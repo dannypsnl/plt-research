@@ -236,15 +236,6 @@
          [(go v) (error 'go-on "Pattern did not match value ~v" v)]
          [(stop expr msg) (stop exp msg)]))]))
 
-(define (type=? t1 t2)
-  (match* (t1 t2)
-    [('Nat 'Nat) #t]
-    [(`(→ ,A1 ,B1) `(→ ,A2 ,B2))
-     (and (type=? A1 A2) (type=? B1 B2))]
-    [(_ _) #f]))
-(define (type? t)
-  (type=? t t))
-
 ;;; bidirectional typing means rule of judgement e : t be split to two forms e ⇒ t(synthesize type t from e) and e ⇐ t(check e has type t)
 ; these rules produce `synth` and `check`
 (define (synth Γ e)
