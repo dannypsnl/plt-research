@@ -93,3 +93,19 @@
          (term:call/cc)
          (term:call/ec)) #t]
     [_ #f]))
+
+(module+ test
+  (require racket/pretty)
+  (pretty-print
+   (transform-c
+    (term:ap (term:var "g") (list (term:var "a")))
+    (atom:var "halt")))
+  (pretty-print
+   (transform-c
+    (term:ap
+     (term:call/cc)
+     (list (term:λ
+            (list "halt")
+            (term:ap (term:var "halt")
+                     (list (term:int-literal 5))))))
+    (atom:var "halt"))))
