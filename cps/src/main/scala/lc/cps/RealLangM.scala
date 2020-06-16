@@ -5,7 +5,7 @@ import lc.Gensym
 
 object RealLangM {
   val gensym = new Gensym()
-  def transform_k(term: Term, cont: ATerm => CTerm): CTerm = {
+  def transform_k(term: Term, cont: AValue => CValue): CValue = {
     if (isAtomicExpr(term)) {
       return cont(m(term))
     }
@@ -16,14 +16,14 @@ object RealLangM {
         transform_k(condition, aCond =>
           CIf(aCond, transform_c(thenE, newCont), transform_c(elseE, newCont)))
       }
-      case MultipleApplication(_, _) => {
+      case Application(_, _) => {
         val rv = gensym.apply("$rv")
         val newCont = ALambda(List(rv), cont(AVar(rv)))
         transform_c(term, newCont)
       }
     }
   }
-  def transform_c(term: Term, continuation: ATerm): CTerm = {
+  def transform_c(term: Term, continuation: AValue): CValue = {
     if (isAtomicExpr(term)) {
       return CApplication(continuation, List(m(term)))
     }
@@ -36,23 +36,23 @@ object RealLangM {
           List(continuation)
         )
       }
-      case MultipleApplication(f, args) => {
+      case Application(f, args) => {
         transform_k(f, fs =>
           transform_k_variant(args, es =>
             CApplication(fs, es :+ continuation)))
       }
     }
   }
-  def transform_k_variant(terms: List[Term], cont: List[ATerm] => CTerm): CTerm = {
+  def transform_k_variant(terms: List[Term], cont: List[AValue] => CValue): CValue = {
     terms match {
       case List() => cont(List())
       case head :: rest => transform_k(head, hd =>
         transform_k_variant(rest, t1 => cont(hd :: t1)))
     }
   }
-  def m(term: Term): ATerm = {
+  def m(term: Term): AValue = {
     term match {
-      case MultipleLambda(params, body) => {
+      case Lambda(params, body) => {
         val cont = gensym.apply("$k")
         ALambda(params :+ cont, transform_c(body, AVar(cont)))
       }
@@ -70,7 +70,7 @@ object RealLangM {
   def isAtomicExpr(term: Term): Boolean = {
     term match {
       case Variable(_) => true
-      case MultipleLambda(_, _) => true
+      case Lambda(_, _) => true
       case LiteralInt(_) => true
       case CallWithCurrentContinuation() => true
       case CallWithEscapeContinuation() => true
