@@ -1,16 +1,12 @@
 #lang typed/racket
 
-(provide quote-zero)
+(provide quote)
 
 (require "term.rkt"
          "value.rkt")
 
-(define (quote-zero [v : value])
-  : checkable-term
-  (quote v 0))
-(define (quote [v : value]
-               [i : Integer])
-  : checkable-term
+(: quote (->* (value) (Integer) checkable-term))
+(define (quote v [i : Integer 0])
   (match v
     [(v:λ f)
      (t:λ (quote (f (vfree (name:quote i))) (+ 1 i)))]
