@@ -1,5 +1,9 @@
 #lang typed/racket
 
+(provide Γ
+         eval-inferable
+         type-inferable)
+
 (require "term.rkt"
          "value.rkt"
          "quote.rkt")
@@ -63,8 +67,10 @@
      (define vp (type-inferable ctx (cast inferable inferable-term) i))
      (cond
        [(string? vp) vp]
-       [vp (if (not (eqv? (quote vp) (quote v)))
-               (format "type mismatch, want: %s but got: %s" vp v)
+       [vp (if (not (equal? (quote vp) (quote v)))
+               (format "type mismatch, want: ~s but got: ~s"
+                       (quote vp)
+                       (quote v))
                (void))])]
     [(_ _) "type mismatch"]))
 
