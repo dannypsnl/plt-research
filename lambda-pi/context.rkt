@@ -10,16 +10,38 @@
                        ; String stands for error in case
                        (U value String)))
 (define (type-inferable ctx term [i 0])
-  (match term
-    [(t:annotation e p)
-     (let/cc throw : String
+  (let/cc throw : String
+    (match term
+      [(t:annotation e p)
        (let ([err (type-checkable ctx i p (v:*))])
          (when (string? err) (throw err)))
        (define type : value
-         (eval-checkable p (ann empty (Listof value))))
+         (eval-checkable p empty))
        (let ([err (type-checkable ctx i e type)])
          (when (string? err) (throw err)))
-       type)]))
+       type]
+      [(t:*) (v:*)]
+      [(t:free name) (hash-ref ctx name
+                               (λ () "unknown identifier"))]
+      [(t:Π p pp)
+       (let ([err (type-checkable ctx i p (v:*))])
+         (when (string? err) (throw err)))
+       (define sr (eval-checkable p empty))
+       (hash-set! ctx (name:local i) sr)
+       (type-checkable ctx (+ 1 i)
+                       (subst-checkable 0 (t:free (name:local i))
+                                        pp)
+                       (v:*))
+       (v:*)]
+      [(t:app e ep)
+       (let ([ty+err (type-inferable ctx e i)])
+         (when (string? ty+err) (throw ty+err))
+         (match ty+err
+           [(v:Π t tp)
+            (let ([err (type-checkable ctx i ep t)])
+              (when (string? err) (throw err)))
+            (tp (eval-checkable ep empty))]
+           [_ "illegal application"]))])))
 (define (type-checkable [ctx : Γ]
                         [i : Integer]
                         [term : checkable-term]
