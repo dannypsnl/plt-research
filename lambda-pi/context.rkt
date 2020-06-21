@@ -6,6 +6,46 @@
 
 (define-type Γ (Mutable-HashTable name value))
 
+(: type-inferable (->* (Γ inferable-term) (Integer)
+                       ; String stands for error in case
+                       (U value String)))
+(define (type-inferable ctx term [i 0])
+  (match term
+    [(t:annotation e p)
+     (let/cc throw : String
+       (let ([err (type-checkable ctx i p (v:*))])
+         (when (string? err) (throw err)))
+       (define type : value
+         (eval-checkable p (ann empty (Listof value))))
+       (let ([err (type-checkable ctx i e type)])
+         (when (string? err) (throw err)))
+       type)]))
+(define (type-checkable [ctx : Γ]
+                        [i : Integer]
+                        [term : checkable-term]
+                        [type : value])
+  ; String stands for error in case
+  : (U Void String)
+  (match* (term type)
+    [((t:λ checkable)
+      (v:Π s sp))
+     (hash-set! ctx (name:local i)
+                s)
+     (type-checkable ctx
+                     (+ 1 i)
+                     (subst-checkable 0
+                                      (t:free (name:local i))
+                                      checkable)
+                     (sp (vfree (name:local i))))]
+    [(inferable v)
+     (define vp (type-inferable ctx (cast inferable inferable-term) i))
+     (cond
+       [(string? vp) vp]
+       [vp (if (not (eqv? (quote vp) (quote v)))
+               (format "type mismatch, want: %s but got: %s" vp v)
+               (void))])]
+    [(_ _) "type mismatch"]))
+
 (define (subst-inferable [i : Integer]
                          [r : inferable-term]
                          [t : inferable-term])
@@ -35,3 +75,35 @@
      (t:λ (subst-checkable (+ 1 i) r c))]
     [inferable
      (subst-inferable i r (cast inferable inferable-term))]))
+
+(define (eval-inferable [t : inferable-term]
+                        [v* : (Listof value)])
+  : value
+  (define (vapp [t : value] [v : value]) : value
+    (match t
+      [(v:λ f) (f v)]
+      [(v:neutral neu)
+       (v:neutral (neu:app neu v))]))
+  (match t
+    [(t:annotation c _)
+     (eval-checkable c v*)]
+    [(t:app f arg)
+     (vapp (eval-inferable f v*)
+           (eval-checkable arg v*))]
+    [(t:Π t1 t2)
+     (v:Π (eval-checkable t1 v*)
+          (λ ([x : value])
+            (eval-checkable t2 (list* x v*))))]
+    [(t:bound i) (list-ref v* i)]
+    [(t:free name) (vfree name)]
+    [(t:*) (v:*)]))
+(define (eval-checkable [t : checkable-term]
+                        [v* : (Listof value)])
+  : value
+  (match t
+    [(t:λ checkable)
+     (v:λ (λ ([x : value])
+            (eval-checkable checkable (#{cons @ value} x v*))))]
+    [inferable
+     (eval-inferable (cast inferable inferable-term)
+                     v*)]))
