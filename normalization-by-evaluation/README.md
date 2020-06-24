@@ -1,3 +1,3 @@
-normalization-by-evaluation
-===========================
-README text here.
+# normalization-by-evaluation
+
+Tutorial: http://davidchristiansen.dk/tutorials/nbe/
