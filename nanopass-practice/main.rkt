@@ -51,22 +51,16 @@
 (define-pass make-explicit : L0 (ir) -> L1 ()
   (definitions)
   (Expr : Expr (ir) -> Expr ()
-        [,x x]
-        [,pr pr]
         [,c `',c]
-        [',d `',d]
-        [(begin ,[e*] ... ,[e]) `(begin ,e* ... ,e)]
         ;;; c: condition, t: then-expression, e: else-expression
         ;;; if c t e|if c t => if c t e
         [(if ,[e0] ,[e1]) `(if ,e0 ,e1 (void))]
-        [(if ,[e0] ,[e1] ,[e2]) `(if ,e0 ,e1 ,e2)]
         [(lambda (,x* ...) ,[body*] ... ,[body])
          `(lambda (,x* ...) (begin ,body* ... ,body))]
         [(let ([,x* ,[e*]] ...) ,[body*] ... ,[body])
          `(let ([,x* ,e*] ...) (begin ,body* ... ,body))]
         [(letrec ([,x* ,[e*]] ...) ,[body*] ... ,[body])
-         `(letrec ([,x* ,e*] ...) (begin ,body* ... ,body))]
-        [(,[e0] ,[e1] ...) `(,e0 ,e1 ...)])
+         `(letrec ([,x* ,e*] ...) (begin ,body* ... ,body))])
   (Expr ir))
 
 (define-pass a-lambda : (L0 Expr) (e) -> * (string)
