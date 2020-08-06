@@ -1,0 +1,5 @@
+langVersion: 1.4.1
+sourcesDir: src
+testsDir: test
+binariesDir: .bin
+dependencies: [arend-lib]
