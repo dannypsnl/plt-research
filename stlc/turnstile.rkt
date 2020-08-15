@@ -48,9 +48,7 @@
   [⊢ e- ⇒ type.norm])
 
 ;;; extension
-; type Int
-(define-base-type Int)
-(define-base-type String)
+(define-base-types Int String)
 (define-typed-syntax #%datum
   ; an integer literal synth type Int
   [(_ . n:integer) ≫
