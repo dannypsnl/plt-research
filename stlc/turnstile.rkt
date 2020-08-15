@@ -28,7 +28,7 @@
                     [⊢ (λ- (x- ...) e-)]])
 
 (define-typed-syntax (#%app exp/func exp/arg* ...) ≫
-  ; infer type of func, produces a 
+  ; infer type of func, produces a arrow type
   [⊢ exp/func ≫ exp/func- ⇒ (~→ typ/arg* ... typ/return)]
   ; ensure exp and type length matched
   ; if fail, use `num-args-fail-msg` constructs error message
