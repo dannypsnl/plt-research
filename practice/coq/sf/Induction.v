@@ -20,7 +20,7 @@ Theorem mult_n_1 : forall n : nat, n * 1 = n.
 Proof.
   induction n as [| n' IHn'].
   - reflexivity.
-  - reflexivity.
+  - simpl. rewrite -> IHn'. reflexivity.
 Qed.
 
 Theorem mult_0_plus' : forall n m : nat,
@@ -35,6 +35,9 @@ Proof.
   reflexivity.
 Qed.
 
+Lemma plus_comm : forall n m : nat,
+  (n + m) = (m + n).
+Proof. Admitted.
 Theorem plus_rearrange : forall n m p q : nat,
   (n + m) + (p + q) = (m + n) + (p + q).
 Proof.
