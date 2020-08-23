@@ -3,7 +3,7 @@ Proof.
   induction n as [| n' IHn'].
   - (* n = 0 *)
     reflexivity.
-  - (* n = S n' *) 
+  - (* n = S n' *)
     simpl. rewrite <- IHn'. reflexivity.
 Qed.
 
