@@ -60,11 +60,35 @@ Fixpoint append (l1 l2 : natlist) : natlist :=
   | h :: t => h :: (append t l2)
   end.
 
+Definition head (default:nat) (l:natlist) : nat :=
+  match l with
+  | nil => default
+  | h :: t => h
+  end.
+Definition tail (l:natlist) : natlist :=
+  match l with
+  | nil => nil
+  | h :: t => t
+  end.
+
 Notation "x ++ y" := (append x y)
   (at level 60, right associativity).
 
 
 Example test_app1 : [1;2;3] ++ [4;5;6] = [1;2;3;4;5;6].
 Proof. reflexivity. Qed.
+
+Theorem nil_app : forall l:natlist, [] ++ l = l.
+Proof. reflexivity. Qed.
+
+Theorem tl_length_pred : forall l:natlist,
+  pred (length l) = length (tail l).
+Proof.
+  intros l. destruct l as [| n l'].
+  - (* l = [] *)
+    reflexivity.
+  - (* l = n :: l' *)
+    reflexivity.
+Qed.
 
 End NatList.
