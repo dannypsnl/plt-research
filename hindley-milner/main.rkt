@@ -9,7 +9,8 @@
 
 (provide (except-out (all-from-out racket) #%module-begin #%top-interaction)
          (rename-out [module-begin #%module-begin]
-                     [top-interaction #%top-interaction]))
+                     [top-interaction #%top-interaction])
+         (all-from-out "lang.rkt"))
 
 (define-syntax (parse stx)
   (define-syntax-class bind
@@ -30,16 +31,14 @@
     (`b:boolean #'(expr:bool (#%datum . b)))
     (`i:exact-integer #'(expr:int (#%datum . i)))))
 
-(define-syntax-rule (module-begin EXPR ...)
-  (#%module-begin
-   (define all-form (list (parse EXPR) ...))
-   (for-each (λ (form)
-               (displayln form)
-               (printf "type:- ~a~n" (pretty-print-typ (type/infer form))))
-             all-form)))
+(define-syntax-rule (top-interaction e)
+  (begin
+    (printf "type:- ~a~n" (pretty-print-typ (type/infer (parse e))))
+    (parse e)))
 
-(define-syntax-rule (top-interaction . exp)
-  (pretty-print-typ (type/infer (parse exp))))
+(define-syntax-rule (module-begin e* ...)
+  (#%module-begin
+   (top-interaction e*) ...))
 
 (module reader syntax/module-reader
   hindley-milner)

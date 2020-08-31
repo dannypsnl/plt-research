@@ -40,6 +40,4 @@
                     (typ:constructor "list" (list (typ:freevar 0 #f)))
                     (typ:constructor "list" (list (typ:freevar 1 #f)))))
                   (typ:constructor "list" (list (typ:freevar 1 #f)))))
-                "((list ?0) (list ?1)) -> (list ?1)")
-
-  )
+                "((list ?0) (list ?1)) -> (list ?1)"))
