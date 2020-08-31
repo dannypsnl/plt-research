@@ -1,10 +1,6 @@
 #lang typed/racket
 
-(provide typ
-         typ:builtin
-         typ:freevar subst!
-         typ:constructor
-         typ:arrow)
+(provide (all-defined-out))
 
 (struct typ [] #:transparent)
 (struct typ:freevar typ

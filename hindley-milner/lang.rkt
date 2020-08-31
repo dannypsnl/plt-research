@@ -1,14 +1,6 @@
 #lang typed/racket
 
-(provide expr
-         expr:int
-         expr:bool
-         expr:string
-         expr:list
-         expr:variable
-         expr:lambda
-         expr:application
-         expr:let)
+(provide (all-defined-out))
 
 ;;; expressions
 (struct expr [] #:transparent)
