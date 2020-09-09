@@ -4,7 +4,7 @@
 
 (define (ty-> expected actual)
   (match* (expected actual)
-    [(`(record (,e-f* ...) ,e-p) `(record ,a-f*))
+    [(`(record ,e-f* ... ,e-p) `(record ,a-f*))
      (let/cc return
        (let* ([exp (make-immutable-hash e-f*)]
               [act (make-immutable-hash a-f*)]
@@ -18,7 +18,7 @@
 (define (<-ty tm [env #hash()])
   (match tm
     [`(record (,field-name* ,field-e*) ...)
-     `(record ,(map (λ (name ty)
+     `(record ,@(map (λ (name ty)
                       `(,name : ,ty))
                     field-name*
                     (map (λ (e) (<-ty e env)) field-e*)))]
@@ -38,9 +38,9 @@
        [ft (error 'semantic "not appliable: ~a" ft)])]
     [else (error 'semantic "unknown term: ~a" tm)]))
 
-(<-ty '((λ (e : (record ([a : String] [b : Number]))) e)
+(<-ty '((λ (e : (record [a : String] [b : Number])) e)
         (record (a "") (b 2))))
-#;(<-ty '((λ (e : (record ([a : String]))) e)
+#;(<-ty '((λ (e : (record [a : String])) e)
           (record (a "") (b 2))))
-(<-ty '((λ (e : (record ([a : String]) rest)) e)
+(<-ty '((λ (e : (record [a : String] rest)) e)
         (record (a "") (b 2))))
