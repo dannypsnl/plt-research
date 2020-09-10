@@ -1,29 +1,35 @@
 #lang racket
 
-(require racket/hash)
+(require racket/set)
 
 (define (ty-> expected actual)
   (match* (expected actual)
-    [(`(record ,e-f* ... ,e-p) `(record ,a-f*))
+    [(`(record ,e-f* ... ,e-p) `(record ,a-f* ...))
      (let/cc return
-       (let* ([exp (make-immutable-hash e-f*)]
-              [act (make-immutable-hash a-f*)]
-              [new-set (hash-union exp act
-                                   #:combine/key (lambda (k v1 v2) (if (equal? v1 v2) v2 (return #f))))])
+       (let* ([exp (list->set e-f*)]
+              [act (list->set a-f*)]
+              [new-set (set-union exp act)])
          (if (empty? e-p)
-             (= (hash-count new-set) (hash-count exp))
-             #t)))]
+             (set=? new-set exp)
+             (let ([rest (set-subtract act exp)])
+               (hash e-p (set->list rest))))))]
     [(_ _) (equal? expected actual)]))
+
+(define (subst t subst-map)
+  (match t
+    [`(record ,e-f* ... ,e-p)
+     `(record ,@e-f* ,(hash-ref subst-map e-p e-p))]
+    [else t]))
 
 (define (<-ty tm [env #hash()])
   (match tm
     [`(record (,field-name* ,field-e*) ...)
      `(record ,@(map (λ (name ty)
-                      `(,name : ,ty))
-                    field-name*
-                    (map (λ (e) (<-ty e env)) field-e*)))]
+                       `(,name : ,ty))
+                     field-name*
+                     (map (λ (e) (<-ty e env)) field-e*)))]
     [`(,lam (,arg : ,ty) ,b) #:when (member lam '(λ lambda))
-     `(-> ,ty ,(<-ty b (hash-set env arg ty)))]
+                             `(-> ,ty ,(<-ty b (hash-set env arg ty)))]
     [id #:when (symbol? id)
         (hash-ref env id (λ () (error 'semantic "no identifier: ~a" id)))]
     [num #:when (number? num) 'Number]
@@ -31,10 +37,12 @@
     [`(,f ,e)
      (match (<-ty f env)
        [`(-> ,arg-ty ,ret-ty)
-        ;;; TODO: unification to remove row-poly free variables
-        (unless (ty-> arg-ty (<-ty e env))
+        (define subst? (ty-> arg-ty (<-ty e env)))
+        (unless subst?
           (error 'semantic "type mismatching, expected: `~a` got: `~a`" arg-ty (<-ty e env)))
-        ret-ty]
+        (if (hash? subst?)
+            (subst ret-ty subst?)
+            ret-ty)]
        [ft (error 'semantic "not appliable: ~a" ft)])]
     [else (error 'semantic "unknown term: ~a" tm)]))
 
