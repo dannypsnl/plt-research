@@ -1,5 +1,7 @@
 module Equality where
 
+open import Agda.Builtin.Nat using (Nat; _+_; suc)
+
 data _≡_ {A : Set} (x : A) : A → Set where
   refl : x ≡ x
 
@@ -36,3 +38,59 @@ cong-app : ∀ {A B : Set} {f g : A → B}
   -------
   → ∀ (x : A) → f x ≡ g x
 cong-app refl x = refl
+
+module ≡-Reasoning {A : Set} where
+
+  infix 1 begin_
+  infixr 2 _≡⟨⟩_ _≡⟨_⟩_
+  infix 3 _∎
+
+  begin_ : ∀ {x y : A}
+    → x ≡ y
+    -------
+    → x ≡ y
+  begin x≡y = x≡y
+
+  _≡⟨⟩_ : ∀ (x : A) {y : A}
+      → x ≡ y
+      -------
+      → x ≡ y
+  x ≡⟨⟩ x≡y = x≡y
+
+  _≡⟨_⟩_ : ∀ (x : A) {y z : A}
+    → x ≡ y
+    → y ≡ z
+    -------
+    → x ≡ z
+  x ≡⟨ x≡y ⟩ y≡z = trans x≡y y≡z
+
+  _∎ : ∀ (x : A)
+    -------
+    → x ≡ x
+  x ∎ = refl
+
+open ≡-Reasoning
+
+postulate
+  +-identity : ∀ (m : Nat) → m + 0 ≡ m
+  +-suc : ∀ (m n : Nat) → m + suc n ≡ suc (m + n)
+
++-comm : ∀ (m n : Nat) → m + n ≡ n + m
++-comm m 0 =
+  begin
+    m + 0
+  ≡⟨ +-identity m ⟩
+    m
+  ≡⟨⟩
+    0 + m
+  ∎
++-comm m (suc n) =
+  begin
+    m + (suc n)
+  ≡⟨ +-suc m n ⟩
+    suc (m + n)
+  ≡⟨ cong suc (+-comm m n) ⟩
+    suc (n + m)
+  ≡⟨⟩
+    suc n + m
+  ∎
