@@ -94,3 +94,19 @@ postulate
   ≡⟨⟩
     suc n + m
   ∎
+
+data even : Nat → Set
+data odd : Nat → Set
+
+data even where
+  even-zero : even 0
+  even-suc : ∀ {n : Nat} → odd n → even (suc n)
+data odd where
+  odd-suc : ∀ {n : Nat} → even n → odd (suc n)
+
+{-# BUILTIN EQUALITY _≡_ #-}
+
+even-comm : ∀ (m n : Nat)
+  → even (m + n)
+  → even (n + m)
+even-comm m n ev rewrite +-comm n m = ev
