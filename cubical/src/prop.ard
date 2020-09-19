@@ -1,6 +1,0 @@
-\import Data.Bool
-
-\data I
-  | i Nat
-
-\func main => 1
