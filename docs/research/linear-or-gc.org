@@ -1,0 +1,61 @@
+* Linear or GC
+
+This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be **Tenured** object, rest object get released immediately. But notice the special type like =File=, =NetworkPort= would need some special treatment, and small(size) type like =i32=, =i64=, and =f32= no need to analysis.
+
+** First Language
+
+Since we need to get help from type message, this is a static typed language, in this version we ignore special resource like =File= first. Another thing is the language is pure and reject side effect. And to simplify algorithm, small size type still get analyzing. The following shows some examples.
+
+#+BEGIN_SRC racket
+;;; define variable
+(define x : i32 'i32)
+;;; define function
+(define add : (-> i32 i32 i32)
+  (lambda ([x : i32] [y : i32]) : i32
+    (+ x y)))
+(define foo : (-> () i32)
+  (define x : i32 'i32)
+  (lambda () : i32
+    (+ x 'i32)))
+;;; function call
+(add 'i32 'i32)
+#+END_SRC
+
+*** Formal tree
+
+Then we have a formal tree, and primitive function would be introduced in anytime by need.
+
+#+BEGIN_SRC racket
+;;; stmt
+(define ~var : ~typ ~exp)
+exp
+;;; exp
+(lambda ([~var* : ~typ*] ...) : ~typ
+  ~stmt* ...
+  ~exp)
+(~var ~exp* ...)
+'exp ; any atom can be value, 'i32 represented value of i32
+#+END_SRC
+
+*** Properties
+
+We can get simple think for these.
+**** parameter and returns belongs to upper scope
+**** variable belongs to current scope
+***** variable be referenced by returned value is a moved out 
+***** variable end in current scope is linear
+***** variable be referenced by a lambda is un-analyzable
+**** function call would get a value, the value belongs to caller scope
+
+*** Algorithm
+
+Now can define the algorithm.
+**** analysis works for every single scope
+**** define introduces a variable in current scope 
+**** ignore variables were moved to greater scope
+**** let captured variables be managed by GC
+**** ignore parameter
+
+** reference
+
+[[http://www.fos.kuis.kyoto-u.ac.jp/~igarashi/papers/pdf/lgc.TIC00.rev.pdf][Garbage Collection Based on a Linear Type System]]

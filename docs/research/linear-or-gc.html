@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2020-10-05 Mon 04:48 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="林子篆" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2020 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgb6eda96">1. Linear or GC</a>
+<ul>
+<li><a href="#org2b731fd">1.1. First Language</a>
+<ul>
+<li><a href="#orgcbfea14">1.1.1. Formal tree</a></li>
+<li><a href="#org2a710f4">1.1.2. Properties</a></li>
+<li><a href="#orge27d23e">1.1.3. Algorithm</a></li>
+</ul>
+</li>
+<li><a href="#org87faf36">1.2. reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgb6eda96" class="outline-2">
+<h2 id="orgb6eda96"><span class="section-number-2">1</span> Linear or GC</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be <b><b>Tenured</b></b> object, rest object get released immediately. But notice the special type like <code>File</code>, <code>NetworkPort</code> would need some special treatment, and small(size) type like <code>i32</code>, <code>i64</code>, and <code>f32</code> no need to analysis.
+</p>
+</div>
+
+<div id="outline-container-org2b731fd" class="outline-3">
+<h3 id="org2b731fd"><span class="section-number-3">1.1</span> First Language</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Since we need to get help from type message, this is a static typed language, in this version we ignore special resource like <code>File</code> first. Another thing is the language is pure and reject side effect. And to simplify algorithm, small size type still get analyzing. The following shows some examples.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">define variable</span>
+<span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">define</span> <span style="color: #715ab1;">x</span> <span style="color: #3a81c3;">:</span> i32 <span style="color: #2e8b57;">'i32</span><span style="color: #3a81c3;">)</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">define function</span>
+<span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">define</span> <span style="color: #715ab1;">add</span> <span style="color: #3a81c3;">:</span> <span style="color: #6c3163;">(</span><span style="color: #3a81c3;">-&gt;</span> i32 i32 i32<span style="color: #6c3163;">)</span>
+  <span style="color: #6c3163;">(</span><span style="color: #3a81c3; font-weight: bold;">lambda</span> <span style="color: #2d9574;">(</span><span style="color: #67b11d;">[</span>x <span style="color: #3a81c3;">:</span> i32<span style="color: #67b11d;">]</span> <span style="color: #67b11d;">[</span>y <span style="color: #3a81c3;">:</span> i32<span style="color: #67b11d;">]</span><span style="color: #2d9574;">)</span> <span style="color: #3a81c3;">:</span> i32
+    <span style="color: #2d9574;">(</span><span style="color: #3a81c3;">+</span> x y<span style="color: #2d9574;">)</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span>
+<span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">define</span> <span style="color: #715ab1;">foo</span> <span style="color: #3a81c3;">:</span> <span style="color: #6c3163;">(</span><span style="color: #3a81c3;">-&gt;</span> <span style="color: #2d9574;">()</span> i32<span style="color: #6c3163;">)</span>
+  <span style="color: #6c3163;">(</span><span style="color: #3a81c3; font-weight: bold;">define</span> <span style="color: #715ab1;">x</span> <span style="color: #3a81c3;">:</span> i32 <span style="color: #2e8b57;">'i32</span><span style="color: #6c3163;">)</span>
+  <span style="color: #6c3163;">(</span><span style="color: #3a81c3; font-weight: bold;">lambda</span> <span style="color: #2d9574;">()</span> <span style="color: #3a81c3;">:</span> i32
+    <span style="color: #2d9574;">(</span><span style="color: #3a81c3;">+</span> x <span style="color: #2e8b57;">'i32</span><span style="color: #2d9574;">)</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">function call</span>
+<span style="color: #3a81c3;">(</span>add <span style="color: #2e8b57;">'i32</span> <span style="color: #2e8b57;">'i32</span><span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgcbfea14" class="outline-4">
+<h4 id="orgcbfea14"><span class="section-number-4">1.1.1</span> Formal tree</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+Then we have a formal tree, and primitive function would be introduced in anytime by need.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">stmt</span>
+<span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">define</span> <span style="color: #715ab1;">~var</span> <span style="color: #3a81c3;">:</span> ~typ ~exp<span style="color: #3a81c3;">)</span>
+<span style="color: #3a81c3;">exp</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">exp</span>
+<span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">lambda</span> <span style="color: #6c3163;">(</span><span style="color: #2d9574;">[</span>~var* <span style="color: #3a81c3;">:</span> ~typ*<span style="color: #2d9574;">]</span> <span style="color: #3a81c3; font-weight: bold;">...</span><span style="color: #6c3163;">)</span> <span style="color: #3a81c3;">:</span> ~typ
+  ~stmt* <span style="color: #3a81c3; font-weight: bold;">...</span>
+  ~exp<span style="color: #3a81c3;">)</span>
+<span style="color: #3a81c3;">(</span>~var ~exp* <span style="color: #3a81c3; font-weight: bold;">...</span><span style="color: #3a81c3;">)</span>
+<span style="color: #2e8b57;">'exp</span> <span style="color: #2aa1ae; background-color: #ecf3ec;">; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">any atom can be value, 'i32 represented value of i32</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2a710f4" class="outline-4">
+<h4 id="org2a710f4"><span class="section-number-4">1.1.2</span> Properties</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<p>
+We can get simple think for these.
+</p>
+</div>
+<ol class="org-ol">
+<li><a id="org53a0504"></a>parameter and returns belongs to upper scope<br /></li>
+<li><a id="orge5002b6"></a>variable belongs to current scope<br />
+<ol class="org-ol">
+<li><a id="orgbd41bd3"></a>variable be referenced by returned value is a moved out<br /></li>
+<li><a id="orgbf0c68e"></a>variable end in current scope is linear<br /></li>
+<li><a id="orgf13a0c0"></a>variable be referenced by a lambda is un-analyzable<br /></li>
+</ol>
+</li>
+<li><a id="org33a298c"></a>function call would get a value, the value belongs to caller scope<br /></li>
+</ol>
+</div>
+
+<div id="outline-container-orge27d23e" class="outline-4">
+<h4 id="orge27d23e"><span class="section-number-4">1.1.3</span> Algorithm</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<p>
+Now can define the algorithm.
+</p>
+</div>
+<ol class="org-ol">
+<li><a id="org97142d5"></a>analysis works for every single scope<br /></li>
+<li><a id="orgd5be84e"></a>define introduces a variable in current scope<br /></li>
+<li><a id="orgd4ae71b"></a>ignore variables were moved to greater scope<br /></li>
+<li><a id="orgb9d5789"></a>let captured variables be managed by GC<br />
+<div class="outline-text-5" id="text-1-1-3-4">
+<p>
+<b>**</b>
+</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org87faf36" class="outline-3">
+<h3 id="org87faf36"><span class="section-number-3">1.2</span> reference</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+<a href="http://www.fos.kuis.kyoto-u.ac.jp/~igarashi/papers/pdf/lgc.TIC00.rev.pdf">Garbage Collection Based on a Linear Type System</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: 林子篆</p>
+<p class="date">Created: 2020-10-05 Mon 04:48</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
