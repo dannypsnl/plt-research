@@ -44,14 +44,15 @@ We can get simple think for these.
 **** variable belongs to current scope
 ***** variable be referenced by returned value is a moved out 
 ***** variable end in current scope is linear
-***** variable be referenced by a lambda is un-analyzable
+***** variable be captured by a lambda is un-analyzable
 **** function call would get a value, the value belongs to caller scope
 
 *** Algorithm
 
 Now can define the algorithm.
 **** analysis works for every single scope
-**** define introduces a variable in current scope 
+**** define introduces a new variable
+**** lambda introduces a new scope 
 **** ignore variables were moved to greater scope
 **** let captured variables be managed by GC
 **** ignore parameter
