@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-05 Mon 05:13 -->
+<!-- 2020-10-07 Wed 04:34 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -246,32 +246,69 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgc2f6abe">1. Linear or GC</a>
+<li><a href="#org0b3f3d4">1. Linear or GC</a>
 <ul>
-<li><a href="#orgc588b08">1.1. First Language</a>
+<li><a href="#org85db0d2">1.1. Abstraction</a></li>
+<li><a href="#org3849a38">1.2. Introduction</a></li>
+<li><a href="#org04acb92">1.3. Apporach</a></li>
+<li><a href="#org6f898d1">1.4. First Language</a>
 <ul>
-<li><a href="#org5ab703c">1.1.1. Formal tree</a></li>
-<li><a href="#org32790a0">1.1.2. Properties</a></li>
-<li><a href="#orgf17adac">1.1.3. Algorithm</a></li>
+<li><a href="#orgda64852">1.4.1. Formal tree</a></li>
+<li><a href="#org2035811">1.4.2. Properties</a></li>
+<li><a href="#orgebfb991">1.4.3. Algorithm</a></li>
 </ul>
 </li>
-<li><a href="#orgba7b07d">1.2. reference</a></li>
 </ul>
 </li>
+<li><a href="#org4f9b633">2. reference</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgc2f6abe" class="outline-2">
-<h2 id="orgc2f6abe"><span class="section-number-2">1</span> Linear or GC</h2>
+<div id="outline-container-org0b3f3d4" class="outline-2">
+<h2 id="org0b3f3d4"><span class="section-number-2">1</span> Linear or GC</h2>
 <div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org85db0d2" class="outline-3">
+<h3 id="org85db0d2"><span class="section-number-3">1.1</span> Abstraction</h3>
+<div class="outline-text-3" id="text-1-1">
 <p>
-This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be <b><b>Tenured</b></b> object, rest object get released immediately. But notice the special type like <code>File</code>, <code>NetworkPort</code> would need some special treatment, and small(size) type like <code>i32</code>, <code>i64</code>, and <code>f32</code> no need to analysis.
+This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be <b><b>Tenured</b></b>, rest object get released immediately. But notice the special type like <code>File</code>, <code>NetworkPort</code> would need some special treatment, and small(size) type like <code>i32</code>, <code>i64</code>, and <code>f32</code> no need to analysis.
 </p>
 </div>
+</div>
 
-<div id="outline-container-orgc588b08" class="outline-3">
-<h3 id="orgc588b08"><span class="section-number-3">1.1</span> First Language</h3>
-<div class="outline-text-3" id="text-1-1">
+<div id="outline-container-org3849a38" class="outline-3">
+<h3 id="org3849a38"><span class="section-number-3">1.2</span> Introduction</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Linear logic restrict a property can be traced statically, memory allocation problem is a kind of application. For example, once we know a variable <code>a</code> never used after line <code>k</code>, we can deallocate <code>a</code> at line <code>k+1</code>. To analyze it, we can do full scope analysis, which means analyze function by dependency, the problem is such method required full information and won't work well with compiled language which erased most information from source code. Therefore, the way we choose is analyzing independently by each function, in this apporach, although it can't analyze some cases and required some helps from programmer, we can get a local analyzing based on function and a little bit type information of others function but no need to wait analyzing result of others function, algorithm can be a lot faster.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org04acb92" class="outline-3">
+<h3 id="org04acb92"><span class="section-number-3">1.3</span> Apporach</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Under our method, we need to distinguish ownership of an object, according to our purpose was a general method for all languages, we have three cases:
+</p>
+</div>
+<ol class="org-ol">
+<li><a id="org0c8520f"></a>A variable directly to an object(<code>T</code>)<br /></li>
+<li><a id="org841161b"></a>A reference to an object(<code>*T</code>)<br /></li>
+<li><a id="orga3cb57e"></a>A GC reference to an object(<code>*T</code>)<br />
+<div class="outline-text-5" id="text-1-3-0-3">
+<p>
+GC and raw reference(pointer) might look like the same thing, but since we're analyzing liveness, then a GC object would live anywhere, but raw one won't, this is reason why we distinguish them.
+</p>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-org6f898d1" class="outline-3">
+<h3 id="org6f898d1"><span class="section-number-3">1.4</span> First Language</h3>
+<div class="outline-text-3" id="text-1-4">
 <p>
 Since we need to get help from type message, this is a static typed language, in this version we ignore special resource like <code>File</code> first. Another thing is the language is pure and reject side effect. And to simplify algorithm, small size type still get analyzing. The following shows some examples.
 </p>
@@ -293,9 +330,9 @@ Since we need to get help from type message, this is a static typed language, in
 </div>
 </div>
 
-<div id="outline-container-org5ab703c" class="outline-4">
-<h4 id="org5ab703c"><span class="section-number-4">1.1.1</span> Formal tree</h4>
-<div class="outline-text-4" id="text-1-1-1">
+<div id="outline-container-orgda64852" class="outline-4">
+<h4 id="orgda64852"><span class="section-number-4">1.4.1</span> Formal tree</h4>
+<div class="outline-text-4" id="text-1-4-1">
 <p>
 Then we have a formal tree, and primitive function would be introduced in anytime by need.
 </p>
@@ -315,57 +352,57 @@ Then we have a formal tree, and primitive function would be introduced in anytim
 </div>
 </div>
 
-<div id="outline-container-org32790a0" class="outline-4">
-<h4 id="org32790a0"><span class="section-number-4">1.1.2</span> Properties</h4>
-<div class="outline-text-4" id="text-1-1-2">
+<div id="outline-container-org2035811" class="outline-4">
+<h4 id="org2035811"><span class="section-number-4">1.4.2</span> Properties</h4>
+<div class="outline-text-4" id="text-1-4-2">
 <p>
 We can get simple think for these.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="orga040151"></a>parameter and returns belongs to upper scope<br /></li>
-<li><a id="orgd6848f3"></a>variable belongs to current scope<br />
+<li><a id="org1bd1750"></a>parameter and returns belongs to upper scope<br /></li>
+<li><a id="org2048e64"></a>variable belongs to current scope<br />
 <ol class="org-ol">
-<li><a id="org080b6e5"></a>variable be referenced by returned value is a moved out<br /></li>
-<li><a id="orgec519c6"></a>variable end in current scope is linear<br /></li>
-<li><a id="org287697f"></a>variable be captured by a lambda is un-analyzable<br /></li>
+<li><a id="org639011a"></a>variable be referenced by returned value is a moved out<br /></li>
+<li><a id="org175faf8"></a>variable end in current scope is linear<br /></li>
+<li><a id="orgaab2f27"></a>variable be captured by a lambda is un-analyzable<br /></li>
 </ol>
 </li>
-<li><a id="org0299902"></a>function call would get a value, the value belongs to caller scope<br /></li>
+<li><a id="orga3cbf44"></a>function call would get a value, the value belongs to caller scope<br /></li>
 </ol>
 </div>
 
-<div id="outline-container-orgf17adac" class="outline-4">
-<h4 id="orgf17adac"><span class="section-number-4">1.1.3</span> Algorithm</h4>
-<div class="outline-text-4" id="text-1-1-3">
+<div id="outline-container-orgebfb991" class="outline-4">
+<h4 id="orgebfb991"><span class="section-number-4">1.4.3</span> Algorithm</h4>
+<div class="outline-text-4" id="text-1-4-3">
 <p>
 Now can define the algorithm.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org248a77c"></a>analysis works for every single scope<br /></li>
-<li><a id="org03e77c2"></a>define introduces a new variable<br /></li>
-<li><a id="orgb9ca1be"></a>lambda introduces a new scope<br /></li>
-<li><a id="org0b73ac6"></a>ignore variables were moved to greater scope<br /></li>
-<li><a id="org4735bb0"></a>let captured variables be managed by GC<br /></li>
-<li><a id="org7f676d0"></a>ignore parameter<br /></li>
+<li><a id="orgb0fa8c3"></a>analysis works for every single scope<br /></li>
+<li><a id="orgb5c65d1"></a>define introduces a new variable<br /></li>
+<li><a id="org75025d4"></a>lambda introduces a new scope<br /></li>
+<li><a id="orga6d1544"></a>ignore variables were moved to greater scope<br /></li>
+<li><a id="org3bbb9c7"></a>let captured variables be managed by GC<br /></li>
+<li><a id="orga241c7c"></a>ignore parameter<br /></li>
 </ol>
 </div>
 </div>
+</div>
 
-<div id="outline-container-orgba7b07d" class="outline-3">
-<h3 id="orgba7b07d"><span class="section-number-3">1.2</span> reference</h3>
-<div class="outline-text-3" id="text-1-2">
+<div id="outline-container-org4f9b633" class="outline-2">
+<h2 id="org4f9b633"><span class="section-number-2">2</span> reference</h2>
+<div class="outline-text-2" id="text-2">
 <p>
 <a href="http://www.fos.kuis.kyoto-u.ac.jp/~igarashi/papers/pdf/lgc.TIC00.rev.pdf">Garbage Collection Based on a Linear Type System</a>
 </p>
 </div>
 </div>
 </div>
-</div>
 <div id="postamble" class="status">
 <p class="author">Author: 林子篆</p>
-<p class="date">Created: 2020-10-05 Mon 05:13</p>
+<p class="date">Created: 2020-10-07 Wed 04:34</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

@@ -1,6 +1,21 @@
 * Linear or GC
 
-This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be **Tenured** object, rest object get released immediately. But notice the special type like =File=, =NetworkPort= would need some special treatment, and small(size) type like =i32=, =i64=, and =f32= no need to analysis.
+** Abstraction
+
+This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be **Tenured**, rest object get released immediately. But notice the special type like =File=, =NetworkPort= would need some special treatment, and small(size) type like =i32=, =i64=, and =f32= no need to analysis.
+
+** Introduction
+
+Linear logic restrict a property can be traced statically, memory allocation problem is a kind of application. For example, once we know a variable =a= never used after line =k=, we can deallocate =a= at line =k+1=. To analyze it, we can do full scope analysis, which means analyze function by dependency, the problem is such method required full information and won't work well with compiled language which erased most information from source code. Therefore, the way we choose is analyzing independently by each function, in this apporach, although it can't analyze some cases and required some helps from programmer, we can get a local analyzing based on function and a little bit type information of others function but no need to wait analyzing result of others function, algorithm can be a lot faster.
+
+** Apporach
+
+Under our method, we need to distinguish ownership of an object, according to our purpose was a general method for all languages, we have three cases:
+**** A variable directly to an object(=T=)
+**** A reference to an object(=*T=)
+**** A GC reference to an object(=*T=)
+
+GC and raw reference(pointer) might look like the same thing, but since we're analyzing liveness, then a GC object would live anywhere, but raw one won't, this is reason why we distinguish them.
 
 ** First Language
 
@@ -57,6 +72,6 @@ Now can define the algorithm.
 **** let captured variables be managed by GC
 **** ignore parameter
 
-** reference
+* reference
 
 [[http://www.fos.kuis.kyoto-u.ac.jp/~igarashi/papers/pdf/lgc.TIC00.rev.pdf][Garbage Collection Based on a Linear Type System]]
