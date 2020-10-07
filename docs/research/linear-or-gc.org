@@ -11,11 +11,20 @@ Linear logic restrict a property can be traced statically, memory allocation pro
 ** Apporach
 
 Under our method, we need to distinguish ownership of an object, according to our purpose was a general method for all languages, we have three cases:
-**** A variable directly to an object(=T=)
-**** A reference to an object(=*T=)
-**** A GC reference to an object(=*T=)
+
+1. A variable directly to an object(=T=)
+2. A reference to an object(=*T=)
+3. A GC reference to an object(=*T=)
 
 GC and raw reference(pointer) might look like the same thing, but since we're analyzing liveness, then a GC object would live anywhere, but raw one won't, this is reason why we distinguish them.
+
+In our perspective, to unify general liveness property in different language, we also have tree kinds of object. Ignoring copy since they would be fine in any kinds of memory model, and then we can ignore different between reference and value, since value type is unimportant in our framework. Now we say we only have:
+
+1. owned object
+2. shared object
+3. global shared object
+
+Owned is simple, we totally have this object, we can delete it once at the end of the scope or move it to other owner. Shared means we didn't own it, but we can use it, we must distinguish this since captured can't take a shared object out of scope(notice that if stay in the same scope then it's allowed). Global shared means the object would live whatever where it is, which mean it's a GC object.
 
 ** First Language
 
@@ -68,9 +77,10 @@ Now can define the algorithm.
 **** analysis works for every single scope
 **** define introduces a new variable
 **** lambda introduces a new scope 
-**** ignore variables were moved to greater scope
-**** let captured variables be managed by GC
-**** ignore parameter
+**** by default, variable allocated by GC
+**** lifetime who can be detected by algorithm use allocate/deallocate directly in that scope
+**** parameter and returned value can't be detected by algorithm
+**** captured by lambda can't be detected by algorithm
 
 * reference
 
