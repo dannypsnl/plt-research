@@ -26,7 +26,7 @@ In our perspective, to unify general liveness property in different language, we
 
 Owned is simple, we totally have this object, we can delete it once at the end of the scope or move it to other owner. Shared means we didn't own it, but we can use it, we must distinguish this since captured can't take a shared object out of scope(notice that if stay in the same scope then it's allowed). Global shared means the object would live whatever where it is, which mean it's a GC object.
 
-** First Language
+** Let's see, naive algorithm
 
 Since we need to get help from type message, this is a static typed language, in this version we ignore special resource like =File= first. Another thing is the language is pure and reject side effect. And to simplify algorithm, small size type still get analyzing. The following shows some examples.
 
@@ -64,23 +64,53 @@ exp
 *** Properties
 
 We can get simple think for these.
-**** parameter and returns belongs to upper scope
-**** variable belongs to current scope
-***** variable be referenced by returned value is a moved out 
-***** variable end in current scope is linear
-***** variable be captured by a lambda is un-analyzable
-**** function call would get a value, the value belongs to caller scope
+1. parameter and returns belongs to upper scope
+2. variable belongs to current scope
+    1. variable be referenced by returned value is a moved out 
+    2. variable end in current scope is linear
+    3. variable be captured by a lambda is un-analyzable
+3. function call would get a value, the value belongs to caller scope
 
 *** Algorithm
 
 Now can define the algorithm.
-**** analysis works for every single scope
-**** define introduces a new variable
-**** lambda introduces a new scope 
-**** by default, variable allocated by GC
-**** lifetime who can be detected by algorithm use allocate/deallocate directly in that scope
-**** parameter and returned value can't be detected by algorithm
-**** captured by lambda can't be detected by algorithm
+1. analysis works for every single scope
+2. define introduces a new variable
+3. lambda introduces a new scope 
+4. by default, variable allocated by GC
+5. lifetime who can be detected by algorithm use allocate/deallocate directly in that scope
+6. parameter and returned value can't be detected by algorithm
+7. captured by lambda can't be detected by algorithm
+
+*** Problem
+
+The problem of this algorithm was, it backpropagates GC object to everywhere, although it improved a little bit, it's not good enough as we expeceted.
+
+** Point out! How Type be owned?
+
+Tagged, refinement or whatever, our purpose is bring information with our type. In our system, we special points out the ownership. Other type just use meta =T=. We would have =&T= for shared, =@T= for global shared, =T= for type we owned. Now we have a new language, notice that the langauge only points out important message and ignore everything else. Here were some examples
+
+#+BEGIN_SRC racket
+(x : T 'T)
+(foo : a:T -> b:T -> @T
+  (x : T (bar a))
+  ;;; koo : T -> T -> @T
+  (koo x b))
+#+END_SRC
+
+Basically we points out the type of the object and ignore rest information, then we focus on the task.
+
+*** Algorithm
+
+1. Binding introduces new variable, it's has type =T= or =@T= according to how it allocated.
+2. Parameter can be =T=, =&T=, or =@T=. This would affect argument requirement
+3. Usage can required owned the object, we have three case
+   1. =T= would move from source to who required it
+   2. =&T= would give it a compile error
+   3. =@T= would let it pass(since we handle this in runtime actually)
+4. A lambda capture moved(move won't really move a =@T= as above we talk) an object
+5. Moved object can't be used again in the scope
+6. A recursive structure, for example a linked list, the type of element must be =@T=
 
 * reference
 

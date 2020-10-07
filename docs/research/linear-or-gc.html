@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-07 Wed 11:36 -->
+<!-- 2020-10-07 Wed 14:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -246,30 +246,36 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org3013c39">1. Linear or GC</a>
+<li><a href="#orgf5ad136">1. Linear or GC</a>
 <ul>
-<li><a href="#orgbeaac8a">1.1. Abstraction</a></li>
-<li><a href="#org644fb74">1.2. Introduction</a></li>
-<li><a href="#org4365651">1.3. Approach</a></li>
-<li><a href="#org5cd4164">1.4. First Language</a>
+<li><a href="#org51b59cf">1.1. Abstraction</a></li>
+<li><a href="#org786c4ea">1.2. Introduction</a></li>
+<li><a href="#org90a7ec7">1.3. Approach</a></li>
+<li><a href="#org05d37ae">1.4. Let's see, naive algorithm</a>
 <ul>
-<li><a href="#org99b89cb">1.4.1. Formal tree</a></li>
-<li><a href="#orgb0401b0">1.4.2. Properties</a></li>
-<li><a href="#org1580465">1.4.3. Algorithm</a></li>
+<li><a href="#orgbd3c938">1.4.1. Formal tree</a></li>
+<li><a href="#orgc3308c9">1.4.2. Properties</a></li>
+<li><a href="#orgffa4b86">1.4.3. Algorithm</a></li>
+<li><a href="#org7ef53fa">1.4.4. Problem</a></li>
+</ul>
+</li>
+<li><a href="#org2167908">1.5. Point out! How Type be owned?</a>
+<ul>
+<li><a href="#org6acb00e">1.5.1. Algorithm</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org99dcac1">2. reference</a></li>
+<li><a href="#orgfe4fbbf">2. reference</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org3013c39" class="outline-2">
-<h2 id="org3013c39"><span class="section-number-2">1</span> Linear or GC</h2>
+<div id="outline-container-orgf5ad136" class="outline-2">
+<h2 id="orgf5ad136"><span class="section-number-2">1</span> Linear or GC</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgbeaac8a" class="outline-3">
-<h3 id="orgbeaac8a"><span class="section-number-3">1.1</span> Abstraction</h3>
+<div id="outline-container-org51b59cf" class="outline-3">
+<h3 id="org51b59cf"><span class="section-number-3">1.1</span> Abstraction</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be <b><b>Tenured</b></b>, rest object get released immediately. But notice the special type like <code>File</code>, <code>NetworkPort</code> would need some special treatment, and small(size) type like <code>i32</code>, <code>i64</code>, and <code>f32</code> no need to analysis.
@@ -277,8 +283,8 @@ This research idea was about a linear liveness analysis with fall back to GC. Id
 </div>
 </div>
 
-<div id="outline-container-org644fb74" class="outline-3">
-<h3 id="org644fb74"><span class="section-number-3">1.2</span> Introduction</h3>
+<div id="outline-container-org786c4ea" class="outline-3">
+<h3 id="org786c4ea"><span class="section-number-3">1.2</span> Introduction</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Linear logic restrict a property can be traced statically, memory allocation problem is a kind of application. For example, once we know a variable <code>a</code> never used after line <code>k</code>, we can deallocate <code>a</code> at line <code>k+1</code>. To analyze it, we can do full scope analysis, which means analyze function by dependency, the problem is such method required full information and won't work well with compiled language which erased most information from source code. Therefore, the way we choose is analyzing independently by each function, in this approach, although it can't analyze some cases and required some helps from programmer, we can get a local analyzing based on function and a little bit type information of others function but no need to wait analyzing result of others function, algorithm can be a lot faster.
@@ -286,8 +292,8 @@ Linear logic restrict a property can be traced statically, memory allocation pro
 </div>
 </div>
 
-<div id="outline-container-org4365651" class="outline-3">
-<h3 id="org4365651"><span class="section-number-3">1.3</span> Approach</h3>
+<div id="outline-container-org90a7ec7" class="outline-3">
+<h3 id="org90a7ec7"><span class="section-number-3">1.3</span> Approach</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 Under our method, we need to distinguish ownership of an object, according to our purpose was a general method for all languages, we have three cases:
@@ -319,8 +325,8 @@ Owned is simple, we totally have this object, we can delete it once at the end o
 </div>
 </div>
 
-<div id="outline-container-org5cd4164" class="outline-3">
-<h3 id="org5cd4164"><span class="section-number-3">1.4</span> First Language</h3>
+<div id="outline-container-org05d37ae" class="outline-3">
+<h3 id="org05d37ae"><span class="section-number-3">1.4</span> Let's see, naive algorithm</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 Since we need to get help from type message, this is a static typed language, in this version we ignore special resource like <code>File</code> first. Another thing is the language is pure and reject side effect. And to simplify algorithm, small size type still get analyzing. The following shows some examples.
@@ -343,8 +349,8 @@ Since we need to get help from type message, this is a static typed language, in
 </div>
 </div>
 
-<div id="outline-container-org99b89cb" class="outline-4">
-<h4 id="org99b89cb"><span class="section-number-4">1.4.1</span> Formal tree</h4>
+<div id="outline-container-orgbd3c938" class="outline-4">
+<h4 id="orgbd3c938"><span class="section-number-4">1.4.1</span> Formal tree</h4>
 <div class="outline-text-4" id="text-1-4-1">
 <p>
 Then we have a formal tree, and primitive function would be introduced in anytime by need.
@@ -365,48 +371,97 @@ Then we have a formal tree, and primitive function would be introduced in anytim
 </div>
 </div>
 
-<div id="outline-container-orgb0401b0" class="outline-4">
-<h4 id="orgb0401b0"><span class="section-number-4">1.4.2</span> Properties</h4>
+<div id="outline-container-orgc3308c9" class="outline-4">
+<h4 id="orgc3308c9"><span class="section-number-4">1.4.2</span> Properties</h4>
 <div class="outline-text-4" id="text-1-4-2">
 <p>
 We can get simple think for these.
 </p>
+<ol class="org-ol">
+<li>parameter and returns belongs to upper scope</li>
+<li>variable belongs to current scope
+<ol class="org-ol">
+<li>variable be referenced by returned value is a moved out</li>
+<li>variable end in current scope is linear</li>
+<li>variable be captured by a lambda is un-analyzable</li>
+</ol></li>
+<li>function call would get a value, the value belongs to caller scope</li>
+</ol>
 </div>
-<ol class="org-ol">
-<li><a id="org5af9b9e"></a>parameter and returns belongs to upper scope<br /></li>
-<li><a id="orgdbf609a"></a>variable belongs to current scope<br />
-<ol class="org-ol">
-<li><a id="org13dba32"></a>variable be referenced by returned value is a moved out<br /></li>
-<li><a id="org9a620b6"></a>variable end in current scope is linear<br /></li>
-<li><a id="org96a1610"></a>variable be captured by a lambda is un-analyzable<br /></li>
-</ol>
-</li>
-<li><a id="org94e7fc5"></a>function call would get a value, the value belongs to caller scope<br /></li>
-</ol>
 </div>
 
-<div id="outline-container-org1580465" class="outline-4">
-<h4 id="org1580465"><span class="section-number-4">1.4.3</span> Algorithm</h4>
+<div id="outline-container-orgffa4b86" class="outline-4">
+<h4 id="orgffa4b86"><span class="section-number-4">1.4.3</span> Algorithm</h4>
 <div class="outline-text-4" id="text-1-4-3">
 <p>
 Now can define the algorithm.
 </p>
-</div>
 <ol class="org-ol">
-<li><a id="org76a85e8"></a>analysis works for every single scope<br /></li>
-<li><a id="org8ff9d4a"></a>define introduces a new variable<br /></li>
-<li><a id="org4e33a6f"></a>lambda introduces a new scope<br /></li>
-<li><a id="org8c8faa9"></a>by default, variable allocated by GC<br /></li>
-<li><a id="orgbd52d69"></a>lifetime who can be detected by algorithm use allocate/deallocate directly in that scope<br /></li>
-<li><a id="org08dad65"></a>parameter and returned value can't be detected by algorithm<br /></li>
-<li><a id="org33e29b9"></a>captured by lambda can't be detected by algorithm<br /></li>
+<li>analysis works for every single scope</li>
+<li>define introduces a new variable</li>
+<li>lambda introduces a new scope</li>
+<li>by default, variable allocated by GC</li>
+<li>lifetime who can be detected by algorithm use allocate/deallocate directly in that scope</li>
+<li>parameter and returned value can't be detected by algorithm</li>
+<li>captured by lambda can't be detected by algorithm</li>
 </ol>
+</div>
+</div>
+
+<div id="outline-container-org7ef53fa" class="outline-4">
+<h4 id="org7ef53fa"><span class="section-number-4">1.4.4</span> Problem</h4>
+<div class="outline-text-4" id="text-1-4-4">
+<p>
+The problem of this algorithm was, it backpropagates GC object to everywhere, although it improved a little bit, it's not good enough as we expeceted.
+</p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org99dcac1" class="outline-2">
-<h2 id="org99dcac1"><span class="section-number-2">2</span> reference</h2>
+<div id="outline-container-org2167908" class="outline-3">
+<h3 id="org2167908"><span class="section-number-3">1.5</span> Point out! How Type be owned?</h3>
+<div class="outline-text-3" id="text-1-5">
+<p>
+Tagged, refinement or whatever, our purpose is bring information with our type. In our system, we special points out the ownership. Other type just use meta <code>T</code>. We would have <code>&amp;T</code> for shared, <code>@T</code> for global shared, <code>T</code> for type we owned. Now we have a new language, notice that the langauge only points out important message and ignore everything else. Here were some examples
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #3a81c3;">(</span>x <span style="color: #3a81c3;">:</span> T <span style="color: #2e8b57;">'T</span><span style="color: #3a81c3;">)</span>
+<span style="color: #3a81c3;">(</span>foo <span style="color: #3a81c3;">:</span> a:T <span style="color: #3a81c3;">-&gt;</span> b:T <span style="color: #3a81c3;">-&gt;</span> @T
+  <span style="color: #6c3163;">(</span>x <span style="color: #3a81c3;">:</span> T <span style="color: #2d9574;">(</span>bar a<span style="color: #2d9574;">)</span><span style="color: #6c3163;">)</span>
+  <span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">koo : T -&gt; T -&gt; @T</span>
+  <span style="color: #6c3163;">(</span>koo x b<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+
+<p>
+Basically we points out the type of the object and ignore rest information, then we focus on the task.
+</p>
+</div>
+
+<div id="outline-container-org6acb00e" class="outline-4">
+<h4 id="org6acb00e"><span class="section-number-4">1.5.1</span> Algorithm</h4>
+<div class="outline-text-4" id="text-1-5-1">
+<ol class="org-ol">
+<li>Binding introduces new variable, it's has type <code>T</code> or <code>@T</code> according to how it allocated.</li>
+<li>Parameter can be <code>T</code>, <code>&amp;T</code>, or <code>@T</code>. This would affect argument requirement</li>
+<li>Usage can required owned the object, we have three case
+<ol class="org-ol">
+<li><code>T</code> would move from source to who required it</li>
+<li><code>&amp;T</code> would give it a compile error</li>
+<li><code>@T</code> would let it pass(since we handle this in runtime actually)</li>
+</ol></li>
+<li>A lambda capture moved(move won't really move a <code>@T</code> as above we talk) an object</li>
+<li>Moved object can't be used again in the scope</li>
+<li>A recursive structure, for example a linked list, the type of element must be <code>@T</code></li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfe4fbbf" class="outline-2">
+<h2 id="orgfe4fbbf"><span class="section-number-2">2</span> reference</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 <a href="http://www.fos.kuis.kyoto-u.ac.jp/~igarashi/papers/pdf/lgc.TIC00.rev.pdf">Garbage Collection Based on a Linear Type System</a>
@@ -416,7 +471,7 @@ Now can define the algorithm.
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: 林子篆</p>
-<p class="date">Created: 2020-10-07 Wed 11:36</p>
+<p class="date">Created: 2020-10-07 Wed 14:12</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
