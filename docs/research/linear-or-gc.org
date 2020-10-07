@@ -111,6 +111,7 @@ Basically we points out the type of the object and ignore rest information, then
 4. A lambda capture moved(move won't really move a =@T= as above we talk) an object
 5. Moved object can't be used again in the scope
 6. A recursive structure, for example a linked list, the type of element must be =@T=
+7. We can convert =@T= to =T= or =&T=, and =T= to =&T=, rest would be rejected
 
 * reference
 
