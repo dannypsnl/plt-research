@@ -1,0 +1,65 @@
+* inductive intro/elim rules
+
+For any inductive type $T$, there would has a list of constructor $c_1, c_2, c_3, ..., c_m$, constructor has a type, $c_1$ has $T_1$ and so on.
+
+** Example: Nat
+
+Now we have pesudo program define a constructor $Nat$
+
+#+BEGIN_SRC racket
+(ind Nat
+  [z : Nat]
+  [s : Nat → Nat]) 
+#+END_SRC
+
+In this program we can see that $Nat$ has two constructors: $z$ and $s$.
+
+The introduction rules of $z$ and $s$ was:
+
+intro-z:
+\(
+\frac{
+  \Gamma
+}{
+  z : Nat
+}
+\)
+intro-s:
+\(
+\frac{
+  \Gamma, n : Nat
+}{
+  s \; n : Nat
+}
+\)
+
+elim-z: No
+elim-s:
+\(
+\frac{
+  \Gamma, s \; n : Nat, s : Nat \to Nat
+}{
+  n : Nat
+}
+\)
+
+** General
+
+We can observe the general rules, a constructor $c_i$ of $T$, would definitly have intro/elim rules like this:
+
+intro-$c_i$:
+\(
+\frac{
+  \Gamma, a_1 : A_1, ..., a_m : A_m, c_i : A_1 \to A_m \to T
+}{
+  c_i \; a_1 \; ... \; a_m
+}
+\)
+elim-$c_i$:
+\(
+\frac{
+  \Gamma, a_1 : A_1, ..., a_m : A_m, c_i : A_1 \to ... \to A_m \to T
+}{
+  a_1 : A_1 \; ... \; a_m : A_m
+}
+\)
