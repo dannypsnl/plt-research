@@ -1,0 +1,37 @@
+-- A constant function always return 0
+\func f => 0
+-- or we can make more precisely, it's a `Nat`
+\func f' : Nat => 0
+
+-- parameter
+\func id-nat (n : Nat) => n
+-- again, can specific return type
+\func id-nat' (n : Nat) : Nat => n
+
+\func fst (m _ : Nat) => m
+\func snd (_ n : Nat) => n
+-- lambda is same thing
+\func fst' => \lam (m _ : Nat) => m
+
+-- infix operator, precedence can be 1-9
+\func \infixl 6 $$ (x y : Nat) => x
+\func test => 3 $$ 7
+
+-- no member
+\data Empty
+-- unit is the only member of Unit
+\data Unit | unit
+-- Boolean
+\data Bool | false | true
+-- not function
+\func not (b : Bool) : Bool
+  | true => false
+  | false => true
+\func or (a b : Bool) : Bool \elim a, b
+  | true, _ => true
+  | _, true => true
+  | _, _ => false
+
+\data Nat' | zero' | suc' Nat
+
+\func id {A : \Type} (a : A) => a
