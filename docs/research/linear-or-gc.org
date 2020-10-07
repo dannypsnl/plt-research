@@ -6,9 +6,9 @@ This research idea was about a linear liveness analysis with fall back to GC. Id
 
 ** Introduction
 
-Linear logic restrict a property can be traced statically, memory allocation problem is a kind of application. For example, once we know a variable =a= never used after line =k=, we can deallocate =a= at line =k+1=. To analyze it, we can do full scope analysis, which means analyze function by dependency, the problem is such method required full information and won't work well with compiled language which erased most information from source code. Therefore, the way we choose is analyzing independently by each function, in this apporach, although it can't analyze some cases and required some helps from programmer, we can get a local analyzing based on function and a little bit type information of others function but no need to wait analyzing result of others function, algorithm can be a lot faster.
+Linear logic restrict a property can be traced statically, memory allocation problem is a kind of application. For example, once we know a variable =a= never used after line =k=, we can deallocate =a= at line =k+1=. To analyze it, we can do full scope analysis, which means analyze function by dependency, the problem is such method required full information and won't work well with compiled language which erased most information from source code. Therefore, the way we choose is analyzing independently by each function, in this approach, although it can't analyze some cases and required some helps from programmer, we can get a local analyzing based on function and a little bit type information of others function but no need to wait analyzing result of others function, algorithm can be a lot faster.
 
-** Apporach
+** Approach
 
 Under our method, we need to distinguish ownership of an object, according to our purpose was a general method for all languages, we have three cases:
 
