@@ -1,3 +1,6 @@
+#+title: Linear and GC
+#+author: Lîm Tsú-thuàn
+
 This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be **Tenured**, rest object get released immediately. But notice the special type like =File=, =NetworkPort= would need some special treatment, and small(size) type like =i32=, =i64=, and =f32= no need to analysis.
 
 * Introduction
