@@ -1,14 +1,10 @@
-* Linear or GC
-
-** Abstraction
-
 This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be **Tenured**, rest object get released immediately. But notice the special type like =File=, =NetworkPort= would need some special treatment, and small(size) type like =i32=, =i64=, and =f32= no need to analysis.
 
-** Introduction
+* Introduction
 
 Linear logic restrict a property can be traced statically, memory allocation problem is a kind of application. For example, once we know a variable =a= never used after line =k=, we can deallocate =a= at line =k+1=. To analyze it, we can do full scope analysis, which means analyze function by dependency, the problem is such method required full information and won't work well with compiled language which erased most information from source code. Therefore, the way we choose is analyzing independently by each function, in this approach, although it can't analyze some cases and required some helps from programmer, we can get a local analyzing based on function and a little bit type information of others function but no need to wait analyzing result of others function, algorithm can be a lot faster.
 
-** Approach
+* Approach
 
 Under our method, we need to distinguish ownership of an object, according to our purpose was a general method for all languages, we have three cases:
 
@@ -26,7 +22,7 @@ In our perspective, to unify general liveness property in different language, we
 
 Owned is simple, we totally have this object, we can delete it once at the end of the scope or move it to other owner. Shared means we didn't own it, but we can use it, we must distinguish this since captured can't take a shared object out of scope(notice that if stay in the same scope then it's allowed). Global shared means the object would live whatever where it is, which mean it's a GC object.
 
-** Let's see, naive algorithm
+* Let's see, naive algorithm
 
 Since we need to get help from type message, this is a static typed language, in this version we ignore special resource like =File= first. Another thing is the language is pure and reject side effect. And to simplify algorithm, small size type still get analyzing. The following shows some examples.
 
@@ -45,7 +41,7 @@ Since we need to get help from type message, this is a static typed language, in
 (add 'i32 'i32)
 #+END_SRC
 
-*** Formal tree
+** Formal tree
 
 Then we have a formal tree, and primitive function would be introduced in anytime by need.
 
@@ -61,7 +57,7 @@ exp
 'exp ; any atom can be value, 'i32 represented value of i32
 #+END_SRC
 
-*** Properties
+** Properties
 
 We can get simple think for these.
 1. parameter and returns belongs to upper scope
@@ -71,7 +67,7 @@ We can get simple think for these.
     3. variable be captured by a lambda is un-analyzable
 3. function call would get a value, the value belongs to caller scope
 
-*** Algorithm
+** Algorithm
 
 Now can define the algorithm.
 1. analysis works for every single scope
@@ -82,11 +78,11 @@ Now can define the algorithm.
 6. parameter and returned value can't be detected by algorithm
 7. captured by lambda can't be detected by algorithm
 
-*** Problem
+** Problem
 
 The problem of this algorithm was, it backpropagates GC object to everywhere, although it improved a little bit, it's not good enough as we expeceted.
 
-** Point out! How Type be owned?
+* Point out! How Type be owned?
 
 Tagged, refinement or whatever, our purpose is bring information with our type. In our system, we special points out the ownership. Other type just use meta =T=. We would have =&T= for shared, =@T= for global shared, =T= for type we owned. Now we have a new language, notice that the langauge only points out important message and ignore everything else. Here were some examples
 
@@ -100,7 +96,7 @@ Tagged, refinement or whatever, our purpose is bring information with our type. 
 
 Basically we points out the type of the object and ignore rest information, then we focus on the task.
 
-*** Algorithm
+** Algorithm
 
 1. Binding introduces new variable, it's has type =T= or =@T= according to how it allocated.
 2. Parameter can be =T=, =&T=, or =@T=. This would affect argument requirement
