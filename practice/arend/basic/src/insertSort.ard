@@ -1,0 +1,17 @@
+\import Data.Bool
+\import Data.List
+\import Data.Or
+\import Order.LinearOrder
+\open LinearOrder
+
+\func insert {T : Dec} (elem : T) (list : List T) : List T \elim list
+  | nil => elem :: nil
+  | :: head tail => \case trichotomy head elem \with {
+    | less head<elem => head :: insert elem tail
+    | equals head=elem => elem :: head :: tail
+    | greater head>elem => elem :: head :: tail
+  }
+\func insertSort {T : Dec} (list : List T) : List T
+  | nil => nil
+  | :: head tail => \let | sorted => insertSort tail
+                    \in insert head sorted
