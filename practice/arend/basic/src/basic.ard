@@ -1,3 +1,6 @@
+\import Logic
+\import Paths
+
 -- A constant function always return 0
 \func f => 0
 -- or we can make more precisely, it's a `Nat`
@@ -17,8 +20,6 @@
 \func \infixl 6 $$ (x y : Nat) => x
 \func test => 3 $$ 7
 
--- no member
-\data Empty
 -- unit is the only member of Unit
 \data Unit | unit
 -- Boolean
@@ -38,3 +39,12 @@
 \data Nat' | zero' | suc' Nat
 
 \func id {A : \Type} (a : A) => a
+
+\func left=right : left = right => coe (\lam i => left = i) idp right
+
+\func false/=true (p : false = true) : Empty => transport T p unit
+  \where {
+    \func T (b : Bool) : \Type
+      | true => Empty
+      | false => Unit
+  }
