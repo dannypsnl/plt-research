@@ -31,6 +31,9 @@
   | true, _ => true
   | _, true => true
   | _, _ => false
+\func if {A : \Type} (cond : Bool) (then else : A) : A \elim cond
+  | true => then
+  | false => else
 
 \data Nat' | zero' | suc' Nat
 
