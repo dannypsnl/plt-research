@@ -48,3 +48,13 @@
       | true => Empty
       | false => Unit
   }
+
+\data CoerceBool | coerce-true | coerce-false
+  \where
+    \use \coerce toNat (b : CoerceBool) : Nat
+      | coerce-true => 1
+      | coerce-false => 0
+    \use \coerce fromNat (n : Nat) : CoerceBool
+      | 0 => coerce-false
+      | 1 => coerce-true
+      | suc (suc n) => fromNat n
