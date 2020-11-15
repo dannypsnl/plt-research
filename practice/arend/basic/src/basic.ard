@@ -58,3 +58,20 @@
       | 0 => coerce-false
       | 1 => coerce-true
       | suc (suc n) => fromNat n
+
+\func Leibinz {A : \Type} {a a' : A}
+  -- forall P : A -> \Type, exist P a -> P a' and P a' -> P a
+  (f : \Pi (P : A -> \Type) -> \Sigma (P a -> P a') (P a' -> P a))
+  -- implements a = a'
+  : a = a'
+  => (f (\lam x => a = x)).1 idp
+
+\func transport {A : \Type} (B : A -> \Type) {a a' : A} (p : a = a') (b : B a) : B a' =>
+  coe (\lam i => B (p @ i)) b right
+
+\func inv {A : \Type} {a a' : A} (p : a = a') : a' = a =>
+  transport (\lam x => x = a) p idp
+\func trans {A : \Type} {a a' a'' : A} (p : a = a') (q : a' = a'') : a = a'' =>
+  transport (\lam x => a = x) q p
+\func congruence {A B : \Type} (f : A -> B) {a a' : A} (p : a = a') : f a = f a' =>
+  transport (\lam x => f a = f x) p idp
