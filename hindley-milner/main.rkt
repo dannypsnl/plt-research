@@ -18,12 +18,13 @@
              #:with bind
              #'(cons (symbol->string 'bind-name) (parse bind-expr))))
   (syntax-parse stx
+    #:literals (let λ)
     ; (let ([a 1]
     ;       [b (λ (x) x)])
     ;   (b a))
-    (`[(~literal let) (binding*:bind ...) body]
+    (`[let (binding*:bind ...) body]
      #'(expr:let (list binding*.bind ...) (parse body)))
-    (`[(~literal λ) (ps* ...) body] #'(expr:lambda (list (symbol->string 'ps*) ...) (parse body)))
+    (`[λ (ps* ...) body] #'(expr:lambda (list (symbol->string 'ps*) ...) (parse body)))
     (`[(~literal quote) (elem* ...)] #'(expr:list (list (parse elem*) ...)))
     (`[f arg* ...] #'(expr:application (parse f) (list (parse arg*) ...)))
     (`v:id #'(expr:variable (symbol->string 'v)))
