@@ -1,10 +1,10 @@
-#lang racket
+#lang racket/base
 
 ; import with no phase shift
-(require "a.rkt")
+(require racket/match)
 ; shift phase by +1
-(require (for-syntax "a.rkt"))
+(require (for-syntax racket/match))
 ; shift phase by -1
-(require (for-template "a.rkt"))
+(require (for-template racket/match))
 ; shift phase by +5
-(require (for-meta 5 "a.rkt"))
+(require (for-meta 5 racket/match))
