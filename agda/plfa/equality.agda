@@ -1,4 +1,4 @@
-module Equality where
+module equality where
 
 open import Agda.Builtin.Nat using (Nat; _+_; suc)
 

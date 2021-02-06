@@ -1,4 +1,4 @@
-module Isomorphism where
+module isomorphism where
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; refl; cong; cong-app)
