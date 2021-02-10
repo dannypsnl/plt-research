@@ -34,9 +34,6 @@ data Term : Set where
   case_[zero⇒_|suc_⇒_] : Term → Term → Id → Term → Term
   μ_⇒_ : Id → Term → Term
 
-data Value : Term → Set where
-  V-ƛ : ∀ {x N} → Value (ƛ x ⇒ N)
-
 two : Term
 two = `suc `suc `zero
 
@@ -62,3 +59,51 @@ mul = μ "*" ⇒ ƛ "m" ⇒ ƛ "n" ⇒
 
 _ : Term
 _ = mul ∙ two ∙ two
+
+data Value : Term → Set where
+  V-ƛ : ∀ {x N} →
+      ---------------
+      Value (ƛ x ⇒ N)
+  V-zero :
+      -----------
+      Value `zero
+  V-suc : ∀ {V}
+    → Value V
+      --------------
+    → Value (`suc V)
+
+-- substitution
+infix 9 _[_:=_]
+
+_[_:=_] : Term → Id → Term → Term
+(` x) [ y := V ] with x ≟ y
+-- yes, replace x with V
+... | yes _          =  V
+-- no, return x itself
+... | no  _          =  ` x
+(ƛ x ⇒ N) [ y := V ] with x ≟ y
+-- new intro x shadow the outer scope, stop substitution
+... | yes _          =  ƛ x ⇒ N
+-- keep substituting
+... | no  _          =  ƛ x ⇒ N [ y := V ]
+(L ∙ M) [ y := V ]   =  L [ y := V ] ∙ M [ y := V ]
+(`zero) [ y := V ]   =  `zero
+(`suc M) [ y := V ]  =  `suc M [ y := V ]
+(case L [zero⇒ M |suc x ⇒ N ]) [ y := V ] with x ≟ y
+... | yes _          =  case L [ y := V ] [zero⇒ M [ y := V ] |suc x ⇒ N ]
+... | no  _          =  case L [ y := V ] [zero⇒ M [ y := V ] |suc x ⇒ N [ y := V ] ]
+(μ x ⇒ N) [ y := V ] with x ≟ y
+... | yes _          =  μ x ⇒ N
+... | no  _          =  μ x ⇒ N [ y := V ]
+
+_ : (ƛ "x" ⇒ ` "y") [ "y" := `zero ] ≡ ƛ "x" ⇒ `zero
+_ = refl
+
+_ : (ƛ "x" ⇒ ` "x") [ "x" := `zero ] ≡ ƛ "x" ⇒ ` "x"
+_ = refl
+
+_ : (ƛ "y" ⇒ ` "y") [ "x" := `zero ] ≡ ƛ "y" ⇒ ` "y"
+_ = refl
+
+_ : (ƛ "y" ⇒ ` "x" ∙ (ƛ "x" ⇒ ` "x")) [ "x" := `zero ] ≡ (ƛ "y" ⇒ `zero ∙ (ƛ "x" ⇒ ` "x"))
+_ = refl
