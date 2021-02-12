@@ -60,18 +60,6 @@ mul = μ "*" ⇒ ƛ "m" ⇒ ƛ "n" ⇒
 _ : Term
 _ = mul ∙ two ∙ two
 
-data Value : Term → Set where
-  V-ƛ : ∀ {x N} →
-      ---------------
-      Value (ƛ x ⇒ N)
-  V-zero :
-      -----------
-      Value `zero
-  V-suc : ∀ {V}
-    → Value V
-      --------------
-    → Value (`suc V)
-
 -- substitution
 infix 9 _[_:=_]
 
@@ -107,3 +95,63 @@ _ = refl
 
 _ : (ƛ "y" ⇒ ` "x" ∙ (ƛ "x" ⇒ ` "x")) [ "x" := `zero ] ≡ (ƛ "y" ⇒ `zero ∙ (ƛ "x" ⇒ ` "x"))
 _ = refl
+
+data Value : Term → Set where
+  V-ƛ : ∀ {x N} →
+      ---------------
+      Value (ƛ x ⇒ N)
+  V-zero :
+      -----------
+      Value `zero
+  V-suc : ∀ {V}
+    → Value V
+      --------------
+    → Value (`suc V)
+
+infix 4 _—→_
+
+data _—→_ : Term → Term → Set where
+  ξ-·₁ : ∀ {L L′ M}
+    → L —→ L′
+      -----------------
+    → L ∙ M —→ L′ ∙ M
+
+  ξ-·₂ : ∀ {V M M′}
+    → Value V
+    → M —→ M′
+      -----------------
+    → V ∙ M —→ V ∙ M′
+
+  β-ƛ : ∀ {x N V}
+    → Value V
+      ------------------------------
+    → (ƛ x ⇒ N) ∙ V —→ N [ x := V ]
+
+  ξ-suc : ∀ {M M′}
+    → M —→ M′
+      ------------------
+    → `suc M —→ `suc M′
+
+  ξ-case : ∀ {x L L′ M N}
+    → L —→ L′
+      -----------------------------------------------------------------
+    → case L [zero⇒ M |suc x ⇒ N ] —→ case L′ [zero⇒ M |suc x ⇒ N ]
+
+  β-zero : ∀ {x M N}
+      ----------------------------------------
+    → case `zero [zero⇒ M |suc x ⇒ N ] —→ M
+
+  β-suc : ∀ {x V M N}
+    → Value V
+      ---------------------------------------------------
+    → case `suc V [zero⇒ M |suc x ⇒ N ] —→ N [ x := V ]
+
+  β-μ : ∀ {x M}
+      ------------------------------
+    → μ x ⇒ M —→ M [ x := μ x ⇒ M ]
+
+_ : (ƛ "x" ⇒ `"x") ∙ (ƛ "x" ⇒ `"x") —→ (ƛ "x" ⇒ ` "x")
+_ = β-ƛ V-ƛ
+
+_ : (ƛ "x" ⇒ ` "x") ∙ (ƛ "x" ⇒ ` "x") ∙ (ƛ "x" ⇒ ` "x")  —→ (ƛ "x" ⇒ ` "x") ∙ (ƛ "x" ⇒ ` "x")
+_ = ξ-·₁ (β-ƛ V-ƛ)
