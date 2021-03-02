@@ -11,7 +11,7 @@
   | abstraction x M, a => subst M x a
   | f, a => application f a
 
-\instance NatDecSet : DecSet.Impl Nat
+\instance NatDecSet : DecSet Nat
   | decideEq x y => \case x, y \with {
     | 0, 0 => yes {?}
     | 0, suc y => no {?}
