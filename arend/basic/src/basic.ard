@@ -1,5 +1,4 @@
 \import Logic
-\import Order.PartialOrder
 \import Paths
 
 -- A constant function always return 0
