@@ -1,4 +1,5 @@
 \import Logic
+\import Order.PartialOrder
 \import Paths
 
 -- A constant function always return 0
@@ -75,3 +76,6 @@
   transport (\lam x => a = x) q p
 \func congruence {A B : \Type} (f : A -> B) {a a' : A} (p : a = a') : f a = f a' =>
   transport (\lam x => f a = f x) p idp
+
+\func f1 {n : Nat} : 0 Nat.<= n =>
+  Nat.zero<=_
