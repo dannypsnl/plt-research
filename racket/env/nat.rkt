@@ -1,13 +1,23 @@
 #lang racket
 
-(provide 
+(provide (for-syntax zero suc)
          zero suc)
 
 (require (for-syntax "env.rkt"))
 
 (begin-for-syntax
-  (env-add! #'zero 'Nat))
+  (define Bool 'Bool)
+  (define true 'true)
+  (define false 'false)
+
+  (define Nat 'Nat)
+  (define zero 'zero)
+  (define (suc n) `(suc ,n)))
+
+(define Bool 'Bool)
+(define true 'true)
+(define false 'false)
+
+(define Nat 'Nat)
 (define zero 'zero)
-(begin-for-syntax
-  (env-add! #'suc '(-> Nat Nat)))
 (define (suc n) `(suc ,n))

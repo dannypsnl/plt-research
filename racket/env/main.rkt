@@ -1,9 +1,9 @@
 #lang racket
 
-(require (for-syntax "env.rkt")
+(require (for-syntax "app.rkt")
          "nat.rkt")
 
 (begin-for-syntax
-  (displayln (env-ref #'suc)))
+  (suc true))
 (suc zero)
 zero
