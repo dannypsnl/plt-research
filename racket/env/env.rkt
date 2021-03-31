@@ -20,15 +20,20 @@
 (env-add! 'zero 'Nat)
 (env-add! 'suc '(-> Nat Nat))
 
+(env-add! 'Vec '(-> Type Nat Type))
+
 (define (check-app e)
-  (let/cc return
-    (syntax-parse e
+  (syntax-parse e
       [(f e* ...)
        (define f-ty (infer #'f))
        (define e-ty* (map infer
                           (syntax->list #'(e* ...))))
        (match f-ty
          [`(-> ,t1 ... ,t2)
+          (unless (= (length e-ty*) (length t1))
+            (raise-syntax-error 'arity
+                                ""
+                                #'f))
           (for ([e (syntax->list #'(e* ...))]
                 [e-ty e-ty*]
                 [t t1])
@@ -36,13 +41,13 @@
               (raise-syntax-error 'type-mismatched
                                   (format "expect: ~a, get: ~a" t e-ty)
                                   #'f
-                                  e))
-            (return t2))]
+                                  e)))
+          t2]
          ; in this case, means this is builtin method, we do nothing
          [#f (void)]
          [else (raise-syntax-error 'not-func
                                    ""
-                                   #'f)])])))
+                                   #'f)])]))
 (define (infer e)
   (syntax-parse e
     [(f e ...)

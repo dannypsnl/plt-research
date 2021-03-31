@@ -4,6 +4,8 @@
          "nat.rkt")
 
 (begin-for-syntax
-  (displayln (suc zero)))
+  (displayln (suc zero))
+
+  (displayln (Vec Nat zero)))
 (suc zero)
 zero
