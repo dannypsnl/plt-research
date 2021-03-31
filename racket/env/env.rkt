@@ -38,6 +38,8 @@
                                   #'f
                                   e))
             (return t2))]
+         ; in this case, means this is builtin method, we do nothing
+         [#f (void)]
          [else (raise-syntax-error 'not-func
                                    ""
                                    #'f)])])))
