@@ -3,7 +3,7 @@
 (require "data.rkt")
 
 (data expr
-      [var (name : String)]
+      [Var (name : String)]
       [abs (name : String) (body : expr)]
       [app (fn : expr) (arg : expr)]
       [pi (name : String) (e : expr) (body : expr)]
@@ -39,3 +39,16 @@
     [(vabs lam) (lam v)]
     [(vneutral n) (vneutral (napp n v))]
     [_ (error 'fail "u: ~a, v: ~a" u v)]))
+
+(: eval : (Immutable-HashTable String value) expr -> value)
+(define (eval env t)
+  (match t
+    [(Var name) (hash-ref env name
+                          (λ () (vneutral (nvar name))))]
+    [(abs x e) (vabs (λ (v) (eval (hash-set env x v) e)))]
+    [(app fn arg) (vapp (eval env fn) (eval env arg))]
+    [(pi x a e) (vpi (eval env a) (λ (v) (eval (hash-set env x v) e)))]
+    [(type i) (vtype i)]
+    [(nat) (vnat)]
+    [(zero) (vzero)]
+    [(succ e) (vsucc (eval env e))]))
