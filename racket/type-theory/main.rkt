@@ -11,10 +11,10 @@
       [nat]
       [zero]
       [succ (n : expr)]
-      [rec (e1 : expr) (e2 : expr) (e3 : expr) (e4 : expr)]
-      [id (e1 : expr) (e2 : expr) (e3 : expr)]
-      [refl (e : expr)]
-      [J (e1 : expr) (e2 : expr) (e3 : expr) (e4 : expr) (e5 : expr) (e6 : expr)])
+      [rec expr expr expr expr]
+      [id expr expr expr]
+      [refl expr]
+      [J expr expr expr expr expr expr])
 
 (data value
       [vabs (lam : (-> value value))]
@@ -23,15 +23,15 @@
       [vnat]
       [vzero]
       [vsucc (n : value)]
-      [vid (v1 : value) (v2 : value) (v3 : value)]
-      [vrefl (v : value)]
+      [vid value value value]
+      [vrefl value]
       [vneutral (n : neutral)])
 
 (data neutral
       [nvar (name : String)]
       [napp (fn : neutral) (arg : value)]
-      [nrec (n : neutral) (v1 : value) (v2 : value) (v3 : value)]
-      [nj (v1 : value) (v2 : value) (v3 : value) (v4 : value) (v5 : value) (n : neutral)])
+      [nrec (n : neutral) value value value]
+      [nj value value value value value (n : neutral)])
 
 (: vapp : value value -> value)
 (define (vapp u v)
