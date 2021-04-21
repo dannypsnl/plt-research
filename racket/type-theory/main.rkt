@@ -98,3 +98,7 @@
   [((vid a t u)) (id (readback a) (readback t) (readback u))]
   [((vrefl t)) (refl (readback t))]
   [((vneutral t)) (readback-neutral t)])
+
+(: veq : value value -> Boolean)
+(define (veq t u)
+  (equal? (readback t) (readback u)))
