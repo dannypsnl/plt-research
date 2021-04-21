@@ -3,10 +3,10 @@
 (require "data.rkt")
 
 (data expr
-      [Var (name : String)]
-      [abs (name : String) (body : expr)]
+      [Var (name : Symbol)]
+      [abs (name : Symbol) (body : expr)]
       [app (fn : expr) (arg : expr)]
-      [pi (name : String) (e : expr) (body : expr)]
+      [pi (name : Symbol) (e : expr) (body : expr)]
       [type (level : Integer)]
       [nat]
       [zero]
@@ -28,7 +28,7 @@
       [vneutral (n : neutral)])
 
 (data neutral
-      [nvar (name : String)]
+      [nvar (name : Symbol)]
       [napp (fn : neutral) (arg : value)]
       [nrec (n : neutral) value value value]
       [nj value value value value value (n : neutral)])
@@ -40,7 +40,7 @@
     [(vneutral n) (vneutral (napp n v))]
     [_ (error 'fail "u: ~a, v: ~a" u v)]))
 
-(: eval : (Immutable-HashTable String value) expr -> value)
+(: eval : (Immutable-HashTable Symbol value) expr -> value)
 (define (eval env t)
   (match t
     [(Var name) (hash-ref env name
@@ -58,12 +58,11 @@
            [z (eval env z)]
            [s (eval env s)])
        (letrec ([f : (-> value value)
-                   (λ (n)
-                     (match n
-                       [(vzero) z]
-                       [(vsucc n) (vapp (vapp s n) (f n))]
-                       [(vneutral n) (vneutral (nrec n a z s))]
-                       [_ (error 'fail "rec")]))])
+                   (match-lambda
+                     [(vzero) z]
+                     [(vsucc n) (vapp (vapp s n) (f n))]
+                     [(vneutral n) (vneutral (nrec n a z s))]
+                     [_ (error 'fail "rec")])])
          (f n)))]
     [(id a t u) (vid (eval env a) (eval env t) (eval env u))]
     [(refl t) (vrefl (eval env t))]
@@ -73,3 +72,29 @@
        [(vneutral e)
         (vneutral (nj (eval env a) (eval env p) (eval env r) (eval env t) (eval env u) e))]
        [_ (error 'fail "t: ~a" t)])]))
+
+(: readback-neutral : neutral -> expr)
+(define/match (readback-neutral n)
+  [((nvar x)) (Var x)]
+  [((napp t u))
+   (app (readback-neutral t) (readback u))]
+  [((nrec n a z s))
+   (rec (readback-neutral n) (readback a) (readback z) (readback s))]
+  [((nj a p r t u e))
+   (J (readback a) (readback p) (readback r)
+      (readback t) (readback u) (readback-neutral e))])
+(: readback : value -> expr)
+(define/match (readback v)
+  [((vabs f))
+   (let ([x (gensym 'k)])
+     (abs x (readback (f (vneutral (nvar x))))))]
+  [((vpi a b))
+   (let ([x (gensym)])
+     (pi x (readback a) (readback (b (vneutral (nvar x))))))]
+  [((vtype i)) (type i)]
+  [((vnat)) (nat)]
+  [((vzero)) (zero)]
+  [((vsucc n)) (succ (readback n))]
+  [((vid a t u)) (id (readback a) (readback t) (readback u))]
+  [((vrefl t)) (refl (readback t))]
+  [((vneutral t)) (readback-neutral t)])
