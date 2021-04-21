@@ -51,4 +51,25 @@
     [(type i) (vtype i)]
     [(nat) (vnat)]
     [(zero) (vzero)]
-    [(succ e) (vsucc (eval env e))]))
+    [(succ e) (vsucc (eval env e))]
+    [(rec n a z s)
+     (let ([n (eval env n)]
+           [a (eval env a)]
+           [z (eval env z)]
+           [s (eval env s)])
+       (letrec ([f : (-> value value)
+                   (λ (n)
+                     (match n
+                       [(vzero) z]
+                       [(vsucc n) (vapp (vapp s n) (f n))]
+                       [(vneutral n) (vneutral (nrec n a z s))]
+                       [_ (error 'fail "rec")]))])
+         (f n)))]
+    [(id a t u) (vid (eval env a) (eval env t) (eval env u))]
+    [(refl t) (vrefl (eval env t))]
+    [(J a p r t u e)
+     (match (eval env e)
+       [(vrefl _) (eval env r)]
+       [(vneutral e)
+        (vneutral (nj (eval env a) (eval env p) (eval env r) (eval env t) (eval env u) e))]
+       [_ (error 'fail "t: ~a" t)])]))
