@@ -46,11 +46,11 @@
   (define-syntax-parser data
     [(_ name:id c*:constructor ...)
      (for ([c (attribute c*.desugar-type)])
-       (check #'name c 'positive))
+       (check #'name c #t))
      #''ok]
     [(_ (name:id d*:bind ...) c*:constructor ...)
      (for ([c (attribute c*.desugar-type)])
-       (check #'name c 'positive))
+       (check #'name c #t))
      #''ok]))
 
 (require 'check)
