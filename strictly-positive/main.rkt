@@ -1,15 +1,14 @@
 #lang racket
 
-(require "pi-type.rkt")
-
 (module check racket
   (provide data)
   (require syntax/parse/define
            (for-syntax racket/match
-                       racket/list
-                       "pi-type.rkt"))
+                       racket/list))
 
   (begin-for-syntax
+    (struct Pi (name t1 t2) #:transparent)
+
     ; strictly positive check
     ; @name: name of data type
     ; @c: type of constructor
