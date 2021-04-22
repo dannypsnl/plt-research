@@ -27,9 +27,7 @@
         (check name t1 (not positive?))
         (check name t2 positive?))
       (match c
-        [(Pi name t1 t2)
-         (check-left-right t1 t2)]
-        [`(-> ,t1 ,t2)
+        [(or (struct Pi (_ t1 t2)) `(-> ,t1 ,t2))
          (check-left-right t1 t2)]
         [x (void)]))
 
