@@ -20,7 +20,7 @@
           ; endofunctors are positive
           [(equal? t1 t2) (void)]
           ; self at negative
-          [(and (equal? t1 n)
+          [(and (equal? (if (symbol? t1) t1 (first t1)) n)
                 (not positive?))
            (raise-syntax-error 'negative "bad data type"
                                name)])
