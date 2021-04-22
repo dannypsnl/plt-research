@@ -1,10 +1,13 @@
 #lang racket
 
+(require "pi-type.rkt")
+
 (module check racket
   (provide data)
   (require syntax/parse/define
            (for-syntax racket/match
-                       racket/list))
+                       racket/list
+                       "pi-type.rkt"))
 
   (begin-for-syntax
     ; strictly positive check
@@ -17,31 +20,33 @@
           ; endofunctors are positive
           [(equal? t1 t2) (void)]
           ; self at negative
-          [(and (equal? (if (symbol? t1) t1 (first t1)) n)
+          [(and (equal? t1 n)
                 (not positive?))
            (raise-syntax-error 'negative "bad data type"
                                name)])
         (check name t1 (not positive?))
         (check name t2 positive?))
       (match c
-        [`(Pi (,name : ,t1) ,t2)
+        [(Pi name t1 t2)
          (check-left-right t1 t2)]
         [`(-> ,t1 ,t2)
          (check-left-right t1 t2)]
         [x (void)]))
 
+    (define-syntax-class type
+      (pattern ty #:attr val (syntax->datum #'ty)))
     (define-syntax-class bind
-      (pattern (name:id : ty)
+      (pattern (name:id : ty:type)
                #:attr lam
-               (λ (t) #`(Pi [name : ty] #,t))))
+               (λ (t)
+                 (Pi (syntax->datum #'name) (attribute ty.val) t))))
     (define-syntax-class constructor
-      (pattern (name b*:bind ... : ty)
+      (pattern (name b*:bind ... : ty:type)
                #:attr desugar-type
-               (syntax->datum
-                (foldr (λ (n r)
-                         (n r))
-                       #'ty
-                       (attribute b*.lam))))))
+               (foldr (λ (n r)
+                        (n r))
+                      (attribute ty.val)
+                      (attribute b*.lam)))))
 
   (define-syntax-parser data
     [(_ name:id c*:constructor ...)
