@@ -13,7 +13,7 @@
     ; strictly positive check
     ; @name: name of data type
     ; @c: type of constructor
-    (define (check name c positive?)
+    (define (check name c [positive? #t])
       (define n (syntax->datum name))
       (define (check-left-right t1 t2)
         (cond
@@ -51,11 +51,11 @@
   (define-syntax-parser data
     [(_ name:id c*:constructor ...)
      (for ([c (attribute c*.desugar-type)])
-       (check #'name c #t))
+       (check #'name c))
      #''ok]
     [(_ (name:id d*:bind ...) c*:constructor ...)
      (for ([c (attribute c*.desugar-type)])
-       (check #'name c #t))
+       (check #'name c))
      #''ok]))
 
 (require 'check)
