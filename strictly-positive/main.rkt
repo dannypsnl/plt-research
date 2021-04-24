@@ -12,7 +12,7 @@
     ; strictly positive check
     ; @name: name of data type
     ; @c: type of constructor
-    (define (check name c [positive? #t])
+    (define (check name c [positive? #true])
       (define n (syntax->datum name))
       (define (check-left-right t1 t2)
         (cond
