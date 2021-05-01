@@ -26,7 +26,8 @@
         (check name t1 (not positive?))
         (check name t2 positive?))
       (match c
-        [(or (Pi _ t1 t2) `(-> ,t1 ,t2))
+        [(or (Pi _ t1 t2)
+             `(-> ,t1 ,t2))
          (check-left-right t1 t2)]
         [x (void)]))
 
@@ -52,14 +53,17 @@
      #''ok]
     [(_ (name:id d*:bind ...) c*:constructor ...)
      (for ([c (attribute c*.desugar-type)])
-       (check #'name c))
+       (check #'name (foldr (λ (n r)
+                              (n r))
+                            c
+                            (attribute d*.lam))))
      #''ok]))
 
 (require 'check)
 
 (data Nat
       [z : Nat]
-      [s [n : Nat] : Nat])
+      [s : (-> Nat Nat)])
 (data (Vec [A : Type] [len : Nat])
       [vecnil : (Vec A 0)]
       [vec:: [a : A] [v : (Vec A n)] : (Vec A (s n))])
@@ -67,3 +71,5 @@
 ; neg
 #;(data Bad
         [bad [x : (-> Bad X)] : Bad])
+#;(data Bad2
+        [bad : (-> (-> Bad2 X) Bad2)])
