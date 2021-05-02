@@ -53,6 +53,7 @@
      #''ok]
     [(_ (name:id d*:bind ...) c*:constructor ...)
      (for ([c (attribute c*.desugar-type)])
+       ; FIXME: 有用到才展開，例如 Vec 沒有用到 len
        (check #'name (foldr (λ (n r)
                               (n r))
                             c
