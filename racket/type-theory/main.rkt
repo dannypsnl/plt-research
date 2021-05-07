@@ -108,12 +108,14 @@
 
 (: veq : value value -> Boolean)
 (define (veq t u)
-  (equal? (readback t) (readback u)))
+  (match* {t u}
+    [{(vpi a _) (vpi b _)} (equal? (readback a) (readback b))]
+    [{a b} (equal? (readback a) (readback b))]))
 
 (: infer : TypeEnv Env expr -> value)
 (define (infer tenv env e)
   (match e
-    [(var x) (hash-ref tenv
+    [(Var x) (hash-ref tenv x
                        (λ () (error 'unbound-variable "~a" x)))]
     [(app t u)
      (match (infer tenv env t)
@@ -197,4 +199,19 @@
          (error 'type-error)))]
     [{t a}
      (unless (veq a (infer tenv env t))
-       (error 'type-error))]))
+       (error 'type-error
+              "~a ~a"
+              a (infer tenv env t)))]))
+
+(module+ test
+  (let ([a (varr (vnat) (varr (vnat) (vnat)))]
+        [t (abs 'm
+                (rec (Var 'm)
+                  (pi '_ (nat) (pi '_ (nat) (nat)))
+                  (abs 'n (Var 'n))
+                  (abs 'm
+                       (abs 'r
+                            (abs 'n (succ (app (Var 'r) (Var 'n))))))))])
+    (check (make-immutable-hash)
+           (make-immutable-hash)
+           t a)))
