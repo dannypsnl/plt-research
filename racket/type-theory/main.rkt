@@ -109,7 +109,10 @@
 (: veq : value value -> Boolean)
 (define (veq t u)
   (match* {t u}
-    [{(vpi a _) (vpi b _)} (equal? (readback a) (readback b))]
+    [{(vpi a fa) (vpi b fb)}
+     (define k (var 'k))
+     (and (equal? (readback a) (readback b))
+          (equal? (readback (fa k)) (readback (fb k))))]
     [{a b} (equal? (readback a) (readback b))]))
 
 (: infer : TypeEnv Env expr -> value)
