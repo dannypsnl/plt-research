@@ -1,5 +1,6 @@
-strictly-positive
+[strictly-positive](https://dannypsnl.github.io/blog/2021/05/02/cs/strictly-positive-check/)
 =================
+
 Check strictly positive, rules:
 1. endofunctors are positive
 2. if `\Pi x:A B` is positive, then `A` is negative, `B` is positive
