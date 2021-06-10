@@ -150,3 +150,9 @@
   (Ctx (cons t (Ctx-env ctx))
        (cons (cons x (cons (Ctx-lvl ctx) a)) (Ctx-types ctx))
        (add1 (Ctx-lvl ctx))))
+
+(: bind : Name VTy Ctx -> Ctx)
+(define (bind x a ctx)
+  (Ctx (cons (VVar (Ctx-lvl ctx)) (Ctx-env ctx))
+       (cons (cons x (cons (Ctx-lvl ctx) a)) (Ctx-types ctx))
+       (add1 (Ctx-lvl ctx))))
