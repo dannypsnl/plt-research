@@ -141,18 +141,53 @@
 
 (struct Ctx
   ([env : Env]
-   [types : (Listof (Pairof Name (Pairof Lvl VTy)))]
+   [types : (Immutable-HashTable Name (Pairof Lvl VTy))]
    [lvl : Lvl])
   #:transparent)
 
 (: def : Name VTy Val Ctx -> Ctx)
 (define (def x a t ctx)
   (Ctx (cons t (Ctx-env ctx))
-       (cons (cons x (cons (Ctx-lvl ctx) a)) (Ctx-types ctx))
+       (hash-set (Ctx-types ctx) x (cons (Ctx-lvl ctx) a))
        (add1 (Ctx-lvl ctx))))
 
 (: bind : Name VTy Ctx -> Ctx)
 (define (bind x a ctx)
   (Ctx (cons (VVar (Ctx-lvl ctx)) (Ctx-env ctx))
-       (cons (cons x (cons (Ctx-lvl ctx) a)) (Ctx-types ctx))
+       (hash-set (Ctx-types ctx) x (cons (Ctx-lvl ctx) a))
        (add1 (Ctx-lvl ctx))))
+
+(: check : Ctx RTm VTy -> Tm)
+(define (check ctx t a)
+  (match* {t a}
+    [{(RLam x t) (VPi x- a b)}
+     (Lam x (check (bind x a ctx) t (b (VVar (Ctx-lvl ctx)))))]
+    [{(RLet x a t u) b}
+     (define-values (a1 _) (check-ty ctx a))
+     (define va (eval (Ctx-env ctx) a1))
+     (define u (check ctx t va))
+     (define t1 (check (def x va (eval (Ctx-env ctx) u) ctx) t b))
+     (Let x a1 t1 u)]
+    [{t a}
+     (define-values (t1 a1) (infer ctx t))
+     (if (conv (Ctx-lvl ctx) a a1)
+         t1
+         (error "Type mismatch, expected ~a, inferred ~a"
+                (quote (Ctx-lvl ctx) a)
+                (quote (Ctx-lvl ctx) a1)))]))
+
+(: check-ty : Ctx RTm -> (Values Tm VLevel))
+(define (check-ty ctx t)
+  (define-values (t1 a) (infer ctx t))
+  (match a
+    [(VU l) (values t1 l)]
+    [_ (error "expected a type")]))
+
+(: infer : Ctx RTm -> (Values Tm VTy))
+(define (infer ctx t)
+  (match t
+    [(RVar x) (if (hash-ref (Ctx-types ctx) x #f)
+                  (let ([l (car (hash-ref (Ctx-types ctx) x))]
+                        [a (cdr (hash-ref (Ctx-types ctx) x))])
+                    (values (Var (- (Ctx-lvl ctx) l 1)) a))
+                  (error "~a" x))]))
