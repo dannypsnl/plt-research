@@ -107,3 +107,7 @@
     [(VLMax t u) (LMax (quote l t) (quote l u))]
     [(VFinLvl) (FinLvl)]
     [(VU t) (U (quoteLevel l t))]))
+
+(: nf : Tm -> Tm)
+(define (nf tm)
+  (quote 0 (eval (list) tm)))
