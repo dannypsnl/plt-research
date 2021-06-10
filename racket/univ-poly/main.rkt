@@ -144,3 +144,9 @@
    [types : (Listof (Pairof Name (Pairof Lvl VTy)))]
    [lvl : Lvl])
   #:transparent)
+
+(: def : Name VTy Val Ctx -> Ctx)
+(define (def x a t ctx)
+  (Ctx (cons t (Ctx-env ctx))
+       (cons (cons x (cons (Ctx-lvl ctx) a)) (Ctx-types ctx))
+       (add1 (Ctx-lvl ctx))))
