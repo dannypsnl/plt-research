@@ -183,6 +183,41 @@
     [(VU l) (values t1 l)]
     [_ (error "expected a type")]))
 
+(: lmax : VLevel VLevel -> VLevel)
+(define/match (lmax a b)
+  [{(VFin t) (VFin t2)}
+   (VFin (finmax t t2))]
+  [{_ _} (VOmega)])
+
+(: strLevel : Lvl Lvl VLevel -> Level)
+(define (strLevel l1 l2 v)
+  (match v
+    [(VOmega) (Omega)]
+    [(VFin t) (Fin (str l1 l2 t))]))
+
+(: str : Lvl Lvl Val -> Tm)
+(define (str l x v)
+  (match v
+    [(VVar x-)
+     (cond
+       [(< x- x) (Var (- l x- 1))]
+       [(> x- x) (Var (- l x-))]
+       [else (error "illegal universe level dependency")])]
+    [(VApp t u) (App (str l x t) (str l x u))]
+    [(VLam x- t)
+     (Lam x- (str (add1 l) x (t (VVar l))))]
+    [(VPi x- a b)
+     (Pi x-
+         (str l x a)
+         (str (add1 l) x (b (VVar l))))]
+    [(VU t) (U (strLevel l x t))]
+    [(VFinLvl) (FinLvl)]
+    [(VL0) (L0)]
+    [(VLS t) (LS (str l x t))]
+    [(VLMax t u)
+     (LMax (str l x t)
+           (str l x u))]))
+
 (: infer : Ctx RTm -> (Values Tm VTy))
 (define (infer ctx t)
   (match t
@@ -190,4 +225,44 @@
                   (let ([l (car (hash-ref (Ctx-types ctx) x))]
                         [a (cdr (hash-ref (Ctx-types ctx) x))])
                     (values (Var (- (Ctx-lvl ctx) l 1)) a))
-                  (error "~a" x))]))
+                  (error "~a" x))]
+    [(RApp t u)
+     (define-values (t1 a) (infer ctx t))
+     (match a
+       [(VPi x a b)
+        (define u1 (check ctx u a))
+        (values (App t1 u1) (b (eval (Ctx-env ctx) u1)))]
+       [_ (error "expected a function")])]
+    [(RLam _ _)
+     (error "can't infer type for lambda")]
+    [(RPi x a- b-)
+     (define-values (a al) (check-ty ctx a-))
+     (match al
+       [(VOmega)
+        (define-values (b bl) (check-ty (bind x (eval (Ctx-env ctx) a) ctx) b-))
+        (values (Pi x a b) (VU (VOmega)))]
+       [(VFin al)
+        (define-values (b bl) (check-ty (bind x (eval (Ctx-env ctx) a) ctx) b-))
+        (define bl- (strLevel (Ctx-lvl ctx) (Ctx-lvl ctx) bl))
+        (define newl (lmax (VFin al) (level (Ctx-env ctx) bl-)))
+        (values (Pi x a b) (VU newl))])]
+    [(RLet x a t u)
+     (define-values (a- al) (check-ty ctx a))
+     (define va (eval (Ctx-env ctx) a-))
+     (define t- (check ctx t va))
+     (define-values (u- b-) (infer (def x va (eval (Ctx-env ctx) t-) ctx) u))
+     (values (Let x a- t- u-) b-)]
+    [(RUFin t)
+     (define t- (check ctx t (VFinLvl)))
+     (values (U (Fin t-)) (VU (VFin (VLS (eval (Ctx-env ctx) t-)))))]
+    [(RFinLvl)
+     (values (FinLvl) (VU (VOmega)))]
+    [(RL0)
+     (values (L0) (VFinLvl))]
+    [(RLS t)
+     (define t- (check ctx t (VFinLvl)))
+     (values (LS t-) (VFinLvl))]
+    [(RLMax t u)
+     (define t- (check ctx t (VFinLvl)))
+     (define u- (check ctx u (VFinLvl)))
+     (values (LMax t- u-) (VFinLvl))]))
