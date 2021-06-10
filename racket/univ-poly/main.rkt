@@ -138,3 +138,9 @@
      (conv l t t2)]
     [{(VFinLvl) (VFinLvl)} #t]
     [{_ _} #f]))
+
+(struct Ctx
+  ([env : Env]
+   [types : (Listof (Pairof Name (Pairof Lvl VTy)))]
+   [lvl : Lvl])
+  #:transparent)
