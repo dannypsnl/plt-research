@@ -54,9 +54,37 @@
   [VLS Val]
   [VLMax Val Val])
 
-(: finmax : (-> Val Val Val))
+(: finmax : Val Val -> Val)
 (define/match (finmax l1 l2)
   [{(VL0) l2} l2]
   [{l1 (VL0)} l1]
   [{(VLS l1) (VLS l2)} (finmax l1 l2)]
   [{l1 l2} (VLMax l1 l2)])
+
+(: level : Env Level -> VLevel)
+(define (level env l)
+  (match l
+    [(Omega) (VOmega)]
+    [(Fin t) (VFin (eval env t))]))
+
+(: eval : Env Tm -> Val)
+(define (eval env tm)
+  (match tm
+    [(Var x) (list-ref env x)]
+    [(App t u)
+     (match* {(eval env t) (eval env u)}
+       [{(VLam _ t) u} (t u)]
+       [{t u} (VApp t u)])]
+    [(Lam x t)
+     (VLam x (λ (u) (eval (cons u env) t)))]
+    [(Pi x a b)
+     (VPi x (eval env a)
+          (λ (u) (eval (cons u env) b)))]
+    [(Let x a t u)
+     (eval (cons (eval env t) env) u)]
+    [(U t)
+     (VU (level env t))]
+    [(FinLvl) (VFinLvl)]
+    [(L0) (VL0)]
+    [(LS t) (VLS (eval env t))]
+    [(LMax t u) (finmax (eval env t) (eval env u))]))
