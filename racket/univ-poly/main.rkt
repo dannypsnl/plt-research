@@ -12,47 +12,47 @@
 (define-type Lvl Integer)
 
 (data RTm
-  [RVar Name]
-  [RApp RTm RTm]
-  [RLam Name RTm]
-  [RPi Name RTm RTm]
-  [RLet Name RTy RTm RTm]
-  [RUFin RTm]
-  [RFinLvl]
-  [RL0]
-  [RLS RTm]
-  [RLMax RTm RTm])
+      [RVar Name]
+      [RApp RTm RTm]
+      [RLam Name RTm]
+      [RPi Name RTm RTm]
+      [RLet Name RTy RTm RTm]
+      [RUFin RTm]
+      [RFinLvl]
+      [RL0]
+      [RLS RTm]
+      [RLMax RTm RTm])
 
 (data Level
-  [Fin Tm]
-  [Omega])
+      [Fin Tm]
+      [Omega])
 
 (data Tm
-  [Var Ix]
-  [App Tm Tm]
-  [Lam Name Tm]
-  [Pi Name Tm Tm]
-  [Let Name Ty Tm Tm]
-  [U Level]
-  [FinLvl]
-  [L0]
-  [LS Tm]
-  [LMax Tm Tm])
+      [Var Ix]
+      [App Tm Tm]
+      [Lam Name Tm]
+      [Pi Name Tm Tm]
+      [Let Name Ty Tm Tm]
+      [U Level]
+      [FinLvl]
+      [L0]
+      [LS Tm]
+      [LMax Tm Tm])
 
 (data VLevel
-  [VFin Val]
-  [VOmega])
+      [VFin Val]
+      [VOmega])
 
 (data Val
-  [VVar Lvl]
-  [VApp Val Val]
-  [VLam Name Clos]
-  [VPi Name VTy Clos]
-  [VU VLevel]
-  [VFinLvl]
-  [VL0]
-  [VLS Val]
-  [VLMax Val Val])
+      [VVar Lvl]
+      [VApp Val Val]
+      [VLam Name Clos]
+      [VPi Name VTy Clos]
+      [VU VLevel]
+      [VFinLvl]
+      [VL0]
+      [VLS Val]
+      [VLMax Val Val])
 
 (: finmax : Val Val -> Val)
 (define/match (finmax l1 l2)
@@ -111,3 +111,30 @@
 (: nf : Tm -> Tm)
 (define (nf tm)
   (quote 0 (eval (list) tm)))
+
+(: conv : Lvl Val Val -> Boolean)
+(define (conv l v1 v2)
+  (match* {v1 v2}
+    [{(VVar x) (VVar y)} (= x y)]
+    [{(VApp t u) (VApp t2 u2)}
+     (and (conv l t t2)
+          (conv l u u2))]
+    [{(VLam x t) (VLam _ t2)}
+     (conv (add1 l) (t (VVar l)) (t2 (VVar l)))]
+    [{(VLam x t) t2}
+     (conv (add1 l) (t (VVar l)) (VApp t2 (VVar l)))]
+    [{t (VLam x t2)}
+     (conv (add1 l) (VApp t (VVar l)) (t2 (VVar l)))]
+    [{(VPi x a b) (VPi _ a2 b2)}
+     (and (conv l a a2)
+          (conv (add1 l) (b (VVar l)) (b2 (VVar l))))]
+    [{(VL0) (VL0)} #t]
+    [{(VLS t) (VLS t2)} (conv l t t2)]
+    [{(VLMax t u) (VLMax t2 u2)}
+     (and (conv l t t2)
+          (conv l u u2))]
+    [{(VU (VOmega)) (VU (VOmega))} #t]
+    [{(VU (VFin t)) (VU (VFin t2))}
+     (conv l t t2)]
+    [{(VFinLvl) (VFinLvl)} #t]
+    [{_ _} #f]))
