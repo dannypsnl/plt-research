@@ -88,3 +88,22 @@
     [(L0) (VL0)]
     [(LS t) (VLS (eval env t))]
     [(LMax t u) (finmax (eval env t) (eval env u))]))
+
+(: quoteLevel : Lvl VLevel -> Level)
+(define (quoteLevel l lvl)
+  (match lvl
+    [(VFin t) (Fin (quote l t))]
+    [(VOmega) (Omega)]))
+
+(: quote : Lvl Val -> Tm)
+(define (quote l v)
+  (match v
+    [(VVar x) (Var (- l x 1))]
+    [(VApp t u) (App (quote l t) (quote l u))]
+    [(VLam x t) (Lam x (quote (add1 l) (t (VVar l))))]
+    [(VPi x a b) (Pi x (quote l a) (quote (add1 l) (b (VVar l))))]
+    [(VL0) (L0)]
+    [(VLS t) (LS (quote l t))]
+    [(VLMax t u) (LMax (quote l t) (quote l u))]
+    [(VFinLvl) (FinLvl)]
+    [(VU t) (U (quoteLevel l t))]))
