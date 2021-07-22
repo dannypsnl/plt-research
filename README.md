@@ -11,5 +11,5 @@ we could use following commands and documents to get them.
 
 ```sh
 # notice that raco was provided by Racket
-raco pkg install --deps search-auto scribble-math
+raco pkg install --deps search-auto scribble-math pie
 ```
