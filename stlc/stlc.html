@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=0.8"/><title>Simply typed lambda calculus(STLC)</title><link rel="stylesheet" type="text/css" href="scribble.css" title="default"/><link rel="stylesheet" type="text/css" href="scribble-style.css" title="default"/><script type="text/javascript" src="scribble-common.js"></script><script type="text/javascript">
+(function() {
+  document.write('<link rel="stylesheet" href="katex/katex.min.css" />');
+})();(function() {document.write('<scr' + 'ipt type="text/javascript" src="katex/katex.min.js"></scr' + 'ipt>');})();(function(f) {
+  // A "simple" onLoad function
+  if (window.document.readyState == "complete") {
+    f();
+  } else if (window.document.addEventListener) {
+    window.document.addEventListener("DOMContentLoaded", f, false);
+  } else if (window.attachEvent) {
+    window.attachEvent("onreadystatechange", function() {
+      if (window.document.readyState == "complete") {
+        f();
+      }
+    });
+  } else {
+    var oldLoad = window.onload;
+    if (typeof(oldLoad) == "function") {
+      window.onload = function() {
+        try {
+          oldLoad();
+        } finally {
+          f();
+        }
+      };
+    } else {
+      window.onload = f;
+    }
+  }
+})(function() {
+  // This is an ugly way to change the doctype, in case the scribble document
+  // did not use (with-html5).
+  if (!(document.doctype && document.doctype.publicId == '')) {
+    if (console && console.log) {
+      console.log("Re-wrote the document to use the HTML5 doctype.\n"
+                  + "  Consider using the following declaration:\n"
+                  + "      @title[#:style (with-html5 manual-doc-style)]{…}");
+    }
+    var wholeDoc = '<!doctype HTML>\n' + document.documentElement.outerHTML;
+    document.open();
+    document.clear();
+    document.write(wholeDoc);
+  }
+  var inlineElements = document.getElementsByClassName("texMathInline");
+  for (var i = 0; i < inlineElements.length; i++) {
+    var e = inlineElements[i];
+    katex.render(e.textContent, e, { displayMode:false, throwOnError:false });
+  }
+  var displayElements = document.getElementsByClassName("texMathDisplay");
+  for (var i = 0; i < displayElements.length; i++) {
+    var e = displayElements[i];
+    katex.render(e.textContent, e, { displayMode:true, throwOnError:false });
+  }
+});
+</script><!--[if IE 6]><style type="text/css">.SIEHidden { overflow: hidden; }</style><![endif]--></head><body id="scribble-racket-lang-org"><div class="tocset"><div class="tocview"><div class="tocviewlist tocviewlisttopspace"><div class="tocviewtitle"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_0&quot;);">&#9658;</a></td><td></td><td><a href="" class="tocviewselflink" data-pltdoc="x">Simply typed lambda calculus(STLC)</a></td></tr></table></div><div class="tocviewsublistonly" style="display: none;" id="tocview_0"><table cellspacing="0" cellpadding="0"><tr><td align="right">1&nbsp;</td><td><a href="#%28part._formula%29" class="tocviewlink" data-pltdoc="x">formula</a></td></tr></table></div></div></div><div class="tocsub"><table class="tocsublist" cellspacing="0"><tr><td><span class="tocsublinknumber"></span><a href="#%28part._.Simply_typed_lambda_calculus_.S.T.L.C_%29" class="tocsubseclink" data-pltdoc="x">Simply typed lambda calculus(STLC)</a></td></tr><tr><td><span class="tocsublinknumber">1<tt>&nbsp;</tt></span><a href="#%28part._formula%29" class="tocsubseclink" data-pltdoc="x">formula</a></td></tr></table></div></div><div class="maincolumn"><div class="main"><h2><a name="(part._.Simply_typed_lambda_calculus_.S.T.L.C_)"></a>Simply typed lambda calculus(STLC)</h2><h3>1<tt>&nbsp;</tt><a name="(part._formula)"></a>formula</h3><p><span class="texMathInline">\vdash</span> means <span style="font-weight: bold">in context</span>, so <span class="texMathInline">x : \mathbb{N} \vdash x + 3 : \mathbb{N}</span> read as
+<span style="font-weight: bold">in context <span class="texMathInline">x : \mathbb{N}</span>, can judge <span class="texMathInline">x + 3 : \mathbb{N}</span></span>, important thing was we can have several context separate by &lsquo;,&lsquo;,
+so <span class="texMathInline">a, b \vdash c</span> means <span style="font-weight: bold">in context a and b, can judge c</span></p><p><span class="texMathInline">\frac{a}{b}</span> means <span class="texMathInline">\frac{premise}{conculsion}</span>, and no premise was ok, e.g. <span class="texMathInline">\frac{}{b}</span> represents <span class="texMathInline">b</span> is true anyway</p><p><span class="texMathInline">\Gamma</span> represents context, <span class="texMathInline">\Gamma(x)</span> represents lookup <span class="texMathInline">x</span> in <span class="texMathInline">\Gamma</span>.
+<span class="texMathInline">\Gamma</span> means a set of type decalrations <span class="texMathInline">x_1 : A, x_2 : B, x_3 : C ...</span></p><p><span class="texMathDisplay">\frac{
+\Gamma (x) = A
+}{
+\Gamma \vdash x : A
+} Var</span></p><p><span class="texMathDisplay">\frac{
+\Gamma , x : A \vdash E : B
+}{
+\Gamma \vdash (\lambda x^{A} . E) : (A \rightarrow B)
+} Abs</span></p><p><span class="texMathDisplay">\frac{
+\Gamma \vdash E_{1} : (A \rightarrow B) \Gamma \vdash E_{2} : A
+}{
+\Gamma \vdash (E_{1} E_{2}) : B
+} App</span></p></div></div><div id="contextindicator">&nbsp;</div></body></html>

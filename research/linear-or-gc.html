@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2020-10-28 Wed 01:20 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Linear and GC</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Lîm Tsú-thuàn" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2020 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Linear and GC</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org5f4db87">1. Introduction</a></li>
+<li><a href="#org2a632be">2. Approach</a></li>
+<li><a href="#org4a8aca0">3. Let's see, naive algorithm</a>
+<ul>
+<li><a href="#orgbca568e">3.1. Formal tree</a></li>
+<li><a href="#org59e2009">3.2. Properties</a></li>
+<li><a href="#orgc733e38">3.3. Algorithm</a></li>
+<li><a href="#org2745c25">3.4. Problem</a></li>
+</ul>
+</li>
+<li><a href="#orgd57969f">4. Point out! How Type be owned?</a>
+<ul>
+<li><a href="#org9d9b953">4.1. Algorithm</a></li>
+</ul>
+</li>
+<li><a href="#orgc235fd6">5. reference</a></li>
+</ul>
+</div>
+</div>
+<p>
+This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be <b><b>Tenured</b></b>, rest object get released immediately. But notice the special type like <code>File</code>, <code>NetworkPort</code> would need some special treatment, and small(size) type like <code>i32</code>, <code>i64</code>, and <code>f32</code> no need to analysis.
+</p>
+
+<div id="outline-container-org5f4db87" class="outline-2">
+<h2 id="org5f4db87"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Linear logic restrict a property can be traced statically, memory allocation problem is a kind of application. For example, once we know a variable <code>a</code> never used after line <code>k</code>, we can deallocate <code>a</code> at line <code>k+1</code>. To analyze it, we can do full scope analysis, which means analyze function by dependency, the problem is such method required full information and won't work well with compiled language which erased most information from source code. Therefore, the way we choose is analyzing independently by each function, in this approach, although it can't analyze some cases and required some helps from programmer, we can get a local analyzing based on function and a little bit type information of others function but no need to wait analyzing result of others function, algorithm can be a lot faster.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org2a632be" class="outline-2">
+<h2 id="org2a632be"><span class="section-number-2">2</span> Approach</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Under our method, we need to distinguish ownership of an object, according to our purpose was a general method for all languages, we have three cases:
+</p>
+
+<ol class="org-ol">
+<li>A variable directly to an object(<code>T</code>)</li>
+<li>A reference to an object(<code>*T</code>)</li>
+<li>A GC reference to an object(<code>*T</code>)</li>
+</ol>
+
+<p>
+GC and raw reference(pointer) might look like the same thing, but since we're analyzing liveness, then a GC object would live anywhere, but raw one won't, this is reason why we distinguish them.
+</p>
+
+<p>
+In our perspective, to unify general liveness property in different language, we also have tree kinds of object. Ignoring copy since they would be fine in any kinds of memory model, and then we can ignore different between reference and value, since value type is unimportant in our framework. Now we say we only have:
+</p>
+
+<ol class="org-ol">
+<li>owned object</li>
+<li>shared object</li>
+<li>global shared object</li>
+</ol>
+
+<p>
+Owned is simple, we totally have this object, we can delete it once at the end of the scope or move it to other owner. Shared means we didn't own it, but we can use it, we must distinguish this since captured can't take a shared object out of scope(notice that if stay in the same scope then it's allowed). Global shared means the object would live whatever where it is, which mean it's a GC object.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4a8aca0" class="outline-2">
+<h2 id="org4a8aca0"><span class="section-number-2">3</span> Let's see, naive algorithm</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Since we need to get help from type message, this is a static typed language, in this version we ignore special resource like <code>File</code> first. Another thing is the language is pure and reject side effect. And to simplify algorithm, small size type still get analyzing. The following shows some examples.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">define variable</span>
+<span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">define</span> <span style="color: #715ab1;">x</span> <span style="color: #3a81c3;">:</span> i32 <span style="color: #2e8b57;">'i32</span><span style="color: #3a81c3;">)</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">define function</span>
+<span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">define</span> <span style="color: #715ab1;">add</span> <span style="color: #3a81c3;">:</span> <span style="color: #6c3163;">(</span><span style="color: #3a81c3;">-&gt;</span> i32 i32 i32<span style="color: #6c3163;">)</span>
+  <span style="color: #6c3163;">(</span><span style="color: #3a81c3; font-weight: bold;">lambda</span> <span style="color: #2d9574;">(</span><span style="color: #67b11d;">[</span>x <span style="color: #3a81c3;">:</span> i32<span style="color: #67b11d;">]</span> <span style="color: #67b11d;">[</span>y <span style="color: #3a81c3;">:</span> i32<span style="color: #67b11d;">]</span><span style="color: #2d9574;">)</span> <span style="color: #3a81c3;">:</span> i32
+    <span style="color: #2d9574;">(</span><span style="color: #3a81c3;">+</span> x y<span style="color: #2d9574;">)</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span>
+<span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">define</span> <span style="color: #715ab1;">foo</span> <span style="color: #3a81c3;">:</span> <span style="color: #6c3163;">(</span><span style="color: #3a81c3;">-&gt;</span> <span style="color: #2d9574;">()</span> i32<span style="color: #6c3163;">)</span>
+  <span style="color: #6c3163;">(</span><span style="color: #3a81c3; font-weight: bold;">define</span> <span style="color: #715ab1;">x</span> <span style="color: #3a81c3;">:</span> i32 <span style="color: #2e8b57;">'i32</span><span style="color: #6c3163;">)</span>
+  <span style="color: #6c3163;">(</span><span style="color: #3a81c3; font-weight: bold;">lambda</span> <span style="color: #2d9574;">()</span> <span style="color: #3a81c3;">:</span> i32
+    <span style="color: #2d9574;">(</span><span style="color: #3a81c3;">+</span> x <span style="color: #2e8b57;">'i32</span><span style="color: #2d9574;">)</span><span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">function call</span>
+<span style="color: #3a81c3;">(</span>add <span style="color: #2e8b57;">'i32</span> <span style="color: #2e8b57;">'i32</span><span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgbca568e" class="outline-3">
+<h3 id="orgbca568e"><span class="section-number-3">3.1</span> Formal tree</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Then we have a formal tree, and primitive function would be introduced in anytime by need.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">stmt</span>
+<span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">define</span> <span style="color: #715ab1;">~var</span> <span style="color: #3a81c3;">:</span> ~typ ~exp<span style="color: #3a81c3;">)</span>
+<span style="color: #3a81c3;">exp</span>
+<span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">exp</span>
+<span style="color: #3a81c3;">(</span><span style="color: #3a81c3; font-weight: bold;">lambda</span> <span style="color: #6c3163;">(</span><span style="color: #2d9574;">[</span>~var* <span style="color: #3a81c3;">:</span> ~typ*<span style="color: #2d9574;">]</span> <span style="color: #3a81c3; font-weight: bold;">...</span><span style="color: #6c3163;">)</span> <span style="color: #3a81c3;">:</span> ~typ
+  ~stmt* <span style="color: #3a81c3; font-weight: bold;">...</span>
+  ~exp<span style="color: #3a81c3;">)</span>
+<span style="color: #3a81c3;">(</span>~var ~exp* <span style="color: #3a81c3; font-weight: bold;">...</span><span style="color: #3a81c3;">)</span>
+<span style="color: #2e8b57;">'exp</span> <span style="color: #2aa1ae; background-color: #ecf3ec;">; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">any atom can be value, 'i32 represented value of i32</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org59e2009" class="outline-3">
+<h3 id="org59e2009"><span class="section-number-3">3.2</span> Properties</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+We can get simple think for these.
+</p>
+<ol class="org-ol">
+<li>parameter and returns belongs to upper scope</li>
+<li>variable belongs to current scope
+<ol class="org-ol">
+<li>variable be referenced by returned value is a moved out</li>
+<li>variable end in current scope is linear</li>
+<li>variable be captured by a lambda is un-analyzable</li>
+</ol></li>
+<li>function call would get a value, the value belongs to caller scope</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgc733e38" class="outline-3">
+<h3 id="orgc733e38"><span class="section-number-3">3.3</span> Algorithm</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+Now can define the algorithm.
+</p>
+<ol class="org-ol">
+<li>analysis works for every single scope</li>
+<li>define introduces a new variable</li>
+<li>lambda introduces a new scope</li>
+<li>by default, variable allocated by GC</li>
+<li>lifetime who can be detected by algorithm use allocate/deallocate directly in that scope</li>
+<li>parameter and returned value can't be detected by algorithm</li>
+<li>captured by lambda can't be detected by algorithm</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org2745c25" class="outline-3">
+<h3 id="org2745c25"><span class="section-number-3">3.4</span> Problem</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+The problem of this algorithm was, it backpropagates GC object to everywhere, although it improved a little bit, it's not good enough as we expeceted.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd57969f" class="outline-2">
+<h2 id="orgd57969f"><span class="section-number-2">4</span> Point out! How Type be owned?</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Tagged, refinement or whatever, our purpose is bring information with our type. In our system, we special points out the ownership. Other type just use meta <code>T</code>. We would have <code>&amp;T</code> for shared, <code>@T</code> for global shared, <code>T</code> for type we owned. Now we have a new language, notice that the langauge only points out important message and ignore everything else. Here were some examples
+</p>
+
+<div class="org-src-container">
+<pre class="src src-racket"><span style="color: #3a81c3;">(</span>x <span style="color: #3a81c3;">:</span> T <span style="color: #2e8b57;">'T</span><span style="color: #3a81c3;">)</span>
+<span style="color: #3a81c3;">(</span>foo <span style="color: #3a81c3;">:</span> a:T <span style="color: #3a81c3;">-&gt;</span> b:T <span style="color: #3a81c3;">-&gt;</span> @T
+  <span style="color: #6c3163;">(</span>x <span style="color: #3a81c3;">:</span> T <span style="color: #2d9574;">(</span>bar a<span style="color: #2d9574;">)</span><span style="color: #6c3163;">)</span>
+  <span style="color: #2aa1ae; background-color: #ecf3ec;">;;; </span><span style="color: #2aa1ae; background-color: #ecf3ec;">koo : T -&gt; T -&gt; @T</span>
+  <span style="color: #6c3163;">(</span>koo x b<span style="color: #6c3163;">)</span><span style="color: #3a81c3;">)</span>
+</pre>
+</div>
+
+<p>
+Basically we points out the type of the object and ignore rest information, then we focus on the task.
+</p>
+</div>
+
+<div id="outline-container-org9d9b953" class="outline-3">
+<h3 id="org9d9b953"><span class="section-number-3">4.1</span> Algorithm</h3>
+<div class="outline-text-3" id="text-4-1">
+<ol class="org-ol">
+<li>Binding introduces new variable, it's has type <code>T</code> or <code>@T</code> according to how it allocated.</li>
+<li>Parameter can be <code>T</code>, <code>&amp;T</code>, or <code>@T</code>. This would affect argument requirement</li>
+<li>Usage can required owned the object, we have three case
+<ol class="org-ol">
+<li><code>T</code> would move from source to who required it</li>
+<li><code>&amp;T</code> would give it a compile error</li>
+<li><code>@T</code> would let it pass(since we handle this in runtime actually)</li>
+</ol></li>
+<li>A lambda capture moved(move won't really move a <code>@T</code> as above we talk) an object</li>
+<li>Moved object can't be used again in the scope</li>
+<li>A recursive structure, for example a linked list, the type of element must be <code>@T</code></li>
+<li>We can convert <code>@T</code> to <code>T</code> or <code>&amp;T</code>, and <code>T</code> to <code>&amp;T</code>, rest would be rejected</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc235fd6" class="outline-2">
+<h2 id="orgc235fd6"><span class="section-number-2">5</span> reference</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+<a href="http://www.fos.kuis.kyoto-u.ac.jp/~igarashi/papers/pdf/lgc.TIC00.rev.pdf">Garbage Collection Based on a Linear Type System</a>
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Lîm Tsú-thuàn</p>
+<p class="date">Created: 2020-10-28 Wed 01:20</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

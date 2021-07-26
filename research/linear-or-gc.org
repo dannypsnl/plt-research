@@ -1,0 +1,117 @@
+#+title: Linear and GC
+#+author: Lîm Tsú-thuàn
+
+This research idea was about a linear liveness analysis with fall back to GC. Ideally, most GC object would be **Tenured**, rest object get released immediately. But notice the special type like =File=, =NetworkPort= would need some special treatment, and small(size) type like =i32=, =i64=, and =f32= no need to analysis.
+
+* Introduction
+
+Linear logic restrict a property can be traced statically, memory allocation problem is a kind of application. For example, once we know a variable =a= never used after line =k=, we can deallocate =a= at line =k+1=. To analyze it, we can do full scope analysis, which means analyze function by dependency, the problem is such method required full information and won't work well with compiled language which erased most information from source code. Therefore, the way we choose is analyzing independently by each function, in this approach, although it can't analyze some cases and required some helps from programmer, we can get a local analyzing based on function and a little bit type information of others function but no need to wait analyzing result of others function, algorithm can be a lot faster.
+
+* Approach
+
+Under our method, we need to distinguish ownership of an object, according to our purpose was a general method for all languages, we have three cases:
+
+1. A variable directly to an object(=T=)
+2. A reference to an object(=*T=)
+3. A GC reference to an object(=*T=)
+
+GC and raw reference(pointer) might look like the same thing, but since we're analyzing liveness, then a GC object would live anywhere, but raw one won't, this is reason why we distinguish them.
+
+In our perspective, to unify general liveness property in different language, we also have tree kinds of object. Ignoring copy since they would be fine in any kinds of memory model, and then we can ignore different between reference and value, since value type is unimportant in our framework. Now we say we only have:
+
+1. owned object
+2. shared object
+3. global shared object
+
+Owned is simple, we totally have this object, we can delete it once at the end of the scope or move it to other owner. Shared means we didn't own it, but we can use it, we must distinguish this since captured can't take a shared object out of scope(notice that if stay in the same scope then it's allowed). Global shared means the object would live whatever where it is, which mean it's a GC object.
+
+* Let's see, naive algorithm
+
+Since we need to get help from type message, this is a static typed language, in this version we ignore special resource like =File= first. Another thing is the language is pure and reject side effect. And to simplify algorithm, small size type still get analyzing. The following shows some examples.
+
+#+BEGIN_SRC racket
+;;; define variable
+(define x : i32 'i32)
+;;; define function
+(define add : (-> i32 i32 i32)
+  (lambda ([x : i32] [y : i32]) : i32
+    (+ x y)))
+(define foo : (-> () i32)
+  (define x : i32 'i32)
+  (lambda () : i32
+    (+ x 'i32)))
+;;; function call
+(add 'i32 'i32)
+#+END_SRC
+
+** Formal tree
+
+Then we have a formal tree, and primitive function would be introduced in anytime by need.
+
+#+BEGIN_SRC racket
+;;; stmt
+(define ~var : ~typ ~exp)
+exp
+;;; exp
+(lambda ([~var* : ~typ*] ...) : ~typ
+  ~stmt* ...
+  ~exp)
+(~var ~exp* ...)
+'exp ; any atom can be value, 'i32 represented value of i32
+#+END_SRC
+
+** Properties
+
+We can get simple think for these.
+1. parameter and returns belongs to upper scope
+2. variable belongs to current scope
+    1. variable be referenced by returned value is a moved out 
+    2. variable end in current scope is linear
+    3. variable be captured by a lambda is un-analyzable
+3. function call would get a value, the value belongs to caller scope
+
+** Algorithm
+
+Now can define the algorithm.
+1. analysis works for every single scope
+2. define introduces a new variable
+3. lambda introduces a new scope 
+4. by default, variable allocated by GC
+5. lifetime who can be detected by algorithm use allocate/deallocate directly in that scope
+6. parameter and returned value can't be detected by algorithm
+7. captured by lambda can't be detected by algorithm
+
+** Problem
+
+The problem of this algorithm was, it backpropagates GC object to everywhere, although it improved a little bit, it's not good enough as we expeceted.
+
+* Point out! How Type be owned?
+
+Tagged, refinement or whatever, our purpose is bring information with our type. In our system, we special points out the ownership. Other type just use meta =T=. We would have =&T= for shared, =@T= for global shared, =T= for type we owned. Now we have a new language, notice that the langauge only points out important message and ignore everything else. Here were some examples
+
+#+BEGIN_SRC racket
+(x : T 'T)
+(foo : a:T -> b:T -> @T
+  (x : T (bar a))
+  ;;; koo : T -> T -> @T
+  (koo x b))
+#+END_SRC
+
+Basically we points out the type of the object and ignore rest information, then we focus on the task.
+
+** Algorithm
+
+1. Binding introduces new variable, it's has type =T= or =@T= according to how it allocated.
+2. Parameter can be =T=, =&T=, or =@T=. This would affect argument requirement
+3. Usage can required owned the object, we have three case
+   1. =T= would move from source to who required it
+   2. =&T= would give it a compile error
+   3. =@T= would let it pass(since we handle this in runtime actually)
+4. A lambda capture moved(move won't really move a =@T= as above we talk) an object
+5. Moved object can't be used again in the scope
+6. A recursive structure, for example a linked list, the type of element must be =@T=
+7. We can convert =@T= to =T= or =&T=, and =T= to =&T=, rest would be rejected
+
+* reference
+
+[[http://www.fos.kuis.kyoto-u.ac.jp/~igarashi/papers/pdf/lgc.TIC00.rev.pdf][Garbage Collection Based on a Linear Type System]]
