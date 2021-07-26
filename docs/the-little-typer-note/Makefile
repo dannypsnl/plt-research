@@ -1,3 +1,3 @@
 .PHONY: all
 all:
-	@scribble ../../the-little-typer-note/note.scrbl
+	@raco scribble ../../the-little-typer-note/note.scrbl

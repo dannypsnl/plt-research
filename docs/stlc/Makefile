@@ -1,3 +1,3 @@
 .PHONY: all
 all:
-	@scribble ../../stlc/stlc.scrbl
+	@raco scribble ../../stlc/stlc.scrbl
