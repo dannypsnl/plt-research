@@ -29,7 +29,7 @@ jobs:
           distribution: 'minimal'
           variant: 'CS'
           version: '8.2'
-          packages: 'scribble-math, pie'
+          packages: 'scribble-lib, scribble-math, pie'
       - name: Build
         run: |
           make -C docs
