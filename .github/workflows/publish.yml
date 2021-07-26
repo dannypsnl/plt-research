@@ -1,0 +1,41 @@
+# This is a basic workflow to help you get started with Actions
+name: Publish
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the develop branch
+  push:
+    branches: [ develop ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Cache installed packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/racket
+            ~/.local/share/racket
+          key: ${{ runner.os }}-primes
+      - uses: Bogdanp/setup-racket@v1.6
+        with:
+          architecture: 'x64'
+          distribution: 'minimal'
+          variant: 'CS'
+          version: '8.2'
+          packages: 'search-auto, scribble-math, pie'
+      - name: Build
+        run: |
+          make -C docs
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs
+          publish_branch: master
