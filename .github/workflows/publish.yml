@@ -29,9 +29,9 @@ jobs:
           distribution: 'minimal'
           variant: 'CS'
           version: '8.2'
-          packages: 'scribble-lib, scribble-math, pie'
       - name: Build
         run: |
+          raco pkg install --auto --batch --skip-installed scribble-lib scribble-math pie
           make -C docs
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
