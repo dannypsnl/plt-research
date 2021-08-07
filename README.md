@@ -7,7 +7,7 @@ This repository contains several PLT related sub-projects that I created for lea
 - lambda calculus
   - [utlc](https://github.com/dannypsnl/plt-research/tree/develop/utlc)
   - [stlc](https://github.com/dannypsnl/plt-research/tree/develop/stlc)
-  - [de-brujin index](https://github.com/dannypsnl/plt-research/tree/develop/de-brujin-index)
+  - [de-bruijn index](https://github.com/dannypsnl/plt-research/tree/develop/de-bruijn-index)
 - polymorphism
   - [hindley milner](https://github.com/dannypsnl/plt-research/tree/develop/hindley-milner)
   - [row polymorphism](https://github.com/dannypsnl/plt-research/tree/develop/row-poly)
