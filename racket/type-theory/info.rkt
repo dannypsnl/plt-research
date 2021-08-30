@@ -1,6 +1,6 @@
 #lang info
 (define collection "type-theory")
-(define deps '("base"))
+(define deps '("base" "data-type"))
 (define build-deps '("scribble-lib" "racket-doc" "rackunit-lib"))
 (define scribblings '(("scribblings/type-theory.scrbl" ())))
 (define pkg-desc "Description Here")

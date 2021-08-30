@@ -1,6 +1,6 @@
 #lang typed/racket
 
-(require "data.rkt")
+(require data-type)
 
 (data expr
       [Var (name : Symbol)]

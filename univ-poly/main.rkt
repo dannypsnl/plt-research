@@ -1,6 +1,6 @@
 #lang typed/racket
 
-(require "data.rkt")
+(require data-type)
 
 (define-type Name String)
 (define-type Clos (-> Val Val))
