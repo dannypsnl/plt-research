@@ -25,7 +25,7 @@ check TyInt (TmInt _) = Success ()
 check ty tm = throw $ TypeMismatched ty (typeof tm)
 
 typeof :: Term -> Type
---typeof (TmRecord) = TyRecord
+typeof (TmRecord terms) = TyRecord (map (\(s, term) -> (s, typeof term)) terms)
 typeof (TmTuple terms) = TyTuple (map typeof terms)
 typeof (TmString _) = TyString
 typeof (TmInt _) = TyInt
