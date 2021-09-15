@@ -2,14 +2,14 @@ module Lib () where
 
 import Control.Monad.Exception.Synchronous
 
-data Type =
-  TyRecord [(String, Type)]
+data Type
+  = TyRecord [(String, Type)]
   | TyTuple [Type]
   | TyString
   | TyInt
 
-data Term =
-  TmRecord [(String, Term)]
+data Term
+  = TmRecord [(String, Term)]
   | TmTuple [Term]
   | TmString String
   | TmInt Integer
@@ -17,15 +17,15 @@ data Term =
 data TypeError = TypeMismatched Type Type
 
 check :: Type -> Term -> Exceptional TypeError ()
-check (TyRecord s) (TmRecord ss)      = Success ()
+check (TyRecord s) (TmRecord ss) = Success ()
 -- FIXME: check tuple
 check (TyTuple types) (TmTuple terms) = Success ()
-check TyString (TmString _)           = Success ()
-check TyInt (TmInt _)                 = Success ()
-check ty tm                           = throw TypeMismatched ty (typeof tm)
+check TyString (TmString _) = Success ()
+check TyInt (TmInt _) = Success ()
+check ty tm = throw $ TypeMismatched ty (typeof tm)
 
 typeof :: Term -> Type
 --typeof (TmRecord) = TyRecord
 typeof (TmTuple terms) = TyTuple (map typeof terms)
-typeof TmString        = TyString
-typeof TmInt           = TyInt
+typeof (TmString _) = TyString
+typeof (TmInt _) = TyInt
