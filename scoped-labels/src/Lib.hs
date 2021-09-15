@@ -22,5 +22,3 @@ check (TyTuple types) (TmTuple terms) = Success ()
 check TyString (TmString _)           = Success ()
 check TyInt (TmInt _)                 = Success ()
 check ty tm                           = throw TypeMismatched
-
-data Value
