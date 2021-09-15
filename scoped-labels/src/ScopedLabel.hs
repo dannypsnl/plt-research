@@ -1,4 +1,4 @@
-module Lib () where
+module ScopedLabel () where
 
 import Control.Monad.Exception.Synchronous
 

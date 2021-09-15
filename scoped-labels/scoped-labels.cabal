@@ -25,7 +25,7 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      ScopedLabel
   other-modules:
       Paths_scoped_labels
   hs-source-dirs:
