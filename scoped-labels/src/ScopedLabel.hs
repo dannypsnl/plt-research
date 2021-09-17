@@ -1,6 +1,7 @@
 module ScopedLabel () where
 
-import Control.Monad.Exception.Synchronous
+import Control.Monad
+import Control.Monad.Catch
 import qualified Data.Map.Strict as M
 
 data Type
@@ -8,6 +9,7 @@ data Type
   | TyTuple [Type]
   | TyString
   | TyInt
+  deriving (Show)
 
 data Term
   = TmRecord (M.Map String Term)
@@ -16,13 +18,20 @@ data Term
   | TmInt Integer
 
 data TypeError = TypeMismatched Type Type
+  deriving (Show)
 
-check :: Type -> Term -> Exceptional TypeError ()
-check (TyRecord s) (TmRecord ss) = Success ()
-check (TyTuple types) (TmTuple terms) = zipWith check types terms
-check TyString (TmString _) = Success ()
-check TyInt (TmInt _) = Success ()
-check ty tm = throw $ TypeMismatched ty (typeof tm)
+instance Exception TypeError
+
+check :: MonadThrow m => Type -> Term -> m ()
+check (TyRecord types) (TmRecord terms) = do
+  -- TODO: check record content
+  return ()
+check (TyTuple types) (TmTuple terms) = do
+  es <- zipWithM check types terms
+  return ()
+check TyString (TmString _) = return ()
+check TyInt (TmInt _) = return ()
+check ty tm = throwM $ TypeMismatched ty (typeof tm)
 
 typeof :: Term -> Type
 typeof (TmRecord terms) = TyRecord (M.map typeof terms)

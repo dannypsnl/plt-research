@@ -21,7 +21,7 @@ description: Please see the README on GitHub at <https://github.com/githubuser/s
 
 dependencies:
   - base >= 4.7 && < 5
-  - explicit-exception >= 0.1.10
+  - exceptions >= 0.10.4
   - containers >= 0.6.5.1
 
 library:
