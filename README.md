@@ -21,8 +21,8 @@ This repository contains several PLT related sub-projects that I created for lea
 
 Here are works that more about implementation/assembly details
 
-1. [scheme to arm64](https://github.com/dannypsnl/scheme-compiler)
-2. [Nanopass.jl](https://github.com/dannypsnl/Nanopass.jl)
+1. [racket-llvm](https://github.com/failed-dragon-slayer/racket-llvm)
+2. [scheme to arm64](https://github.com/dannypsnl/scheme-compiler)
 3. [c to x64](https://github.com/racket-tw/cc)
 4. [still compiling](https://github.com/dannypsnl/still-compiling)
 5. [Write you a programming language](https://github.com/dannypsnl/write-a-programming-language)
