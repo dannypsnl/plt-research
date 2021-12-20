@@ -7,9 +7,9 @@
      (E E ...))
   (X ::= variable-not-otherwise-mentioned)
   (N ::= number)
-  (O ::= O1 O2)
+  (O ::= O1 O-multi)
   (O1 ::= add1 sub1)
-  (O2 ::= + *))
+  (O-multi ::= + *))
 
 (define r
   (reduction-relation
@@ -21,10 +21,10 @@
 (define-judgment-form Arith
   #:mode (Reduce I O)
   #:contract (Reduce (O N ...) N)
-  [(Reduce (+ N_0 N_1) ,(+ (term N_0) (term N_1)))]
-  [(Reduce (* N_0 N_1) ,(* (term N_0) (term N_1)))]
+  [(Reduce (+ N ...) ,(apply * (term (N ...))))]
+  [(Reduce (* N ...) ,(apply * (term (N ...))))]
   [(Reduce (sub1 N) ,(sub1 (term N)))]
   [(Reduce (add1 N) ,(add1 (term N)))])
 
 (define -->r (compatible-closure r Arith E))
-(traces -->r (term (+ (add1 5) (* 2 3))))
+(traces -->r (term (+ (add1 5) (* 2 3 4))))
