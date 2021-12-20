@@ -23,12 +23,12 @@ jobs:
             ~/.cache/racket
             ~/.local/share/racket
           key: ${{ runner.os }}-primes
-      - uses: Bogdanp/setup-racket@v1.6
+      - uses: Bogdanp/setup-racket@v1.7
         with:
           architecture: 'x64'
           distribution: 'minimal'
           variant: 'CS'
-          version: '8.2'
+          version: 'stable'
       - name: Build
         run: |
           raco pkg install --auto --batch --skip-installed scribble-lib scribble-math pie
