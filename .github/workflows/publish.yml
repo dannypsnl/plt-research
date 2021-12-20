@@ -32,7 +32,8 @@ jobs:
       - name: Build
         run: |
           raco pkg install --auto --batch --skip-installed scribble-lib scribble-math pie
-          make -C docs
+          raco scribble --htmls +m --redirect-main http://docs.racket-lang.org/ docs.scrbl
+          cp -R ./research ./docs
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:

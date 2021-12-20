@@ -54,7 +54,7 @@
         (defproc #:kind "eliminator" elim-expr content ...))]))
 
 
-@title{NOTE The Little Typer}
+@title{NOTE: The Little Typer}
 
 @section{Judgement}
 
