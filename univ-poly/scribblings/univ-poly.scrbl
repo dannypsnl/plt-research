@@ -3,7 +3,7 @@
                     racket/base]]
 
 @title{univ-poly}
-@author{linzizhuan}
+@author{林子篆}
 
 @defmodule[univ-poly]
 

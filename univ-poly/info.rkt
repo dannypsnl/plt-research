@@ -5,4 +5,4 @@
 (define scribblings '(("scribblings/univ-poly.scrbl" ())))
 (define pkg-desc "Description Here")
 (define version "0.0")
-(define pkg-authors '(linzizhuan))
+(define pkg-authors '(林子篆))
