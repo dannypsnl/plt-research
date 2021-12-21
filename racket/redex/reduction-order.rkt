@@ -7,7 +7,6 @@
   (E ::= ....
      number
      O)
-  (N number)
   (O O1 O-multi)
   (O1 add1 sub1)
   (O-multi + *))
@@ -19,13 +18,13 @@
         (subst ,(map list (term (E_args ...)) (term (X ...)))
                E_body)
         "app")
-   (--> (+ N ...) ,(apply * (term (N ...)))
+   (--> (+ number ...) ,(apply * (term (number ...)))
         "+")
-   (--> (* N ...) ,(apply * (term (N ...)))
+   (--> (* number ...) ,(apply * (term (number ...)))
         "*")
-   (--> (add1 N) ,(add1 (term N))
+   (--> (add1 number) ,(add1 (term number))
         "add1")
-   (--> (sub1 N) ,(sub1 (term N))
+   (--> (sub1 number) ,(sub1 (term number))
         "sub1")))
 
 (apply-reduction-relation r (term ((λ (e) e) 1)))
