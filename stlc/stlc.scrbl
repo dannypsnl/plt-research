@@ -2,7 +2,7 @@
 
 @require[scribble-math]
 
-@title{Simply typed lambda calculus(STLC)}
+@title[#:style (with-html5 manual-doc-style)]{Simply typed lambda calculus(STLC)}
 
 @section{formula}
 
