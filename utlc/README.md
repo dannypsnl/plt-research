@@ -1,3 +1,0 @@
-# utlc
-
-Untyped lambda calculus
