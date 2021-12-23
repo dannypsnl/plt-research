@@ -1,6 +1,6 @@
 #lang racket
 
-(provide LC subst)
+(provide LC r-app)
 
 (require redex)
 
@@ -9,6 +9,14 @@
      (λ (X ...) E)
      (E E ...))
   (X variable-not-otherwise-mentioned))
+
+(define r-app
+  (reduction-relation
+   LC #:domain E
+   (--> ((λ (X ...) E_body) E_args ...)
+        (subst ,(map list (term (E_args ...)) (term (X ...)))
+               E_body)
+        "app")))
 
 (define-metafunction LC
   subst : ((any X) ...) any -> any
