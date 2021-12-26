@@ -26,4 +26,5 @@ Here are works that more about implementation/assembly details
 3. [Write you a programming language](https://github.com/dannypsnl/write-a-programming-language)
 4. [scheme to arm64](https://github.com/dannypsnl/scheme-compiler)
 5. [c to x64](https://github.com/racket-tw/cc)
-6. [elz](https://github.com/dannypsnl/elz)
+6. [little-scheme](https://github.com/dannypsnl/little-scheme): A little scheme interpreter for playing SICP
+7. [elz](https://github.com/dannypsnl/elz)
