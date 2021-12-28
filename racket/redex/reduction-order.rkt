@@ -26,5 +26,28 @@
 
 (define -->r (compatible-closure r LC+number E))
 
-(traces -->r (term ((λ (x) (x x)) (λ (x) (x x)))))
-(traces -->r (term ((λ (x) (+ 1 2 3)) ((λ (x) (x x)) (λ (x) (x x))))))
+;(traces -->r (term ((λ (x) (x x)) (λ (x) (x x)))))
+
+(define (layout terms)
+  (define root
+    (for/or ([term (in-list terms)])
+      (and (null? (term-node-parents term))
+           term)))
+
+  (define visited (make-hash))
+  (let loop ([depth 0]
+             [width 0]
+             [node root])
+    (cond
+      [(hash-ref visited node #f) (void)]
+      [else
+       (hash-set! visited node #t)
+       (term-node-set-position! node (* width 200) (* depth 100))
+       (for ([child (in-list (term-node-children node))]
+             [width (in-naturals)])
+         (loop (+ depth 1)
+               width
+               child))])))
+
+(traces -->r (term ((λ (x) (+ 1 2 3)) ((λ (x) (x x)) (λ (x) (x x)))))
+        #:layout layout)
