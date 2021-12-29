@@ -8,7 +8,7 @@
 (define/contract (condition n)
   (integer? . -> . (parametric->/c [A] ((listof A) . -> . boolean?)))
   (lambda (l)
-    (>= (length l) 2)))
+    (>= (length l) n)))
 
 (define (f c? cut)
   (parametric->/c
