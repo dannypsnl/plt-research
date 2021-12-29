@@ -24,5 +24,5 @@
         null))
   f*)
 
-(define (chunk-by l) ((f (condition 2) (cutter 2)) l))
+(define chunk-by (f (condition 2) (cutter 2)))
 (chunk-by '(a b c d e))
