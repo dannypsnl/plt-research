@@ -2,27 +2,26 @@
 (require racket/contract/parametric)
 
 (define/contract (cutter n)
-  (integer? . -> . (parametric->/c [A] ((listof A) . -> . (values (listof A) (listof A)))))
+  (-> integer?
+      (parametric->/c
+       [A]
+       (-> (listof A) (values (listof A) (listof A)))))
   (lambda (l)
-    (split-at l n)))
-(define/contract (condition n)
-  (integer? . -> . (parametric->/c [A] ((listof A) . -> . boolean?)))
-  (lambda (l)
-    (>= (length l) n)))
+    (if (>= (length l) n)
+        (split-at l n)
+        (values null null))))
 
-(define (f c? cut)
+(define (f cut)
   (parametric->/c
    [A]
-   (((listof A) . -> . boolean?)
-    ((listof A) . -> . (values (listof A) (listof A)))
+   (((listof A) . -> . (values (listof A) (listof A)))
     . -> .
     (listof (listof A))))
-  (define (f* l)
-    (if (c? l)
-        (let-values ([(l rest) (cut l)])
-          (cons l (f* rest)))
-        null))
-  f*)
+  (lambda (l)
+    (let-values ([(l rest) (cut l)])
+      (if (null? l)
+          rest
+          (cons l ((f cut) rest))))))
 
-(define chunk-by (f (condition 2) (cutter 2)))
+(define chunk-by (f (cutter 2)))
 (chunk-by '(a b c d e))
