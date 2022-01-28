@@ -21,10 +21,11 @@ This repository contains several PLT related sub-projects that I created for lea
 
 Here are works that more about implementation/assembly details
 
-1. [racket-llvm](https://github.com/failed-dragon-slayer/racket-llvm)
-2. [still compiling](https://github.com/dannypsnl/still-compiling)
-3. [Write you a programming language](https://github.com/dannypsnl/write-a-programming-language)
-4. [scheme to arm64](https://github.com/dannypsnl/scheme-to-arm64)
-5. [c to x64](https://github.com/failed-dragon-slayer/cc)
-6. [little-scheme](https://github.com/dannypsnl/little-scheme): A little scheme interpreter for playing SICP
-7. [elz](https://github.com/dannypsnl/elz)
+1. [violet scheme](https://github.com/dannypsnl/violet)
+2. [racket-llvm](https://github.com/failed-dragon-slayer/racket-llvm)
+3. [still compiling](https://github.com/dannypsnl/still-compiling)
+4. [Write you a programming language](https://github.com/dannypsnl/write-a-programming-language)
+5. [scheme to arm64](https://github.com/dannypsnl/scheme-to-arm64)
+6. [c to x64](https://github.com/failed-dragon-slayer/cc)
+7. [little-scheme](https://github.com/dannypsnl/little-scheme): A little scheme interpreter for playing SICP
+8. [elz](https://github.com/dannypsnl/elz)
