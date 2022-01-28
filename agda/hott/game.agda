@@ -1,6 +1,6 @@
 module game where
 
-open import Data.Nat
+open import Data.Nat using (ℕ; suc; zero)
 open import Agda.Builtin.Sigma
 
 Type = Set 
@@ -26,7 +26,20 @@ isEven (suc (suc n)) = isEven n
 _×_ : Type → Type → Type
 A × C = Σ A (λ a → C)
 
+_+_ : ℕ → ℕ → ℕ
+zero + n = n
+suc n + m = suc (n + m)
+
 -- use: div2 (10 , tt)
 div2 : Σ ℕ isEven → ℕ
 div2 (zero , snd) = 0
 div2 ((suc (suc fst)) , snd) = (div2 (fst , snd)) + 1
+
+private
+  postulate
+    A B C : Type
+
+uncurry : (A → B → C) → (A × B → C)
+uncurry f (a , b) = f a b
+curry : (A × B → C) → (A → B → C)
+curry f a b = f (a , b)
