@@ -43,3 +43,12 @@ uncurry : (A → B → C) → (A × B → C)
 uncurry f (a , b) = f a b
 curry : (A × B → C) → (A → B → C)
 curry f a b = f (a , b)
+
+data Id {A : Type} : (x y : A) → Type where
+  rfl : {x : A} → Id x x
+
+idSym : (A : Type) (x y : A) → Id x y → Id y x
+idSym A x y rfl = rfl
+
+idTrans : (A : Type) (x y z : A) → Id x y → Id y z → Id x z
+idTrans A x y z rfl rfl = rfl
