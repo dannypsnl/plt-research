@@ -1,0 +1,12 @@
+\import Data.Bool
+\import Logic
+
+-- compare this definition of T with the one in module Basics
+\data T (b : Bool) \with
+  | true => tt
+
+\func isPos (n : Nat) : Bool
+  | 0 => false
+  | suc _ => true
+
+\record PosNat (n : Nat) (p : T (isPos n))
