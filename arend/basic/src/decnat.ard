@@ -1,0 +1,26 @@
+\import Data.Bool
+\import Logic
+\import Paths
+\import Set
+\import basic (Unit, unit)
+
+\func suc/=0 {n : Nat} (p : suc n = 0) : Empty => transport (\lam n => \case n \with { | 0 => Empty | suc _ => Unit }) p unit
+
+\func pred (n : Nat) : Nat
+  | 0 => 0
+  | suc n => n
+
+\instance NatEq : DecSet Nat
+  | decideEq => decideEq
+  \where
+    \func decideEq (x y : Nat) : Dec (x = y)
+      | 0, 0 => yes idp
+      | 0, suc y => no (\lam p => suc/=0 (inv p))
+      | suc x, 0 => no suc/=0
+      | suc x, suc y => \case decideEq x y \with {
+        | yes p => yes (pmap suc p)
+        | no c => no (\lam p => c (pmap pred p))
+      }
+
+\func test1 : 0 NatEq.== 0 = true => idp
+\func test2 : 0 NatEq.== 1 = false => idp
