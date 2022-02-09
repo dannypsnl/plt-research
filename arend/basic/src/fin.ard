@@ -1,0 +1,21 @@
+\import Data.Maybe
+\import Logic
+
+\data \infixr 2 || (P Q : \Type)
+  | inl P
+  | inr Q
+  
+\data Fin (n : Nat) \with
+  | suc n => { fzero | fsuc (Fin n) }
+
+\func absurd {A : \Type} (x : Fin 0) : A
+
+\func fin0 : Fin 3 => fzero
+\func fin1 : Fin 3 => fsuc fzero
+\func fin2 : Fin 3 => fsuc (fsuc fzero)
+
+\func atMost3 (x : Fin 3) : || (x = fin0) (|| (x = fin1) (x = fin2)) \elim x 
+  | fzero => inl idp
+  | fsuc fzero => inr (inl idp)
+  | fsuc (fsuc fzero) => inr (inr idp)
+  | fsuc (fsuc (fsuc ()))
