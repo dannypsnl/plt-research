@@ -13,8 +13,8 @@
 
 \instance NatDecSet : DecSet Nat
   | decideEq x y => \case x, y \with {
-    | 0, 0 => yes {?}
-    | 0, suc y => no {?}
+    | 0, 0 => {?}
+    | 0, suc y => {?}
     | suc x, y => {?}
   }
 
