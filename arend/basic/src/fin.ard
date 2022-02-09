@@ -1,5 +1,6 @@
 \import Data.Maybe
 \import Logic
+\import Vec
 
 \data \infixr 2 || (P Q : \Type)
   | inl P
@@ -19,3 +20,11 @@
   | fsuc fzero => inr (inl idp)
   | fsuc (fsuc fzero) => inr (inr idp)
   | fsuc (fsuc (fsuc ()))
+
+\func toNat {n : Nat} (x : Fin n) : Nat
+  | {suc _}, fzero => 0
+  | {suc _}, fsuc x => suc (toNat x)
+
+\func lookup {A : \Type} {n : Nat} (xs : Vec A n) (i : Fin n) : A \elim n, xs, i
+  | suc _, fcons x _, fzero => x
+  | suc _, fcons _ xs, fsuc i => lookup xs i
