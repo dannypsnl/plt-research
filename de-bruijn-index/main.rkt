@@ -3,86 +3,85 @@
 (module+ test
   (require typed/rackunit))
 
-(struct term [] #:transparent)
-(struct term:var term [(v : String)] #:transparent)
-(struct term:lambda term [(v : String) (body : term)] #:transparent)
-(struct term:application term [(t1 : term) (t2 : term)] #:transparent)
+(define-type term (U t:var t:λ (app term)))
+(define-type t:var Symbol)
+(struct t:λ
+  ([x : t:var]
+   [m : term])
+  #:transparent
+  #:property prop:custom-write
+  (λ (v port mode)
+    (fprintf port "λ~a.~a"
+             (t:λ-x v)
+             (t:λ-m v))))
+(struct (t) app
+  ([t1 : t]
+   [t2 : t])
+  #:transparent
+  #:property prop:custom-write
+  (λ (v port mode)
+    (fprintf port "(~a ~a)"
+             (app-t1 v)
+             (app-t2 v))))
 
-(struct bterm [] #:transparent)
-(struct bterm:var bterm [(v : Integer)] #:transparent)
-(struct bterm:lambda bterm [(body : bterm)] #:transparent)
-(struct bterm:application bterm [(t1 : bterm) (t2 : bterm)] #:transparent)
+(define-type bterm (U b:var b:λ (app bterm)))
+(define-type b:var Integer)
+(struct b:λ ([m : bterm])
+  #:transparent
+  #:property prop:custom-write
+  (λ (v port mode)
+    (fprintf port "λ~a" (b:λ-m v))))
 
 ;;; convert lambda calculus to de-bruijn index form
-(: convert (->* [term] [(Immutable-HashTable String Integer)] bterm))
-(define (convert t [rename-to (make-immutable-hash '())])
+(: convert (->* (term)
+                ((Immutable-HashTable Symbol Integer))
+                bterm))
+(define (convert t [name->index (make-immutable-hash '())])
   (match t
+    ;; bind parameter name to an index and keep conversion
+    [(t:λ p b) (b:λ (convert b (hash-set name->index p (hash-count name->index))))]
+    [(app t1 t2) (app (convert t1 name->index) (convert t2 name->index))]
     ;; get index from environment
-    ([term:var name] (bterm:var (hash-ref rename-to name)))
-    ([term:lambda p b]
-     (bterm:lambda
-      (convert b
-               ;; bind parameter name to an index
-               (hash-set rename-to p (hash-count rename-to)))))
-    ([term:application t1 t2]
-     (bterm:application
-      (convert t1 rename-to)
-      (convert t2 rename-to)))))
+    [name (hash-ref name->index name)]))
 
 (module+ test
-  (check-equal? (convert (term:lambda "x" (term:var "x")))
-                (bterm:lambda (bterm:var 0)))
-  (check-equal? (convert (term:lambda "f"
-                                      (term:application
-                                       (term:lambda "x"
-                                                    (term:application (term:application (term:var "f")  (term:var "x")) (term:var "x")))
-                                       (term:lambda "x"
-                                                    (term:application (term:application (term:var "f")  (term:var "x")) (term:var "x"))))))
-                (bterm:lambda
-                 (bterm:application
-                  (bterm:lambda
-                   (bterm:application
-                    (bterm:application
-                     (bterm:var 0) (bterm:var 1)) (bterm:var 1)))
-                  (bterm:lambda
-                   (bterm:application
-                    (bterm:application
-                     (bterm:var 0) (bterm:var 1)) (bterm:var 1)))))))
+  (check-equal? (convert (t:λ 'x 'x))
+                (b:λ 0))
+  (check-equal? (convert (t:λ 'f (app (t:λ 'x (app 'f (app 'x 'x)))
+                                      (t:λ 'x (app 'f (app 'x 'x))))))
+                (b:λ (app (b:λ (app 0 (app 1 1)))
+                          (b:λ (app 0 (app 1 1)))))))
 
 ;;; beta-reduction
 ; if t1 is a λx.M then replace all x occurs in M with t2
 ; since bterm using de-bruijn index, lifting after beta-reduction is required
 ; to know which level we are, must count λ
-(: beta-reduction (->* [bterm] [Integer (Immutable-HashTable Integer bterm)] bterm))
-(define (beta-reduction t [de-bruijn-level 0] [subst (make-immutable-hash '())])
+(: β-reduction (->* (bterm)
+                    (Integer (Immutable-HashTable Integer bterm))
+                    bterm))
+(define (β-reduction t [de-bruijn-level 0] [subst (make-immutable-hash '())])
   (match t
-    ([bterm:var i]
-     (hash-ref subst i (λ () t)))
-    ([bterm:lambda body]
-     (bterm:lambda (beta-reduction body (+ 1 de-bruijn-level) subst)))
-    ([bterm:application t1 t2]
+    [(b:λ body) (b:λ (β-reduction body (add1 de-bruijn-level) subst))]
+    [(app t1 t2)
      (match t1
-       ([bterm:lambda body]
-        (let ([reduced-term (beta-reduction body (+ 1 de-bruijn-level)
-                                            (hash-set subst de-bruijn-level t2))])
+       [(b:λ body)
+        (let ([reduced-term (β-reduction body (add1 de-bruijn-level)
+                                         (hash-set subst de-bruijn-level t2))])
           ;;; dbi lifting by replace reduced-term (+ 1 dbi) with (var dbi)
-          (beta-reduction reduced-term de-bruijn-level
-                          (hash-set subst (+ 1 de-bruijn-level) (bterm:var de-bruijn-level)))))
-       (_ (raise "cannot do application on non-lambda term"))))))
+          (β-reduction reduced-term de-bruijn-level
+                       (hash-set subst (add1 de-bruijn-level) de-bruijn-level)))]
+       [_ (raise "cannot do application on non-lambda term")])]
+    [i (hash-ref subst i (λ () t))]))
 
 (module+ test
   ;;; λx.x
   ; => λ0
   ; beta-> λ0
-  (check-equal? (beta-reduction (convert (term:lambda "x" (term:var "x"))))
-                (bterm:lambda (bterm:var 0)))
+  (check-equal? (β-reduction (convert (t:λ 'x 'x)))
+                (b:λ 0))
   ;;; λx.(λy.λz.z x)
   ; => λ(λλ2 0)
   ; beta-> λλ2
   ; beta-> λλ1 (de-bruijn index lifting)
-  (check-equal? (beta-reduction (convert (term:lambda "x"
-                                                      (term:application
-                                                       (term:lambda "y"
-                                                                    (term:lambda "z" (term:var "z")))
-                                                       (term:var "x")))))
-                (bterm:lambda (bterm:lambda (bterm:var 1)))))
+  (check-equal? (β-reduction (convert (t:λ 'x (app (t:λ 'y (t:λ 'z 'z)) 'x))))
+                (b:λ (b:λ 1))))
