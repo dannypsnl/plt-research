@@ -37,8 +37,8 @@
     [`,e `,e]))
 
 (module+ test
-  (require rackunit))
-(module+ test
+  (require rackunit)
+
   (check-equal? (utlc 'a) 'a)
   (check-equal? (utlc '(λ (x) x))
                 '(λ (x) x))
