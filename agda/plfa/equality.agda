@@ -1,6 +1,7 @@
 module equality where
 
 open import Agda.Builtin.Nat using (Nat; _+_; suc)
+open ≡-Reasoning
 
 data _≡_ {A : Set} (x : A) : A → Set where
   refl : x ≡ x
@@ -68,8 +69,6 @@ module ≡-Reasoning {A : Set} where
     -------
     → x ≡ x
   x ∎ = refl
-
-open ≡-Reasoning
 
 postulate
   +-identity : ∀ (m : Nat) → m + 0 ≡ m
