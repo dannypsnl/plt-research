@@ -23,3 +23,9 @@ cong : {A B : Set} → (f : A → B)
        → x ≡ y
        → f x ≡ f y
 cong f refl = refl
+
+UIP : {A : Set}
+      → {x y : A}
+      → (p q : x ≡ y)
+      → p ≡ q
+UIP refl refl = refl
