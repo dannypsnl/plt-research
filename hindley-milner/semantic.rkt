@@ -122,12 +122,12 @@
     ([expr:lambda params body]
      ; params use new freevars as their type
      (letrec ([λ-env : Env (Env/new (Context-type-env ctx))]
-           [param-types (typ:constructor
-                         "pair"
-                         (map (λ ([param-name : String])
-                                (let ([r (Context/new-freevar! ctx)])
-                                  (Env/bind-var λ-env param-name r)
-                                  r)) params))])
+              [param-types (typ:constructor
+                            "pair"
+                            (map (λ ([param-name : String])
+                                   (let ([r (Context/new-freevar! ctx)])
+                                     (Env/bind-var λ-env param-name r)
+                                     r)) params))])
        (set-Context-type-env! ctx λ-env)
        (define body-typ (type/infer body ctx))
        (typ:arrow param-types body-typ)))
