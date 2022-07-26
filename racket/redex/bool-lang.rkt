@@ -31,3 +31,23 @@
 
 (traces bool-any-red
         (term (or (or true false) (or true true))))
+
+(define-language bool-standard-lang
+  (B true
+     false
+     (or B B))
+  (E (or E B)
+     hole))
+
+(define bool-standard-red
+  (reduction-relation
+   bool-standard-lang
+   (--> (in-hole E (or true B))
+        (in-hole E true)
+        "or-true")
+   (--> (in-hole E (or false B))
+        (in-hole E B)
+        "or-false")))
+
+(traces bool-standard-red
+        (term (or (or true false) (or true true))))
