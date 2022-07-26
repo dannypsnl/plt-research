@@ -89,11 +89,15 @@
     t_2)
    (list (term (→ num num)))))
 
-(scale (vl-append
-        20
-        (language->pict L+Γ)
-        (judgment-form->pict types))
-       3/2)
+(with-compound-rewriters
+    (['different?
+      (λ (lws)
+        (list "" (list-ref lws 2) " ≠ " (list-ref lws 3) ""))]
+     ['types
+      (λ (lws)
+        (list "" (list-ref lws 2) " ⊢ " (list-ref lws 3) " : " (list-ref lws 4) ""))])
+  (scale (judgment-form->pict types)
+         1.1))
 
 (define-extended-language Ev L+Γ
   (p (e ...))
