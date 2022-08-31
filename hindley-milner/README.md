@@ -25,7 +25,3 @@ This is just a simple(and of course buggy) language for showing how to inference
       [b (λ (x) x)])
   (b a))
 ```
-
-TODO:
-
-- automatically eval result
