@@ -11,7 +11,7 @@
 
 (define-syntax (top-interaction stx)
   (syntax-parse stx
-    [(_ e) (pretty-display (syntax->datum #'e) #:newline? #f)
+    [(_ e) (pretty-write (syntax->datum #'e) #:newline? #f)
            (printf " :- ~a~n"
                    (pretty-print-typ (type/infer (parse #'e))))
            #'e]))
