@@ -6,14 +6,14 @@
 
 (struct Env
   [(parent : (Option Env))
-   (type-env : (Mutable-HashTable String typ))]
+   (type-env : (Mutable-HashTable Symbol typ))]
   #:transparent
   #:mutable)
 (: Env/new (->* () ((Option Env)) Env))
 (define (Env/new [parent #f])
   (Env parent (make-hash '())))
 ;;; Env/lookup take variable name such as `x` to get a type from env
-(: Env/lookup (-> Env String typ))
+(: Env/lookup (-> Env Symbol typ))
 (define (Env/lookup env var-name)
   (: lookup-parent (-> typ))
   (define lookup-parent (λ ()
@@ -25,12 +25,12 @@
                               ; really fail if we have no parent environment
                               (raise (format "no variable named: `~a`" var-name)))))
   ; try to get value from table
-  (let ([typ-env : (Mutable-HashTable String typ) (Env-type-env env)])
+  (let ([typ-env : (Mutable-HashTable Symbol typ) (Env-type-env env)])
     (hash-ref typ-env var-name
               ; if fail, handler would take
               lookup-parent)))
 ;;; Env/bind-var records form `x : A` into env, when lookup the variable `x` should get type `A`
-(: Env/bind-var (-> Env String typ Void))
+(: Env/bind-var (-> Env Symbol typ Void))
 (define (Env/bind-var env var-name typ)
   (let ([env (Env-type-env env)])
     (if (hash-has-key? env var-name)
@@ -122,7 +122,7 @@
      (letrec ([λ-env : Env (Env/new (Context-type-env ctx))]
               [param-types (typ:constructor
                             "pair"
-                            (map (λ ([param-name : String])
+                            (map (λ ([param-name : Symbol])
                                    (let ([r (Context/new-freevar! ctx)])
                                      (Env/bind-var λ-env param-name r)
                                      r)) params))])
@@ -136,7 +136,7 @@
     ; only values bound in let-polymorphism construct are subject to instantiation.
     ([expr:let bindings exp]
      (letrec ([let-env : Env (Env/new (Context-type-env ctx))]
-              [bind-to-context (λ ([bind : (Pairof String Expr)])
+              [bind-to-context (λ ([bind : (Pairof Symbol Expr)])
                                  (match bind
                                    ([cons name init]
                                     (Env/bind-var let-env name (type/infer init ctx)))))])
@@ -154,8 +154,10 @@
        fresh))))
 
 (module+ test
-  (require typed/rackunit))
-(module+ test
+  (require typed/rackunit)
+  (require/typed "parser.rkt"
+                 [parse (-> Syntax Expr)])
+
   (test-case
    "infer type of simple expression"
    (check-equal? (type/infer (expr:int 1))
@@ -167,7 +169,7 @@
 
   (test-case
    "list is a little bit free"
-   (check-equal? (type/infer (expr:list '()))
+   (check-equal? (type/infer (parse #''()))
                  (typ:constructor "list" (list (typ:freevar 0 #f)))))
 
   (test-case
@@ -179,8 +181,8 @@
    "let id function"
    (define exp (expr:let
                 (list
-                 (cons "id" (expr:lambda (list "x") (expr:variable "x"))))
-                (expr:variable "id")))
+                 (cons 'id (expr:lambda (list 'x) (expr:variable 'x))))
+                (expr:variable 'id)))
    (check-equal? (type/infer exp)
                  ; expect: `(?0) -> ?0`
                  (typ:arrow (typ:constructor "pair" (list (typ:freevar 0 #f))) (typ:freevar 0 #f))))
@@ -189,8 +191,8 @@
    "let id function and apply"
    (define exp-app (expr:let
                     (list
-                     (cons "id" (expr:lambda (list "x") (expr:variable "x"))))
-                    (expr:application (expr:variable "id") (list (expr:bool #t)))))
+                     (cons 'id (expr:lambda (list 'x) (expr:variable 'x))))
+                    (expr:application (expr:variable 'id) (list (expr:bool #t)))))
    (check-equal? (type/infer exp-app)
                  (typ:freevar 1 (typ:builtin "bool"))))
 

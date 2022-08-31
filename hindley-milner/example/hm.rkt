@@ -1,5 +1,4 @@
-#lang racket
-(require "../main.rkt")
+#lang hindley-milner
 
 ;;; integer
 1
@@ -7,7 +6,7 @@
 #t
 #f
 ;;; string
-"a"
+"abc"
 ;;; list
 '(1 2 3)
 ;;; lambda
