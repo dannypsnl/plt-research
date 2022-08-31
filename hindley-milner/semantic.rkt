@@ -174,26 +174,17 @@
 
   (test-case
    "inconsistent element in list"
-   (check-exn string? (λ ()
-                        (type/infer (expr:list (list (expr:int 1) (expr:bool #t)))))))
+   (check-exn string? (λ () (type/infer (parse #''(1 #t))))))
 
   (test-case
    "let id function"
-   (define exp (expr:let
-                (list
-                 (cons 'id (expr:lambda (list 'x) (expr:variable 'x))))
-                (expr:variable 'id)))
-   (check-equal? (type/infer exp)
+   (check-equal? (type/infer (parse #'(let ([id (λ (x) x)]) id)))
                  ; expect: `(?0) -> ?0`
                  (typ:arrow (typ:constructor "pair" (list (typ:freevar 0 #f))) (typ:freevar 0 #f))))
 
   (test-case
    "let id function and apply"
-   (define exp-app (expr:let
-                    (list
-                     (cons 'id (expr:lambda (list 'x) (expr:variable 'x))))
-                    (expr:application (expr:variable 'id) (list (expr:bool #t)))))
-   (check-equal? (type/infer exp-app)
+   (check-equal? (type/infer (parse #'(let ([id (λ (x) x)])
+                                        (id #t))))
                  (typ:freevar 1 (typ:builtin "bool"))))
-
   )
