@@ -1,24 +1,19 @@
 #lang racket
-
-(require (for-syntax syntax/parse)
-         racket/syntax
-         syntax/stx)
-(require "lang.rkt"
-         "semantic.rkt"
-         "pretty-print.rkt")
-
 (provide (except-out (all-from-out racket) #%module-begin #%top-interaction)
          (rename-out [module-begin #%module-begin]
-                     [top-interaction #%top-interaction])
-         (all-from-out "lang.rkt"))
+                     [top-interaction #%top-interaction]))
+(require (for-syntax syntax/parse
+                     "lang.rkt"
+                     "semantic.rkt"
+                     "pretty-print.rkt"))
 
-(define-syntax (parse stx)
+(define-for-syntax (parse stx)
   (define-syntax-class bind
     (pattern (bind-name:id bind-expr)
-             #:with bind
-             #'(cons (symbol->string 'bind-name) (parse bind-expr))))
+      #:with bind
+      #'(cons (symbol->string 'bind-name) (parse bind-expr))))
   (syntax-parse stx
-    #:literals (let λ)
+    #:datum-literals (let λ)
     ; (let ([a 1]
     ;       [b (λ (x) x)])
     ;   (b a))
@@ -32,10 +27,10 @@
     (`b:boolean #'(expr:bool (#%datum . b)))
     (`i:exact-integer #'(expr:int (#%datum . i)))))
 
-(define-syntax-rule (top-interaction e)
-  (begin
-    (printf "type:- ~a~n" (pretty-print-typ (type/infer (parse e))))
-    (parse e)))
+(define-syntax (top-interaction stx)
+  (syntax-parse stx
+    [e (printf "type:- ~a~n" (pretty-print-typ (type/infer (parse #'e))))
+       #'e]))
 
 (define-syntax-rule (module-begin e* ...)
   (#%module-begin

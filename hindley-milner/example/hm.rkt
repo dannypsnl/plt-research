@@ -1,4 +1,5 @@
-#lang hindley-milner
+#lang racket
+(require "../main.rkt")
 
 ;;; integer
 1

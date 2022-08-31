@@ -1,8 +1,6 @@
 #lang typed/racket
-
-(require "typ.rkt")
-
 (provide pretty-print-typ)
+(require "typ.rkt")
 
 (: pretty-print-typ (-> typ String))
 (define (pretty-print-typ t)

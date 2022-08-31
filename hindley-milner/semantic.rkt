@@ -1,7 +1,5 @@
 #lang typed/racket
-
 (provide type/infer)
-
 (require "lang.rkt"
          "typ.rkt"
          "pretty-print.rkt")
@@ -87,7 +85,7 @@
     ([cons (typ:freevar _ _) t2] (unify t2 t1))
     (_ (raise (format "cannot unify type ~a and ~a" (pretty-print-typ t1) (pretty-print-typ t2))))))
 
-(: type/infer (->* (expr) (Context) typ))
+(: type/infer (->* (Expr) (Context) typ))
 (define (type/infer exp [ctx (Context/new)])
   (match exp
     ;;; some expressiones are easy to guess what it is
@@ -110,7 +108,7 @@
                                 ; use first element type as type of all elements
                                 (let ([elem-typ (type/infer (car elems))])
                                   ; check all elements follow first element type
-                                  (for-each (λ ([elem : expr]) (unify elem-typ (type/infer elem)))
+                                  (for-each (λ ([elem : Expr]) (unify elem-typ (type/infer elem)))
                                             (cdr elems))
                                   elem-typ)))))
     ;;; infer variable would rely on lookup in context
@@ -138,7 +136,7 @@
     ; only values bound in let-polymorphism construct are subject to instantiation.
     ([expr:let bindings exp]
      (letrec ([let-env : Env (Env/new (Context-type-env ctx))]
-              [bind-to-context (λ ([bind : (Pairof String expr)])
+              [bind-to-context (λ ([bind : (Pairof String Expr)])
                                  (match bind
                                    ([cons name init]
                                     (Env/bind-var let-env name (type/infer init ctx)))))])
@@ -150,7 +148,7 @@
     ; which unified freevar and concrete type to give freevar a binding
     ([expr:application fn args]
      (let ([fn-typ (type/infer fn ctx)]
-           [args-typ (map (λ ((arg : expr)) (type/infer arg ctx)) args)]
+           [args-typ (map (λ ((arg : Expr)) (type/infer arg ctx)) args)]
            [fresh (Context/new-freevar! ctx)])
        (unify fn-typ (typ:arrow (typ:constructor "pair" args-typ) fresh))
        fresh))))
