@@ -26,12 +26,17 @@
   #:transparent)
 
 (define-type value (U V.lam V.stuck))
-(define-type V.stuck (U V.var))
+(define-type V.stuck (U V.var V.app))
 (struct V.var ([v : Nonnegative-Integer])
   #:property prop:custom-write
   (λ (v port mode)
     (fprintf port "@~a"
              (V.var-v v)))
+  #:transparent)
+(struct V.app ([fn : value] [arg : value])
+  #:property prop:custom-write
+  (λ (v port mode)
+    (fprintf port "~a ~a" (V.app-fn v) (V.app-arg v)))
   #:transparent)
 (struct V.lam ([binder : term] [ctx : context])
   #:property prop:custom-write
@@ -57,7 +62,7 @@
        (cond
          [(V.lam? v-fn) (evaluate (ext v-arg (V.lam-ctx v-fn))
                                   (V.lam-binder v-fn))]
-         [else (error 'not-function "cannot apply ~a" v-fn)]))]
+         [else (V.app v-fn v-arg)]))]
     [(S.lam? t) (V.lam (S.lam-binder t) ctx)]))
 
 (: depth : Sexp -> Nonnegative-Integer)
@@ -78,6 +83,11 @@
 (module+ test
   (require typed/rackunit)
 
+  (check-equal? (evaluate (empty)
+                          (convert '(a b)
+                                   (make-immutable-hash '((a . 1)
+                                                          (b . 2)))))
+                (V.app (V.var 1) (V.var 2)))
   (check-equal? (evaluate (empty)
                           (convert '(((λ (v) (λ (f) (f v))) k)
                                      (λ (x) x))
