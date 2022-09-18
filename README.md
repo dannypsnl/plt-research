@@ -30,3 +30,8 @@ Here are works that more about implementation/assembly details
 4. [c to x64](https://github.com/failed-dragon-slayer/cc)
 5. [little-scheme](https://github.com/dannypsnl/little-scheme): A little scheme interpreter for playing SICP
 6. [elz](https://github.com/dannypsnl/elz)
+
+### NOTE: video
+
+- [Kent Dybvig: Macro-Writer's Bill of Rights](https://youtu.be/LIEX3tUliHw)
+- ["Let's Build a Hygienic Macro Expander" by Matthew Flatt](https://youtu.be/Or_yKiI3Ha4)
