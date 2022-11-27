@@ -5,19 +5,20 @@ This repository contains several PLT related sub-projects that I created for lea
 - [the little typer note](https://dannypsnl.github.io/plt-research/the-little-typer-note/note.html)
 - [continuation](https://github.com/dannypsnl/plt-research/tree/develop/continuations)
 - lambda calculus
-  - [utlc](https://github.com/dannypsnl/plt-research/tree/develop/utlc)
-  - [stlc](https://github.com/dannypsnl/plt-research/tree/develop/stlc)
-  - [de-bruijn index](https://github.com/dannypsnl/plt-research/tree/develop/de-bruijn-index)
+  - [utlc](https://github.com/dannypsnl/plt-research/tree/develop/utlc): untyped lambda calculus
+  - [stlc](https://github.com/dannypsnl/plt-research/tree/develop/stlc): simply typed lambda calculus
+  - [de-bruijn index](https://github.com/dannypsnl/plt-research/tree/develop/de-bruijn-index) is a technology to encode variables by indcies
 - polymorphism
-  - [hindley milner](https://github.com/dannypsnl/plt-research/tree/develop/hindley-milner)
-  - [row polymorphism](https://github.com/dannypsnl/plt-research/tree/develop/row-poly)
+  - [hindley milner](https://github.com/dannypsnl/plt-research/tree/develop/hindley-milner) is a classic decidable algorithm and polymorphic type system variant
+  - [row polymorphism](https://github.com/dannypsnl/plt-research/tree/develop/row-poly) is a type system that you can have record row polymorphic, but my code is buggy
 - dependent type
-  - [lambda pi](https://github.com/dannypsnl/plt-research/tree/develop/lambda-pi)
-  - [strictly positive](https://github.com/dannypsnl/plt-research/tree/develop/strictly-positive)
+  - [lambda pi](https://github.com/dannypsnl/plt-research/tree/develop/lambda-pi) introduces $\Pi$ type
+  - [strictly positive](https://github.com/dannypsnl/plt-research/tree/develop/strictly-positive) is an attribute that well inductive data type should hold, and this is a syntactic checker for it
   - [universe polymorphism](https://github.com/dannypsnl/plt-research/tree/develop/univ-poly)
   - [normalization by evaluation](https://github.com/dannypsnl/plt-research/tree/develop/normalization-by-evaluation)
 - external
   - [Write you a programming language](https://github.com/dannypsnl/write-a-programming-language)
+  - [whisper]: A dependent type language checker uses conversion check algorithm
 
 ### Compiler
 
