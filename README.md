@@ -18,7 +18,7 @@ This repository contains several PLT related sub-projects that I created for lea
   - [normalization by evaluation](https://github.com/dannypsnl/plt-research/tree/develop/normalization-by-evaluation)
 - external
   - [Write you a programming language](https://github.com/dannypsnl/write-a-programming-language)
-  - [whisper]: A dependent type language checker uses conversion check algorithm
+  - [whisper](https://github.com/dannypsnl/whisper): A dependent type language checker uses conversion check algorithm
 
 ### Compiler
 
