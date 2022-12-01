@@ -1,6 +1,6 @@
 # whisper
 
-This project tests ability of typed/racket by implementing conversion checking algorithm, you can run `racket main.rkt` to get the following result.
+This project implementing a conversion checking algorithm, you can run `stack run test.tt` to get the following result.
 
 ```shell
 type of term:

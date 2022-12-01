@@ -1,0 +1,4 @@
+postulate Nat : U;
+postulate zero : Nat;
+postulate suc : Nat -> Nat;
+suc zero
