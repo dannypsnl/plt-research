@@ -1,0 +1,5 @@
+let a : Int = 1;
+let b : Bool = false;
+let id : a -> a = λ x . x;
+let foo : a -> b = λ x . (id x);
+(id a)

@@ -1,0 +1,104 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           antaa
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/antaa#readme>
+homepage:       https://github.com/githubuser/antaa#readme
+bug-reports:    https://github.com/githubuser/antaa/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2022 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/antaa
+
+library
+  exposed-modules:
+      Antaa
+      Antaa.Core
+      Antaa.Parser
+      Antaa.Raw
+      Antaa.Term
+  other-modules:
+      Paths_antaa
+  hs-source-dirs:
+      src
+  default-extensions:
+      DerivingVia
+      DeriveAnyClass
+      ImportQualifiedPost
+      DuplicateRecordFields
+      OverloadedRecordDot
+      LambdaCase
+      Strict
+      StrictData
+      PatternSynonyms
+      ViewPatterns
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , megaparsec
+  default-language: Haskell2010
+
+executable antaa-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_antaa
+  hs-source-dirs:
+      app
+  default-extensions:
+      DerivingVia
+      DeriveAnyClass
+      ImportQualifiedPost
+      DuplicateRecordFields
+      OverloadedRecordDot
+      LambdaCase
+      Strict
+      StrictData
+      PatternSynonyms
+      ViewPatterns
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      antaa
+    , base >=4.7 && <5
+    , containers
+    , megaparsec
+  default-language: Haskell2010
+
+test-suite antaa-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_antaa
+  hs-source-dirs:
+      test
+  default-extensions:
+      DerivingVia
+      DeriveAnyClass
+      ImportQualifiedPost
+      DuplicateRecordFields
+      OverloadedRecordDot
+      LambdaCase
+      Strict
+      StrictData
+      PatternSynonyms
+      ViewPatterns
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      antaa
+    , base >=4.7 && <5
+    , containers
+    , megaparsec
+  default-language: Haskell2010

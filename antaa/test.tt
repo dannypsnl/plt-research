@@ -1,0 +1,3 @@
+let id : (a : U) -> a -> a = \a x. x;
+let id2 : (A : U) -> A -> A = λ A x. id _ x;
+U
