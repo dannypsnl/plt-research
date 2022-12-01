@@ -8,31 +8,13 @@ import Data.Char
 import Data.Functor
 import Data.Maybe
 import Data.Void
+import Syntax
 import System.Environment
 import System.Exit
 import Text.Megaparsec
 import Text.Megaparsec.Char qualified as C
 import Text.Megaparsec.Char.Lexer qualified as L
 import Text.Printf
-
--- syntax
---------------------------------------------------------------------------------
-
-type Name = String
-
-type Ty = Tm
-
-type Raw = Tm
-
-data Tm
-  = Var Name -- x
-  | Lam Name Tm -- \x. t
-  | App Tm Tm -- t u
-  | U -- U
-  | Pi Name Ty Ty -- (x : A) -> B
-  | Let Name Ty Tm Tm -- let x : A = t; u
-  | Postulate Name Ty Tm -- postulate x : A; u
-  | SrcPos SourcePos Tm -- source position for error reporting
 
 -- type checking
 --------------------------------------------------------------------------------
@@ -51,7 +33,7 @@ type Env = [(Name, Val)]
 --   names from the values. Alternatively, we could store the names and types in
 --   unzipped form to begin with, but that'd make lookup less neat.
 fresh :: Env -> Name -> Name
-fresh env "_" = "_"
+fresh _ "_" = "_"
 fresh env x = case lookup x env of
   Just _ -> fresh env (x ++ "'")
   _ -> x
@@ -119,7 +101,7 @@ quoteShow env = show . quote env
 addPos :: SourcePos -> M a -> M a
 addPos pos ma = case ma of
   Left (msg, Nothing) -> Left (msg, Just pos)
-  ma -> ma
+  ma' -> ma'
 
 check :: Env -> Cxt -> Raw -> VTy -> M ()
 check env cxt t a = case (t, a) of
@@ -128,7 +110,7 @@ check env cxt t a = case (t, a) of
     check ((x, VVar x') : env) ((x, a) : cxt) t (b (VVar x'))
   (Let x a' t' u, _) -> do
     check env cxt a' VU
-    let ~a'' = eval env a'
+    let a'' = eval env a'
     check env cxt t' a''
     check ((x, eval env t') : env) ((x, a'') : cxt) u a
   _ -> do
@@ -154,10 +136,10 @@ infer env cxt = \case
       VPi _ a b -> do
         check env cxt u a
         pure (b (eval env u))
-      tty ->
+      v ->
         report $
           "Expected a function type, instead inferred:\n\n  "
-            ++ quoteShow env tty
+            ++ quoteShow env v
   Lam {} -> report "Can't infer type for lambda expresion"
   Pi x a b -> do
     check env cxt a VU
@@ -165,67 +147,13 @@ infer env cxt = \case
     pure VU
   Postulate x a u -> do
     check env cxt a VU
-    let ~a' = eval env a
+    let a' = eval env a
     infer ((x, VVar x) : env) ((x, a') : cxt) u
   Let x a t u -> do
     check env cxt a VU
-    let ~a' = eval env a
+    let a' = eval env a
     check env cxt t a'
     infer ((x, eval env t) : env) ((x, a') : cxt) u
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
--- printing
---------------------------------------------------------------------------------
-
--- printing precedences
-atomp = 3 :: Int -- U, var
-
-appp = 2 :: Int -- application
-
-pip = 1 :: Int -- pi
-
-letp = 0 :: Int -- let, lambda
-
--- | Wrap in parens if expression precedence is lower than
---   enclosing expression precedence.
-par :: Int -> Int -> ShowS -> ShowS
-par p p' = showParen (p' < p)
-
-prettyTm :: Int -> Tm -> ShowS
-prettyTm = go
-  where
-    piBind x a =
-      showParen True ((x ++) . (" : " ++) . go letp a)
-
-    go :: Int -> Tm -> ShowS
-    go p = \case
-      Var x -> (x ++)
-      App t u -> par p appp $ go appp t . (' ' :) . go atomp u
-      Lam x t -> par p letp $ ("λ " ++) . (x ++) . goLam t
-        where
-          goLam (Lam x t) = (' ' :) . (x ++) . goLam t
-          goLam t = (". " ++) . go letp t
-      U -> ("𝕌" ++)
-      Pi "_" a b -> par p pip $ go appp a . (" → " ++) . go pip b
-      Pi x a b -> par p pip $ piBind x a . goPi b
-        where
-          goPi (Pi x a b) | x /= "_" = piBind x a . goPi b
-          goPi b = (" → " ++) . go pip b
-      Let x a t u ->
-        par p letp $
-          ("let " ++)
-            . (x ++)
-            . (" : " ++)
-            . go letp a
-            . ("\n    = " ++)
-            . go letp t
-            . ("\n;\n" ++)
-            . go letp u
-      SrcPos _ t -> go p t
-
-instance Show Tm where showsPrec = prettyTm
 
 -- parsing
 --------------------------------------------------------------------------------
@@ -315,21 +243,6 @@ pTm = withPos $ choice [pLam, pPostulate, pLet, try pPi, funOrSpine]
 
 pSrc :: Parser Tm
 pSrc = ws *> pTm <* eof
-
-parseString :: String -> IO Tm
-parseString src =
-  case parse pSrc "(stdin)" src of
-    Left e -> do
-      putStrLn $ errorBundlePretty e
-      exitSuccess
-    Right t ->
-      pure t
-
-parseStdin :: IO (Tm, String)
-parseStdin = do
-  file <- getContents
-  tm <- parseString file
-  pure (tm, file)
 
 -- main
 --------------------------------------------------------------------------------
