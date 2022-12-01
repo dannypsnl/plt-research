@@ -61,7 +61,7 @@ pAtom =
 pBinder :: Parser String
 pBinder = pIdent <|> C.string "_"
 
-pSpine, pPostulate, pLam, pPi, funOrSpine, pLet :: Parser Tm
+pSpine, pDataType, pPostulate, pLam, pPi, funOrSpine, pLet :: Parser Tm
 pSpine = foldl1 App <$> some pAtom
 pLam = do
   char 'λ' <|> char '\\'
@@ -79,6 +79,19 @@ funOrSpine = do
   optional pArrow >>= \case
     Nothing -> pure sp
     Just _ -> Pi "_" sp <$> pTm
+pDataType = do
+  pKeyword "data"
+  x <- pBinder
+  cs <- many pCase
+  symbol ";"
+  foldl (\postulate (x', p) -> postulate . Postulate x' p) (Postulate x U) cs <$> pTm
+  where
+    pCase = do
+      symbol "|"
+      x <- pBinder
+      symbol ":"
+      p <- pTm
+      return (x, p)
 pPostulate = do
   pKeyword "postulate"
   x <- pBinder
@@ -97,7 +110,7 @@ pLet = do
   Let x a t <$> pTm
 
 pTm :: Parser Tm
-pTm = withPos $ choice [pLam, pPostulate, pLet, try pPi, funOrSpine]
+pTm = withPos $ choice [pLam, pDataType, pPostulate, pLet, try pPi, funOrSpine]
 
 pSrc :: Parser Tm
 pSrc = ws *> pTm <* eof
