@@ -1,14 +1,15 @@
 # whisper
 
-This project implementing a conversion checking algorithm, you can run `stack run test.tt` to get the following result.
+This project implementing a conversion checking algorithm, following commands are some demo
 
 ```shell
-type of term:
-
-let id : (A : 𝕌) → A → A = λA.λx.x;
-id 𝕌
-
-is
-
+$ stack run test.tt
+λ x. x
+  :
 𝕌 → 𝕌
+
+$ stack run postulate.tt
+suc zero
+  :
+Nat
 ```
