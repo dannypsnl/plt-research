@@ -16,9 +16,11 @@ This repository contains several PLT related sub-projects that I created for lea
   - [strictly positive](https://github.com/dannypsnl/plt-research/tree/develop/strictly-positive) is an attribute that well inductive data type should hold, and this is a syntactic checker for it
   - [universe polymorphism](https://github.com/dannypsnl/plt-research/tree/develop/univ-poly)
   - [normalization by evaluation](https://github.com/dannypsnl/plt-research/tree/develop/normalization-by-evaluation)
+  - elaboration-zoo
+    - [whisper](https://github.com/dannypsnl/plt-research/tree/develop/whisper): conversion check
+    - [antaa](https://github.com/dannypsnl/plt-research/tree/develop/antaa): meta solving
 - external
   - [Write you a programming language](https://github.com/dannypsnl/write-a-programming-language)
-  - [whisper](https://github.com/dannypsnl/whisper): A dependent type language checker uses conversion check algorithm
 
 ### Compiler
 
