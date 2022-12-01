@@ -1,4 +1,2 @@
-postulate Nat : U;
-postulate zero : Nat;
-postulate suc : Nat -> Nat;
-suc zero
+let id : (A : U) → A → A = λ A x . x;
+id U
