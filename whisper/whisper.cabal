@@ -24,6 +24,7 @@ source-repository head
 
 library
   exposed-modules:
+      Parser
       Syntax
   other-modules:
       Paths_whisper

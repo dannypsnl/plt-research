@@ -1,19 +1,11 @@
-{-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
+module Main (main) where
 
-module Main where
-
-import Control.Applicative hiding (many, some)
 import Control.Monad
-import Data.Char
-import Data.Functor
 import Data.Maybe
-import Data.Void
+import Parser
 import Syntax
 import System.Environment
-import System.Exit
 import Text.Megaparsec
-import Text.Megaparsec.Char qualified as C
-import Text.Megaparsec.Char.Lexer qualified as L
 import Text.Printf
 
 -- type checking
@@ -154,95 +146,6 @@ infer env cxt = \case
     let a' = eval env a
     check env cxt t a'
     infer ((x, eval env t) : env) ((x, a') : cxt) u
-
--- parsing
---------------------------------------------------------------------------------
-
-type Parser = Parsec Void String
-
-ws :: Parser ()
-ws = L.space C.space1 (L.skipLineComment "--") (L.skipBlockComment "{-" "-}")
-
-withPos :: Parser Tm -> Parser Tm
-withPos p = SrcPos <$> getSourcePos <*> p
-
-lexeme :: Parser a -> Parser a
-lexeme = L.lexeme ws
-
-symbol :: String -> Parser ()
-symbol s = lexeme (C.string s) $> ()
-
-char :: Char -> Parser ()
-char c = lexeme (C.char c) $> ()
-
-parens :: Parser a -> Parser a
-parens p = char '(' *> p <* char ')'
-
-pArrow :: Parser ()
-pArrow = symbol "→" <|> symbol "->"
-
-keyword :: String -> Bool
-keyword x = x == "let" || x == "in" || x == "λ" || x == "U"
-
-pIdent :: Parser Name
-pIdent = try $ do
-  x <- takeWhile1P Nothing isAlphaNum
-  guard (not (keyword x))
-  x <$ ws
-
-pKeyword :: String -> Parser ()
-pKeyword kw = do
-  _ <- C.string kw
-  (takeWhile1P Nothing isAlphaNum *> empty) <|> ws
-
-pAtom :: Parser Tm
-pAtom =
-  withPos ((Var <$> pIdent) <|> (U <$ lexeme (C.string "U")))
-    <|> parens pTm
-
-pBinder :: Parser String
-pBinder = pIdent <|> C.string "_"
-
-pSpine, pPostulate, pLam, pPi, funOrSpine, pLet :: Parser Tm
-pSpine = foldl1 App <$> some pAtom
-pLam = do
-  char 'λ' <|> char '\\'
-  xs <- some pBinder
-  char '.'
-  t <- pTm
-  pure (foldr Lam t xs)
-pPi = do
-  dom <- some (parens ((,) <$> some pBinder <*> (char ':' *> pTm)))
-  pArrow
-  cod <- pTm
-  pure $ foldr (\(xs, a) t -> foldr (`Pi` a) t xs) cod dom
-funOrSpine = do
-  sp <- pSpine
-  optional pArrow >>= \case
-    Nothing -> pure sp
-    Just _ -> Pi "_" sp <$> pTm
-pPostulate = do
-  pKeyword "postulate"
-  x <- pBinder
-  symbol ":"
-  a <- pTm
-  symbol ";"
-  Postulate x a <$> pTm
-pLet = do
-  pKeyword "let"
-  x <- pBinder
-  symbol ":"
-  a <- pTm
-  symbol "="
-  t <- pTm
-  symbol ";"
-  Let x a t <$> pTm
-
-pTm :: Parser Tm
-pTm = withPos $ choice [pLam, pPostulate, pLet, try pPi, funOrSpine]
-
-pSrc :: Parser Tm
-pSrc = ws *> pTm <* eof
 
 -- main
 --------------------------------------------------------------------------------
