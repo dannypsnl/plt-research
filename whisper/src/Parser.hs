@@ -30,11 +30,8 @@ lexeme = L.lexeme ws
 symbol :: String -> Parser ()
 symbol s = lexeme (C.string s) $> ()
 
-char :: Char -> Parser ()
-char c = lexeme (C.char c) $> ()
-
 parens :: Parser a -> Parser a
-parens p = char '(' *> p <* char ')'
+parens p = symbol "(" *> p <* symbol ")"
 
 pArrow :: Parser ()
 pArrow = symbol "→" <|> symbol "->"
@@ -64,13 +61,13 @@ pBinder = pIdent <|> C.string "_"
 pSpine, pDataType, pPostulate, pLam, pPi, funOrSpine, pLet :: Parser Tm
 pSpine = foldl1 App <$> some pAtom
 pLam = do
-  char 'λ' <|> char '\\'
+  symbol "λ"
   xs <- some pBinder
-  char '.'
+  symbol "."
   t <- pTm
   pure (foldr Lam t xs)
 pPi = do
-  dom <- some (parens ((,) <$> some pBinder <*> (char ':' *> pTm)))
+  dom <- some (parens ((,) <$> some pBinder <*> (symbol ":" *> pTm)))
   pArrow
   cod <- pTm
   pure $ foldr (\(xs, a) t -> foldr (`Pi` a) t xs) cod dom

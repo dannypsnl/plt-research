@@ -1,4 +1,17 @@
 data Nat
 | zero : Nat
-| suc : Nat → Nat;
-suc (suc zero)
+| suc : Nat → Nat
+;
+
+data Bool
+| false : Bool
+| true : Bool
+;
+
+data One
+| one : One
+;
+
+let c : Nat → One = λ x . one;
+let d : One → Nat = λ o . suc zero;
+d (c (suc (suc zero)))
