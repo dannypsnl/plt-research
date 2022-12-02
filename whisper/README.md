@@ -13,3 +13,41 @@ suc zero
   :
 Nat
 ```
+
+## Surface syntax
+
+### Data type
+
+```
+data D
+| c₁ : T₁
+| c₂ : T₂
+;
+c₁
+```
+
+### Postulate
+
+```
+postulate x : A;
+u
+```
+
+### Let binding
+
+```
+let x : A = t;
+u
+```
+
+### Pi type
+
+```
+(x : A) -> B
+```
+
+### Application
+
+```
+t u
+```
