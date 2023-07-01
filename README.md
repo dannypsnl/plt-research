@@ -2,7 +2,7 @@
 
 This repository contains several PLT related sub-projects that I created for learning these certain subjects.
 
-- [the little typer note](https://dannypsnl.github.io/plt-research/the-little-typer-note/note.html)
+- [the little typer note](https://dannypsnl.github.io/plt-research/NOTE__The_Little_Typer.html)
 - [continuation](https://github.com/dannypsnl/plt-research/tree/develop/continuations)
 - lambda calculus
   - [utlc](https://github.com/dannypsnl/plt-research/tree/develop/utlc): untyped lambda calculus
