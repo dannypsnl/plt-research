@@ -27,7 +27,7 @@ exception NotCovered of pattern
 
 let type_meta : (typ, pattern list) Hashtbl.t = Hashtbl.create 100
 
-(* A case is said to be cover, if any pattern can cover it *)
+(* A case is said to be covered, if any pattern can cover it *)
 let rec check_coverage (case : pattern) (patterns : pattern list) : unit =
   match patterns with
   | pat :: rest ->
