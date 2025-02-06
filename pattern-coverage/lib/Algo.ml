@@ -18,20 +18,11 @@ type pattern =
         (String.concat " " (List.map show_pattern sp.spine))]
 [@@deriving show]
 
-exception CannotSplit
-exception CanSplit
+exception Split of pattern list
 exception FailMatch
 exception NotCovered of pattern
 
 let type_meta : (typ, pattern list) Hashtbl.t = Hashtbl.create 100
-
-let split (case : pattern) : pattern list =
-  match case with
-  | Var (x, ty) ->
-    Printf.printf "split %s\n" x;
-    Hashtbl.find type_meta ty
-  | _ -> raise CannotSplit
-;;
 
 (* A case is said to be cover, if any pattern can cover it *)
 let rec check_coverage (case : pattern) (patterns : pattern list) : unit =
@@ -39,15 +30,16 @@ let rec check_coverage (case : pattern) (patterns : pattern list) : unit =
   | pat :: rest ->
     (try cover case pat with
      | FailMatch -> check_coverage case rest
-     | CanSplit ->
-       let cases = split case in
-       List.iter (fun c -> check_coverage c patterns) cases)
+     | Split cases -> List.iter (fun c -> check_coverage c patterns) cases)
   | [] -> raise @@ NotCovered case
 
 and cover (case : pattern) (pattern : pattern) : unit =
   match case, pattern with
   | _, Var _ -> ()
-  | Var _, Spine _ -> raise CanSplit
+  | Var (x, ty), Spine _ ->
+    Printf.printf "split %s\n" x;
+    let cases = Hashtbl.find type_meta ty in
+    raise @@ Split cases
   | Spine { constructor = c1; spine = s1 }, Spine { constructor = c2; spine = s2 } ->
     if String.equal c1 c2 then List.iter2 cover s1 s2 else raise FailMatch
 ;;
