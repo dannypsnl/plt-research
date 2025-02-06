@@ -1,0 +1,5 @@
+(library
+ (name pattern_coverage)
+ (inline_tests)
+ (preprocess
+  (pps ppx_deriving.show ppx_expect)))

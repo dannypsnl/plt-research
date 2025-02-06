@@ -1,0 +1,25 @@
+(lang dune 3.17)
+
+(name pattern_coverage)
+
+(generate_opam_files true)
+
+(source
+ (github dannypsnl/plt-research))
+
+(authors "Lîm Tsú-thuàn <inbox@dannypsnl.me>")
+
+(maintainers "Lîm Tsú-thuàn <inbox@dannypsnl.me>")
+
+(license LICENSE)
+
+(documentation https://url/to/documentation)
+
+(package
+ (name pattern_coverage)
+ (synopsis "pattern coverage algorithm")
+ (description
+  "A pattern coverage algorithm, that do not handle dependent cases and only work for single case")
+ (depends ocaml)
+ (allow_empty)
+ (tags ("pattern matching")))
