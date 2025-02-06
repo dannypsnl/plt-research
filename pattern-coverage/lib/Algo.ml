@@ -1,7 +1,3 @@
-exception CannotSplit
-exception CanSplit
-exception FailMatch
-
 type typ = Nat [@printer fun fmt _ -> fprintf fmt "Nat"] [@@deriving show]
 
 type 'a spine =
@@ -22,7 +18,10 @@ type pattern =
         (String.concat " " (List.map show_pattern sp.spine))]
 [@@deriving show]
 
-exception NotCover of pattern
+exception CannotSplit
+exception CanSplit
+exception FailMatch
+exception NotCovered of pattern
 
 let type_meta : (typ, pattern list) Hashtbl.t = Hashtbl.create 100
 
@@ -43,7 +42,7 @@ let rec check_coverage (case : pattern) (patterns : pattern list) : unit =
      | CanSplit ->
        let cases = split case in
        List.iter (fun c -> check_coverage c patterns) cases)
-  | [] -> raise @@ NotCover case
+  | [] -> raise @@ NotCovered case
 
 and cover (case : pattern) (pattern : pattern) : unit =
   match case, pattern with
@@ -67,6 +66,6 @@ let%expect_test "" =
        ; Spine { constructor = "suc"; spine = [ Var ("m1", Nat) ] }
        ]
    with
-   | NotCover case -> Printf.printf "`%s` is not covered\n" ([%show: pattern] case));
+   | NotCovered case -> Printf.printf "`%s` is not covered\n" ([%show: pattern] case));
   [%expect {| split m |}]
 ;;
