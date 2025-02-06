@@ -20,6 +20,6 @@
  (synopsis "pattern coverage algorithm")
  (description
   "A pattern coverage algorithm, that do not handle dependent cases and only work for single case")
- (depends ocaml)
+ (depends ocaml ppxlib ppx_deriving ppx_expect)
  (allow_empty)
  (tags ("pattern matching")))
